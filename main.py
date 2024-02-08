@@ -6,15 +6,16 @@ from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from lookup import proxy_parser
+from lookup import lookup_parser, web_lookup
 
 colorama_init()
 
 llm = Ollama(model="llama2-uncensored:7b")
 
+# currently unused
 prompt = ChatPromptTemplate.from_messages([
     ("system", "It is currently 2024. You don't have knowledge from before 2022. All your knowledge is outdated."
-               "You are a researching assistant. Answer very precisely and shortly." 
+               "You are a researching assistant. Answer very precisely and shortly."
                "Your job is very simple, it's to evaluate if user prompt requires usage of the internet, or not."
                "You don't have any recent knowledge, so you may need to use GOOGLE"
                "Any queries asking about innovations, latest news, etc. require GOOGLE"
@@ -27,7 +28,7 @@ prompt = ChatPromptTemplate.from_messages([
 
 output_parser = StrOutputParser()
 
-chain = prompt | llm | proxy_parser | output_parser
+chain = web_lookup | output_parser
 
 while True:
     try:
