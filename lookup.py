@@ -10,14 +10,25 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.document_loaders import WebBaseLoader
 
+import tiktoken
+
 from googlesearch import search
 
 model = "llama2-uncensored:7b"
 model_base_name = model.split(':')[0]
+token_limit = 2048
 llm = Ollama(model=model)
 embeddings = OllamaEmbeddings(model=model)
 db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=model_base_name)
+encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
+
+
+def _extract_from_quote(text: str):
+    if '"' in text:
+        return text.split('"')[1]
+    else:
+        return text
 
 
 def _rag_chain_function(prompt_text: str):
@@ -25,9 +36,11 @@ def _rag_chain_function(prompt_text: str):
 
 
 def _web_query_google_lookup(prompt_text: str):
+    prompt_text = _extract_from_quote(prompt_text) # my current llm returns its answer in this format: answer: "prompt"
+
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", prompt_text)
 
-    url_list = list(search(prompt_text, stop=20, lang='en', safe='off'))
+    url_list = list(search(prompt_text, stop=5, lang='en', safe='off'))
 
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
 
@@ -43,10 +56,20 @@ def _web_query_google_lookup(prompt_text: str):
     embedding_vector = embeddings.embed_query(prompt_text)
     docs_and_scores = db.similarity_search_by_vector(embedding_vector)
 
-    print(f"{Fore.CYAN}{Style.BRIGHT}Top search results:{Style.RESET_ALL}", docs_and_scores)
+    print(f"{Fore.CYAN}Database search completed.{Fore.RESET}")
 
-    return docs_and_scores[0].page_content  # returning the best scoring document.
+    context_text = ""
+    token_count = 0
+    document_index = 0
+    while token_count < token_limit:
+        token_count += len(encoder.encode(docs_and_scores[document_index].page_content))
+        context_text += docs_and_scores[document_index].page_content
+        document_index += 1
+        if document_index >= len(docs_and_scores):
+            return context_text
 
+    # returning top 3 best results, todo: append to this list based on token limit and check for edge cases.
+    return context_text
 
 def _web_chain_function(prompt_dict: dict):
     web_query_prompt = ChatPromptTemplate.from_messages([
@@ -61,8 +84,8 @@ def _web_chain_function(prompt_dict: dict):
     ])
     web_interpret_prompt = ChatPromptTemplate.from_messages([
         ("system",
-         "You are a search results interpreter. Summarize the provided input focusing on the most important parts."
-         "Your job is to summarize the search results you were given."),
+         "You are a search results interpreter. Expand the provided input focusing on the most important parts."
+         "Your job is to convert all the search results you were given into a long, comprehensive and clean output."),
         ("user", "Search results: "
                  "```"
                  "{input}"

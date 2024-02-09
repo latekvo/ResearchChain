@@ -6,13 +6,13 @@ from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from lookup import lookup_parser, web_lookup
+from lookup import web_lookup
 
 colorama_init()
 
 llm = Ollama(model="llama2-uncensored:7b")
 
-# currently unused
+# currently unused - will be reused for an infinite research loop
 prompt = ChatPromptTemplate.from_messages([
     ("system", "It is currently 2024. You don't have knowledge from before 2022. All your knowledge is outdated."
                "You are a researching assistant. Answer very precisely and shortly."
