@@ -84,4 +84,3 @@ dependencies:
       - beautifulsoup4==4.12.3
       - google==3.0.0
       - soupsieve==2.5
-prefix: /home/armado/.conda/envs/ResearchChain

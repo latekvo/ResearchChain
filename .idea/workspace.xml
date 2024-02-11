@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model.">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/environment.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lookup.py" beforeDir="false" afterPath="$PROJECT_DIR$/lookup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions.">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +21,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -117,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707662112151</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions.">
+      <option name="closed" value="true" />
+      <created>1707668807067</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1707668807067</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -126,6 +133,7 @@
     <MESSAGE value="- google search chat chain is fully functional, all search results are split up, converted into embeddings and uploaded into the vector database.&#10;- vector search results are now stored permanently.&#10;- simplified main chat chain to always perform a google search&#10;- other project related files were added / modified" />
     <MESSAGE value="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes." />
     <MESSAGE value="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model." />
-    <option name="LAST_COMMIT_MESSAGE" value="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model." />
+    <MESSAGE value="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions." />
+    <option name="LAST_COMMIT_MESSAGE" value="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions." />
   </component>
 </project>
