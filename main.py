@@ -6,11 +6,11 @@ from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from lookup import web_lookup
+from lookup import web_lookup, model_name
 
 colorama_init()
 
-llm = Ollama(model="llama2-uncensored:7b")
+llm = Ollama(model=model_name)
 
 # currently unused - will be reused for an infinite research loop
 prompt = ChatPromptTemplate.from_messages([

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="- google search chat chain is fully functional, all search results are split up, converted into embeddings and uploaded into the vector database.&#10;- vector search results are now stored permanently.&#10;- simplified main chat chain to always perform a google search&#10;- other project related files were added / modified">
+    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lookup.py" beforeDir="false" afterPath="$PROJECT_DIR$/lookup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -99,13 +99,22 @@
       <option name="project" value="LOCAL" />
       <updated>1707424603728</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes.">
+      <option name="closed" value="true" />
+      <created>1707477959141</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1707477959141</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="- add initial code and .idea project files" />
     <MESSAGE value="- created lookup.py, which has chains for evaluating and acting on GOOGLE requests. It comes with agents ready to interact with the google api.&#10;- engineered prompts for every available role: user_in, google_in, google_out&#10;- expanded output system to use user-friendly colors, and stream the responses." />
     <MESSAGE value="- google search chat chain is fully functional, all search results are split up, converted into embeddings and uploaded into the vector database.&#10;- vector search results are now stored permanently.&#10;- simplified main chat chain to always perform a google search&#10;- other project related files were added / modified" />
-    <option name="LAST_COMMIT_MESSAGE" value="- google search chat chain is fully functional, all search results are split up, converted into embeddings and uploaded into the vector database.&#10;- vector search results are now stored permanently.&#10;- simplified main chat chain to always perform a google search&#10;- other project related files were added / modified" />
+    <MESSAGE value="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes." />
   </component>
 </project>

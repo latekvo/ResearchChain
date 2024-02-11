@@ -10,18 +10,25 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.document_loaders import WebBaseLoader
 
+from os.path import exists
+
 import tiktoken
 
 from googlesearch import search
 
-model = "llama2-uncensored:7b"
-model_base_name = model.split(':')[0]
+model_name = "zephyr:7b-beta-q5_K_M"  # "llama2-uncensored:7b"
+model_base_name = model_name.split(':')[0]
 token_limit = 2048
-llm = Ollama(model=model)
-embeddings = OllamaEmbeddings(model=model)
-db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=model_base_name)
+llm = Ollama(model=model_name)
+embeddings = OllamaEmbeddings(model=model_name)
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
+
+if not exists('store/' + model_base_name + '.faiss'):
+    tmp_db = FAISS.from_texts(['You are a large language model, intended for research purposes.'], embeddings)
+    tmp_db.save_local(folder_path='store', index_name=model_base_name)
+
+db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=model_base_name)
 
 
 def _extract_from_quote(text: str):
@@ -36,7 +43,7 @@ def _rag_chain_function(prompt_text: str):
 
 
 def _web_query_google_lookup(prompt_text: str):
-    prompt_text = _extract_from_quote(prompt_text) # my current llm returns its answer in this format: answer: "prompt"
+    prompt_text = _extract_from_quote(prompt_text)  # my current llm returns its answer in this format: answer: "prompt"
 
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", prompt_text)
 
@@ -71,6 +78,7 @@ def _web_query_google_lookup(prompt_text: str):
     # returning top 3 best results, todo: append to this list based on token limit and check for edge cases.
     return context_text
 
+
 def _web_chain_function(prompt_dict: dict):
     web_query_prompt = ChatPromptTemplate.from_messages([
         ("system", "You are web prompt creator"
@@ -93,10 +101,10 @@ def _web_chain_function(prompt_dict: dict):
     ])
 
     chain = (
-        {"input": web_query_prompt | llm | RunnableLambda(_web_query_google_lookup)} |
-        web_interpret_prompt |
-        llm |
-        output_parser
+            {"input": web_query_prompt | llm | RunnableLambda(_web_query_google_lookup)} |
+            web_interpret_prompt |
+            llm |
+            output_parser
     )
 
     return chain.invoke(prompt_dict)
