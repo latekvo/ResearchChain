@@ -18,7 +18,7 @@ from googlesearch import search
 
 model_name = "zephyr:7b-beta-q5_K_M"  # "llama2-uncensored:7b"
 model_base_name = model_name.split(':')[0]
-token_limit = 2048
+token_limit = 4096  # depending on VRAM, try 2048, 3072 or 4096. 2048 works great on 4GB VRAM
 llm = Ollama(model=model_name)
 embeddings = OllamaEmbeddings(model=model_name)
 encoder = tiktoken.get_encoding("cl100k_base")

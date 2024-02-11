@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes.">
+    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model.">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/environment.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lookup.py" beforeDir="false" afterPath="$PROJECT_DIR$/lookup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -107,7 +109,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707477959141</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model.">
+      <option name="closed" value="true" />
+      <created>1707662112150</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1707662112151</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -115,6 +125,7 @@
     <MESSAGE value="- created lookup.py, which has chains for evaluating and acting on GOOGLE requests. It comes with agents ready to interact with the google api.&#10;- engineered prompts for every available role: user_in, google_in, google_out&#10;- expanded output system to use user-friendly colors, and stream the responses." />
     <MESSAGE value="- google search chat chain is fully functional, all search results are split up, converted into embeddings and uploaded into the vector database.&#10;- vector search results are now stored permanently.&#10;- simplified main chat chain to always perform a google search&#10;- other project related files were added / modified" />
     <MESSAGE value="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes." />
-    <option name="LAST_COMMIT_MESSAGE" value="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes." />
+    <MESSAGE value="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model." />
+    <option name="LAST_COMMIT_MESSAGE" value="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model." />
   </component>
 </project>

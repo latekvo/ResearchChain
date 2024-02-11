@@ -30,11 +30,10 @@ output_parser = StrOutputParser()
 
 chain = web_lookup | output_parser
 
-while True:
-    try:
-        input_text = input(f"{Fore.GREEN}{Style.BRIGHT}(user){Fore.RESET}{Style.RESET_ALL} ")
-        for output_chunk in chain.stream({"input": input_text}):
-            print(output_chunk, end="", flush=True)
-        print(end='\n')
-    except ConnectionError:
-        print(f"{Fore.RED}{Style.BRIGHT}Connection error, make sure Ollama server is running...{Fore.RESET}{Style.RESET_ALL}")
+try:
+    input_text = input(f"{Fore.GREEN}{Style.BRIGHT}(user){Fore.RESET}{Style.RESET_ALL} ")
+    for output_chunk in chain.stream({"input": input_text}):
+        print(output_chunk, end="", flush=True)
+    print(end='\n')
+except ConnectionError:
+    print(f"{Fore.RED}{Style.BRIGHT}Connection error, make sure Ollama server is running...{Fore.RESET}{Style.RESET_ALL}")
