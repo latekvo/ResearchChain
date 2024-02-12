@@ -75,36 +75,46 @@ def _web_query_google_lookup(prompt_text: str):
         if document_index >= len(docs_and_scores):
             return context_text
 
-    # returning top 3 best results, todo: append to this list based on token limit and check for edge cases.
+    # returning top 3 best results
     return context_text
 
 
 def _web_chain_function(prompt_dict: dict):
+
     web_query_prompt = ChatPromptTemplate.from_messages([
         ("system", "You are web prompt creator"
                    "Your job is to convert the given input into a very short, concise google search prompt."
                    "The prompt should contain as many keywords describing the prompt as possible."
                    "Do not reply with anything else beside the google prompt."
                    "Do not encase the google search prompt into anything, just output it."
-                   "Make sure the google search prompt describes the input, but is not too large."
+                   "Make sure the google search prompt describes the input with keywords, but is not too large."
                    "DO NOT INCLUDE ANY TEXT BESIDES THE SEARCH PROMPT!"),
         ("user", "{input}")
     ])
+
     web_interpret_prompt = ChatPromptTemplate.from_messages([
         ("system",
          "You are a search results interpreter. Expand the provided input focusing on the most important parts."
-         "Your job is to convert all the search results you were given into a long, comprehensive and clean output."),
-        ("user", "Search results: "
+         "Your job is to convert all the search results you were given into a long, comprehensive and clean output."
+         "Use provided search results data to answer the user request to the best of your ability."),
+        ("user", "Search results data: "
                  "```"
-                 "{input}"
-                 "```")
+                 "{search_data}"
+                 "```"
+                 "User request: \"{user_request}\"")
     ])
 
+    def get_user_prompt(_: dict):
+        return prompt_dict['input']
+
     chain = (
-            {"input": web_query_prompt | llm | RunnableLambda(_web_query_google_lookup)} |
-            web_interpret_prompt |
-            llm |
-            output_parser
+        {
+            "search_data": web_query_prompt | llm | RunnableLambda(_web_query_google_lookup),
+            "user_request": RunnableLambda(get_user_prompt)  # this has to be a RunnableLambda, it cannot be a string
+        } |
+        web_interpret_prompt |
+        llm |
+        output_parser
     )
 
     return chain.invoke(prompt_dict)

@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions.">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="- minor fix to the conda env&#10;- sync before testing on separate machines.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,7 +124,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707668807067</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="- minor fix to the conda env&#10;- sync before testing on separate machines.">
+      <option name="closed" value="true" />
+      <created>1707669788213</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1707669788213</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -134,6 +142,7 @@
     <MESSAGE value="- extended the final summarization step to take in as many articles as our model is capable of handling.&#10;- improved search function by further isolating search prompt provided by the llm.&#10;- other minor changes." />
     <MESSAGE value="Urgent fix and improvement.&#10;- The vector database is now automatically created without human interaction.&#10;- switched the default model to a much better zephyr model (5GB), which produces embeddings around 3x faster than the previous model." />
     <MESSAGE value="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions." />
-    <option name="LAST_COMMIT_MESSAGE" value="- add conda config&#10;- add gitignore&#10;- remove user interaction loop (context problems)&#10;- add README with install instructions." />
+    <MESSAGE value="- minor fix to the conda env&#10;- sync before testing on separate machines." />
+    <option name="LAST_COMMIT_MESSAGE" value="- minor fix to the conda env&#10;- sync before testing on separate machines." />
   </component>
 </project>

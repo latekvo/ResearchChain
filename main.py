@@ -12,20 +12,6 @@ colorama_init()
 
 llm = Ollama(model=model_name)
 
-# currently unused - will be reused for an infinite research loop
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "It is currently 2024. You don't have knowledge from before 2022. All your knowledge is outdated."
-               "You are a researching assistant. Answer very precisely and shortly."
-               "Your job is very simple, it's to evaluate if user prompt requires usage of the internet, or not."
-               "You don't have any recent knowledge, so you may need to use GOOGLE"
-               "Any queries asking about innovations, latest news, etc. require GOOGLE"
-               "If the user asks about some specific product or event, that requires GOOGLE, so respond with 'GOOGLE'"
-               "If query requires google, respond with only a single word: 'GOOGLE'."
-               "If query requires web access, do not type ANYTHING besides only the word 'GOOGLE'."
-               "Otherwise, reply with an answer."),
-    ("user", "{input}")
-])
-
 output_parser = StrOutputParser()
 
 chain = web_lookup | output_parser
