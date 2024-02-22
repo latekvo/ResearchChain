@@ -3,14 +3,13 @@ from colorama import Fore
 from colorama import Style
 
 from langchain_community.llms import Ollama
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from lookup import web_lookup, model_name
 
 colorama_init()
 
-llm = Ollama(model=model_name)
+llm = Ollama(model=model_name)  # this is not necessary, but without this line the code does not work
 
 output_parser = StrOutputParser()
 

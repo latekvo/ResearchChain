@@ -14,10 +14,11 @@ from os.path import exists
 
 import tiktoken
 
+# todo: replace with puppeteer, this one gets blocked occasionally
 from googlesearch import search
 
 model_name = "zephyr:7b-beta-q5_K_M"  # "llama2-uncensored:7b"
-model_base_name = model_name.split(':')[0]
+model_base_name = '_'.join('_'.join(model_name.split(':')).split('-'))
 token_limit = 4096  # depending on VRAM, try 2048, 3072 or 4096. 2048 works great on 4GB VRAM
 llm = Ollama(model=model_name)
 embeddings = OllamaEmbeddings(model=model_name)
