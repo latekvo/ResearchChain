@@ -55,7 +55,7 @@ def _web_query_google_lookup(prompt_text: str):
     # download and embed all of the documents
     for url in url_list:
         documents = WebBaseLoader(url).load_and_split(RecursiveCharacterTextSplitter())
-        db.add_documents(documents)
+        db.add_documents(documents, embeddings=embeddings)
     db.save_local(folder_path='store', index_name=model_base_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
