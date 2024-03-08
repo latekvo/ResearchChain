@@ -29,7 +29,11 @@ if not exists('store/' + model_base_name + '.faiss'):
     tmp_db = FAISS.from_texts(['You are a large language model, intended for research purposes.'], embeddings)
     tmp_db.save_local(folder_path='store', index_name=model_base_name)
 
-db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=model_base_name)
+db = FAISS.load_local(
+    folder_path='store',
+    embeddings=embeddings,
+    index_name=model_base_name,
+    allow_dangerous_deserialization=True)
 
 
 def _extract_from_quote(text: str):
