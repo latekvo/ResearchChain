@@ -1,5 +1,3 @@
-from typing import Literal
-
 from colorama import Fore
 from colorama import Style
 
