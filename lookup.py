@@ -1,3 +1,5 @@
+from typing import Literal
+
 from colorama import Fore
 from colorama import Style
 
@@ -17,19 +19,28 @@ import tiktoken
 # todo: replace with puppeteer, this one gets blocked occasionally
 from googlesearch import search
 
+
+def purify_name(name):
+    return '_'.join('_'.join(name.split(':')).split('-'))
+
+
 model_name = "zephyr:7b-beta-q5_K_M"  # "llama2-uncensored:7b"
-model_base_name = '_'.join('_'.join(model_name.split(':')).split('-'))
+model_safe_name = purify_name(model_name)
 token_limit = 4096  # depending on VRAM, try 2048, 3072 or 4096. 2048 works great on 4GB VRAM
 llm = Ollama(model=model_name)
+
+embedding_model_name = "nomic-embed-text"
+embedding_model_safe_name = purify_name(embedding_model_name)
 embeddings = OllamaEmbeddings(model=model_name)
+
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
 
-if not exists('store/' + model_base_name + '.faiss'):
+if not exists('store/' + embedding_model_safe_name + '.faiss'):
     tmp_db = FAISS.from_texts(['You are a large language model, intended for research purposes.'], embeddings)
-    tmp_db.save_local(folder_path='store', index_name=model_base_name)
+    tmp_db.save_local(folder_path='store', index_name=embedding_model_safe_name)
 
-db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=model_base_name)
+db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=embedding_model_safe_name)
 
 
 def _extract_from_quote(text: str):
@@ -43,12 +54,30 @@ def _rag_chain_function(prompt_text: str):
     return prompt_text
 
 
-def _web_query_google_lookup(prompt_text: str):
-    prompt_text = _extract_from_quote(prompt_text)  # my current llm returns its answer in this format: answer: "prompt"
+def _web_query_google_lookup(prompt_text: str, search_type: Literal['info', 'wiki', 'news', 'docs'] = 'news'):
+    # defaults - for info
+    extra_params = None
+    tbs = 0
+    pre_prompt = None
 
-    print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", prompt_text)
+    if search_type == 'wiki':
+        pre_prompt = 'wikipedia'
+    elif search_type == 'news':
+        extra_params = {
+            'tbm': 'nws',  # news only
+        }
+        tbs = 'qdr:m'  # last month only
+    elif search_type == 'docs':
+        pre_prompt = 'documentation '
 
-    url_list = list(search(prompt_text, stop=5, lang='en', safe='off'))
+    prompt_text = f"{pre_prompt}{_extract_from_quote(prompt_text)}"
+
+    print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", f"{pre_prompt}{prompt_text}")
+
+    url_list = list(
+        search(
+            query=f"{pre_prompt}{prompt_text}",
+            stop=5, lang='en', safe='off', tbs=tbs, extra_params=extra_params))
 
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
 
@@ -56,7 +85,7 @@ def _web_query_google_lookup(prompt_text: str):
     for url in url_list:
         documents = WebBaseLoader(url).load_and_split(RecursiveCharacterTextSplitter())
         db.add_documents(documents, embeddings=embeddings)
-    db.save_local(folder_path='store', index_name=model_base_name)
+    db.save_local(folder_path='store', index_name=embedding_model_safe_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
@@ -81,28 +110,19 @@ def _web_query_google_lookup(prompt_text: str):
 
 
 def _web_chain_function(prompt_dict: dict):
-
-    web_query_prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are web prompt creator"
-                   "Your job is to convert the given input into a very short, concise google search prompt."
-                   "The prompt should contain as many keywords describing the prompt as possible."
-                   "Do not reply with anything else beside the google prompt."
-                   "Do not encase the google search prompt into anything, just output it."
-                   "Make sure the google search prompt describes the input with keywords, but is not too large."
-                   "DO NOT INCLUDE ANY TEXT BESIDES THE SEARCH PROMPT!"),
-        ("user", "{input}")
-    ])
-
+    # TODO: news searches should strictly search for news fresher than 1 month / 1 week
+    # TODO: news crawling should be done through only sites like medium, which are much more dense than google
+    # TODO: create a different function + prompt for documentation / facts searching, and make this one news focused
     web_interpret_prompt = ChatPromptTemplate.from_messages([
         ("system",
-         "You are a search results interpreter. Expand the provided input focusing on the most important parts."
+         "You are a search results interpreter. Your job is to write an article based on the provided context."
          "Your job is to convert all the search results you were given into a long, comprehensive and clean output."
          "Use provided search results data to answer the user request to the best of your ability."),
         ("user", "Search results data: "
                  "```"
                  "{search_data}"
                  "```"
-                 "User request: \"{user_request}\"")
+                 "User request: \"Write an article on: {user_request}\"")
     ])
 
     def get_user_prompt(_: dict):
