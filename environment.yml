@@ -1,4 +1,4 @@
-name: ResearchChain
+name: NewsSumoriser
 channels:
   - conda-forge
   - defaults
