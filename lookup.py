@@ -24,6 +24,18 @@ from googlesearch import search
 def purify_name(name):
     return '_'.join('_'.join(name.split(':')).split('-'))
 
+def is_text_junk(text: str):
+    # checks if text contains any of junky keywords eg: privacy policy, subscribe, cookies etc.
+    # do not expand this list, it has to be small to be efficient, and these words are grouped either way.
+    trigger_list = [
+        'sign in', 'privacy policy', 'skip to', 'newsletter', 'subscribe', 'related tags', 'share price'
+    ]
+    low_text = text.lower()
+    for trigger in trigger_list:
+        if trigger in low_text:
+            return True
+    return False
+
 
 model_name = "mixtral:8x7b-instruct-v0.1-q5_K_M"  # "llama2-uncensored:7b"
 model_safe_name = purify_name(model_name)
@@ -33,7 +45,12 @@ llm = Ollama(model=model_name)
 embedding_model_name = "nomic-embed-text"
 embedding_model_safe_name = purify_name(embedding_model_name)
 embeddings = OllamaEmbeddings(model=model_name)
-
+embeddings_chunk_size = 200  # it is not recommended to play with this value, but if anything, make it smaller
+embeddings_article_limit = 10  # adjust 5 - 100 depending on how fast 'database vectorization' runs
+embeddings_buffer_stops = ["\n\n\n", "\n\n", "\n"]  # for additional speed, but less cohesion: remove ", "
+# ^ buffer - RecursiveCharacterTextSplitter creates a buffer traversing the web page,
+#            moving left to right stopping at every buffer stop
+# ^ this functionality appears to be bugged, as in the documentation it's described to work differently.
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
 
@@ -55,37 +72,58 @@ def _rag_chain_function(prompt_text: str):
     return prompt_text
 
 
-def _web_query_google_lookup(prompt_text: str, search_type: Literal['info', 'wiki', 'news', 'docs'] = 'news'):
+def _web_query_google_lookup(prompt_text: str):
+    # defaults - for info
+ # we don't use weeks here because they are not so characteristic for the embed space
+    current_date = datetime.date.today()
+    current_year = current_date.year
+    current_month_year = current_date.strftime("%B %Y")
+
     # defaults - for info
     extra_params = None
     tbs = 0
-    pre_prompt = None
+    prompt_core = _extract_from_quote(prompt_text)
+    prompt_text = prompt_core
+    embed_query = prompt_core  # query to search by
+    embedding_prefix = ''  # prefixed to each article saved to faiss db
 
-    if search_type == 'wiki':
-        pre_prompt = 'wikipedia'
-    elif search_type == 'news':
-        extra_params = {
-            'tbm': 'nws',  # news only
-        }
-        tbs = 'qdr:w'  # last week only
-    elif search_type == 'docs':
-        pre_prompt = 'documentation '
 
-    prompt_text = f"{pre_prompt}{_extract_from_quote(prompt_text)}"
+    # this prompt works surprisingly well for Google News searches
+    prompt_text = f"{prompt_core}"
+    extra_params = {
+        'tbm': 'nws',  # news only
+    }
+    tbs = 'qdr:m'  # last month only
+    # anything that will be embedded as something new and from this date, will be a partial paraphrase of this text
+    embed_query = f"{current_month_year} news on {prompt_core}"
+    embedding_prefix = f"date: {current_month_year}, text: "
 
-    print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", f"{pre_prompt}{prompt_text}")
+
+    print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", f"{prompt_text}")
 
     url_list = list(
         search(
-            query=f"{pre_prompt}{prompt_text}",
-            stop=30, lang='en', safe='off', tbs=tbs, extra_params=extra_params))
+            query=f"{prompt_text}",
+            stop=embeddings_article_limit, lang='en', safe='off', tbs=tbs, extra_params=extra_params))
 
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
 
     # download and embed all of the documents
+    # todo: have a separate DB for each topic of the news queries
     for url in url_list:
-        documents = WebBaseLoader(url).load_and_split(RecursiveCharacterTextSplitter())
-        db.add_documents(documents, embeddings=embeddings)
+        # chunk size is character count, while simple facts may be 100 characters long, descriptions tend to be 200+
+        # nomic supports 256 long chunks, our longest prefix takes 27 characters, generally when i tested this
+        # chunks only 100 long were way out of context, could not provide much info.
+        documents = WebBaseLoader(url).load_and_split(RecursiveCharacterTextSplitter(
+            separators=embeddings_buffer_stops,
+            chunk_size=200,
+            chunk_overlap=0))
+        for document in documents:
+            if is_text_junk(document.page_content):
+                documents.remove(document)
+            document.page_content = embedding_prefix + document.page_content
+        db.add_documents(documents=documents, embeddings=embeddings)
+    print(f"{Fore.CYAN}  Save local.{Fore.RESET}")
     db.save_local(folder_path='store', index_name=embedding_model_safe_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
@@ -96,6 +134,8 @@ def _web_query_google_lookup(prompt_text: str, search_type: Literal['info', 'wik
 
     print(f"{Fore.CYAN}Database search completed.{Fore.RESET}")
 
+    # TODO: investigate tiny context - only around 96 tokens / 5 documents.
+
     context_text = ""
     token_count = 0
     document_index = 0
@@ -104,6 +144,7 @@ def _web_query_google_lookup(prompt_text: str, search_type: Literal['info', 'wik
         context_text += docs_and_scores[document_index].page_content
         document_index += 1
         if document_index >= len(docs_and_scores):
+            print(f"{Fore.CYAN}Used {document_index+1} docs, a total of {token_count} tokens as context.{Fore.RESET}")
             return context_text
 
     # returning top 3 best results

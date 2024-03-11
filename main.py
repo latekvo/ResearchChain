@@ -22,7 +22,7 @@ chain = web_lookup | output_parser
 # Please find significant events from the past 7 days, emphasizing natural disasters, geopolitical updates, and technological advancements curent date: { str(date)
 
 try:
-    Topic = input(f"{Fore.GREEN}{Style.BRIGHT}(Imsert Topic){Fore.RESET}{Style.RESET_ALL} ")
+    Topic = input(f"{Fore.GREEN}{Style.BRIGHT}(Insert Topic){Fore.RESET}{Style.RESET_ALL} ")
     input_text = f"The Latest {Topic} News: A Comprehensive Overview"
     for output_chunk in chain.stream({"input": input_text}):
         print(output_chunk, end="", flush=True)
