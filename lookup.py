@@ -44,7 +44,7 @@ llm = Ollama(model=model_name)
 
 embedding_model_name = "nomic-embed-text"
 embedding_model_safe_name = purify_name(embedding_model_name)
-embeddings = OllamaEmbeddings(model=model_name)
+embeddings = OllamaEmbeddings(model=embedding_model_name)
 embeddings_chunk_size = 200  # it is not recommended to play with this value, but if anything, make it smaller
 embeddings_article_limit = 10  # adjust 5 - 100 depending on how fast 'database vectorization' runs
 embeddings_buffer_stops = ["\n\n\n", "\n\n", "\n"]  # for additional speed, but less cohesion: remove ", "
@@ -58,7 +58,10 @@ if not exists('store/' + embedding_model_safe_name + '.faiss'):
     tmp_db = FAISS.from_texts(['You are a large language model, intended for research purposes.'], embeddings)
     tmp_db.save_local(folder_path='store', index_name=embedding_model_safe_name)
 
-db = FAISS.load_local(folder_path='store', embeddings=embeddings, index_name=embedding_model_safe_name)
+db = FAISS.load_local(folder_path='store',
+                      embeddings=embeddings,
+                      index_name=embedding_model_safe_name,
+                      allow_dangerous_deserialization=True)
 
 
 def _extract_from_quote(text: str):
@@ -103,7 +106,7 @@ def _web_query_google_lookup(prompt_text: str):
 
     url_list = list(
         search(
-            query=f"{prompt_text}",
+            query=prompt_text,
             stop=embeddings_article_limit, lang='en', safe='off', tbs=tbs, extra_params=extra_params))
 
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
