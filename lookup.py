@@ -77,7 +77,7 @@ def _rag_chain_function(prompt_text: str):
 
 def _web_query_google_lookup(prompt_text: str):
     # defaults - for info
- # we don't use weeks here because they are not so characteristic for the embed space
+    # we don't use weeks here because they are not so characteristic for the embed space
     current_date = datetime.date.today()
     current_year = current_date.year
     current_month_year = current_date.strftime("%B %Y")
