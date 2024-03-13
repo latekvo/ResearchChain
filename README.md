@@ -18,4 +18,4 @@ A recursive tree structure granting Research Chain the ability
 to create large hierarchical structures of LLMs and the tools they are using 
 #### Research Loop
 A service launching for a set period of time, and then allowing the user to summarize
-either the entire output of the tree, or a small, selected subset of this it's structure.
+either the entire output of the tree, or a small, selected subset of it's structure.
