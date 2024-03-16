@@ -4,9 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="fixed critical bug occurring with over 9 embedded document generations">
+    <list default="true" id="8bebbc4b-fe93-435e-a6fe-40a4a2c00ba3" name="Changes" comment="Code refactor and 100x embed speedup.&#10;- [MAJOR] fixed wrong model being used for embeddings - ~100x embedding speed improvement, embeddings are much higher quality as well&#10;- separated almost all functionalities into standalone functions&#10;- added multiple other utilities&#10;- cleanup&#10;- other minor adjustments">
+      <change afterPath="$PROJECT_DIR$/core/chainables/lookup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/models/base_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/models/embeddings.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/tools/dbops.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/tools/query.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/tools/rag.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/tools/scraper.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/tools/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lookup.py" beforeDir="false" afterPath="$PROJECT_DIR$/lookup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lookup.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/lookup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/scheduler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,22 +46,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/armado/dev/ai/ResearchChain&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.main.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/armado/dev/ai/ResearchChain",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/core" />
+      <recent name="$PROJECT_DIR$/tools" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="ResearchChain" />
@@ -65,7 +76,6 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -76,13 +86,6 @@
       <method v="2" />
     </configuration>
   </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-python-sdk-d68999036c7f-b11f5e8da5ad-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.14475.56" />
-      </set>
-    </attachedChunks>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -91,10 +94,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1707256280279</updated>
-      <workItem from="1709906845465" duration="106000" />
-      <workItem from="1709908204419" duration="144000" />
-      <workItem from="1709908464388" duration="425000" />
-      <workItem from="1709921178011" duration="1549000" />
     </task>
     <task id="LOCAL-00001" summary="- add initial code and .idea project files">
       <option name="closed" value="true" />
@@ -168,11 +167,48 @@
       <option name="project" value="LOCAL" />
       <updated>1708668095368</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="project expansion groundwork&#10;- added scheduler module&#10;- general architecture plans&#10;- simplified web_lookup function">
+      <option name="closed" value="true" />
+      <created>1709859806512</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1709859806512</updated>
+    </task>
+    <task id="LOCAL-00011" summary="- updated embeddings generator to a dedicated model&#10;- added news, info, wiki and docs searches to the search function&#10;- cleanup">
+      <option name="closed" value="true" />
+      <created>1710087030147</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1710087030147</updated>
+    </task>
+    <task id="LOCAL-00012" summary="- fixed merge error">
+      <option name="closed" value="true" />
+      <created>1710087361886</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1710087361886</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Major improvements to embeddings&#10;- added junk text detection&#10;- improved project configuration&#10;- added timestamps to all embeds&#10;- chunks are now bigger and split better&#10;- google search now returns much better responses&#10;- fixed summarize system prompt&#10;- expanded README.md">
+      <option name="closed" value="true" />
+      <created>1710120256773</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1710120256773</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Code refactor and 100x embed speedup.&#10;- [MAJOR] fixed wrong model being used for embeddings - ~100x embedding speed improvement, embeddings are much higher quality as well&#10;- separated almost all functionalities into standalone functions&#10;- added multiple other utilities&#10;- cleanup&#10;- other minor adjustments">
+      <option name="closed" value="true" />
+      <created>1710291708391</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1710291708391</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -195,9 +231,12 @@
     <MESSAGE value="- minor fix to the conda env&#10;- sync before testing on separate machines." />
     <MESSAGE value="different versions of the same model can now be used (faiss db interaction fixed)" />
     <MESSAGE value="fixed critical bug occurring with over 9 embedded document generations" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed critical bug occurring with over 9 embedded document generations" />
-  </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ResearchChain$main.coverage" NAME="main Coverage Results" MODIFIED="1709923216249" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <MESSAGE value="project expansion groundwork&#10;- added scheduler module&#10;- general architecture plans&#10;- simplified web_lookup function" />
+    <MESSAGE value="- updated embeddings generator to a dedicated model&#10;- added news, info, wiki and docs searches to the search function&#10;- cleanup" />
+    <MESSAGE value="- fixed merge error" />
+    <MESSAGE value="Major improvements to embeddings&#10;- added junk text detection&#10;- improved project configuration&#10;- added timestamps to all embeds&#10;- chunks are now bigger and split better&#10;- google search now returns much better responses&#10;- fixed summarize system prompt&#10;- expanded README.md" />
+    <MESSAGE value="Major improvements to context generation&#10;- fixed empty-context bug&#10;- improved article embedding for news&#10;- improved text splitting algorithm&#10;- temporarily increased verbosity" />
+    <MESSAGE value="Code refactor and 100x embed speedup.&#10;- [MAJOR] fixed wrong model being used for embeddings - ~100x embedding speed improvement, embeddings are much higher quality as well&#10;- separated almost all functionalities into standalone functions&#10;- added multiple other utilities&#10;- cleanup&#10;- other minor adjustments" />
+    <option name="LAST_COMMIT_MESSAGE" value="Code refactor and 100x embed speedup.&#10;- [MAJOR] fixed wrong model being used for embeddings - ~100x embedding speed improvement, embeddings are much higher quality as well&#10;- separated almost all functionalities into standalone functions&#10;- added multiple other utilities&#10;- cleanup&#10;- other minor adjustments" />
   </component>
 </project>

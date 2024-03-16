@@ -5,7 +5,7 @@ from colorama import Style
 from langchain_community.llms import Ollama
 from langchain_core.output_parsers import StrOutputParser
 
-from lookup import web_lookup, model_name
+from core.lookup import web_lookup, model_name
 
 colorama_init()
 
