@@ -4,13 +4,13 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
 
-# todo: replace with puppeteer, this one gets blocked occasionally
+# TODO: replace with puppeteer, this one gets blocked occasionally
 from googlesearch import search
 
-from core.chainables.web import web_news_lookup
+from core.chainables.web import web_docs_lookup
 from core.models.base_model import llm
 from core.tools.dbops import get_db_by_name
-from core.models.embeddings import embedding_model_safe_name, embeddings
+from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, embeddings
 
 
 output_parser = StrOutputParser()
@@ -18,7 +18,7 @@ output_parser = StrOutputParser()
 
 # this general db will be used to save AI responses,
 # might become useful as the responses are better than the input
-results_db = get_db_by_name(embedding_model_safe_name, embeddings)
+results_db = get_db_by_name(EMBEDDING_MODEL_SAFE_NAME, embeddings)
 
 
 def web_chain_function(prompt_dict: dict):
@@ -51,8 +51,9 @@ def web_chain_function(prompt_dict: dict):
 
     chain = (
         {
-            "search_data": RunnableLambda(get_user_prompt) | RunnableLambda(web_news_lookup),
-            "user_request": RunnableLambda(get_user_prompt)  # this has to be a RunnableLambda, it cannot be a string
+            "search_data": RunnableLambda(get_user_prompt) | RunnableLambda(web_docs_lookup),
+            # this has to be a RunnableLambda, it cannot be a string
+            "user_request": RunnableLambda(get_user_prompt)
         } |
         web_interpret_prompt |
         llm |

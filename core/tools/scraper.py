@@ -2,16 +2,15 @@ from typing import List
 
 import requests.exceptions
 import tiktoken
-from colorama import Fore, Style
 from googlesearch import search
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores.faiss import FAISS
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
-
-from core.models.embeddings import embedding_model_safe_name, embeddings_article_limit, embeddings_buffer_stops, \
-    embeddings_chunk_size, embeddings_chunk_overlap, embeddings
+from colorama import Fore, Style
+from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, EMBEDDINGS_ARTICLE_LIMIT, EMBEDDINGS_BUFFER_STOPS, \
+    EMBEDDINGS_CHUNK_SIZE, EMBEDDINGS_CHUNK_OVERLAP, embeddings
 from core.tools.dbops import get_db_by_name
 from core.tools.query import WebQuery
 from core.tools.utils import is_text_junk, remove, timeout_function
@@ -45,7 +44,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
 
     url_list = search(
         query=query.web_query,
-        stop=embeddings_article_limit,
+        stop=EMBEDDINGS_ARTICLE_LIMIT,
         lang='en',
         safe='off',
         tbs=query.web_tbs,
@@ -59,7 +58,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
         # try downloading web content
         try:
             # fixme: certain sites load forever, soft-locking this loop (prompt example: car)
-            document = timeout_function(url_handle.load())
+            document = url_handle.load()
         except requests.exceptions.ConnectionError:
             continue
 
@@ -67,9 +66,9 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
             continue
 
         text_splitter = RecursiveCharacterTextSplitter(
-            separators=embeddings_buffer_stops,
-            chunk_size=embeddings_chunk_size,
-            chunk_overlap=embeddings_chunk_overlap,
+            separators=EMBEDDINGS_BUFFER_STOPS,
+            chunk_size=EMBEDDINGS_CHUNK_SIZE,
+            chunk_overlap=EMBEDDINGS_CHUNK_OVERLAP,
             keep_separator=False,
             strip_whitespace=True)
 
@@ -88,14 +87,14 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
         if len(chunks) != 0:
             database.add_documents(documents=chunks, embeddings=embeddings)
 
-    db_name = embedding_model_safe_name + query.db_save_file_extension
+    db_name = EMBEDDING_MODEL_SAFE_NAME + query.db_save_file_extension
     database.save_local(folder_path='store/vector', index_name=db_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
 def web_query_google_lookup(query: WebQuery, token_limit: int = 2048):
-    db_name = embedding_model_safe_name + query.db_save_file_extension
+    db_name = EMBEDDING_MODEL_SAFE_NAME + query.db_save_file_extension
     db = get_db_by_name(db_name, embeddings)
 
     populate_db_with_google_search(db, query)
