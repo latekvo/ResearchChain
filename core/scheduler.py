@@ -69,7 +69,6 @@ class ThreadObject:
 class ThreadTask:
     priority: int
     item: ThreadObject
-    pass
 
 
 thread_queue: queue.PriorityQueue

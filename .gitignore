@@ -1,5 +1,7 @@
 .idea
+.vscode
 .venv
 .store
+.pylintrc
 store/*
 store/*/*

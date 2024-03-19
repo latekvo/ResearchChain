@@ -43,4 +43,4 @@ class WebQuery:
             self.web_query = 'documentation ' + prompt_core
             # self.db_embedding_prefix = '```'
             # self.db_embedding_postfix = '``` [documentation]'
-            self.db_save_file_extension = f"_docs"
+            self.db_save_file_extension = "_docs"

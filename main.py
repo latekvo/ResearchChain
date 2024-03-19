@@ -1,15 +1,14 @@
 import requests
+from langchain_core.output_parsers import StrOutputParser
+
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
-
-from langchain_core.output_parsers import StrOutputParser
-
 from core.lookup import web_lookup
 
 colorama_init()
 
-# llm = Ollama(model=model_name)  # this is not necessary, but without this line the code does not work
+# llm = Ollama(model=MODEL_NAME) this is not necessary, but without this line the code does not work
 
 output_parser = StrOutputParser()
 
