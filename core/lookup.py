@@ -7,8 +7,8 @@ from langchain_core.runnables import RunnableLambda
 # todo: replace with puppeteer, this one gets blocked occasionally
 from googlesearch import search
 
-from core.chainables.lookup import web_news_lookup
-from core.models.base_model import model_name, llm
+from core.chainables.web import web_news_lookup
+from core.models.base_model import llm
 from core.tools.dbops import get_db_by_name
 from core.models.embeddings import embedding_model_safe_name, embeddings
 

@@ -25,22 +25,22 @@ class WebQuery:
         if query_type == 'wiki':
             self.web_query = 'wikipedia ' + prompt_core
             # if a fact changed, there is a chance the algo will see the update and report it
-            self.db_embedding_prefix = '```'
-            self.db_embedding_postfix = '``` [wikipedia]'
+            # self.db_embedding_prefix = '```'
+            # self.db_embedding_postfix = '``` [wikipedia]'
             self.db_save_file_extension = '_facts'
 
         elif query_type == 'news':
             # this prompt works well for Google News searches
-            self.web_query = f"latest {prompt_core} news comprehensive overview "
+            self.web_query = f"{prompt_core} news comprehensive overview "
             self.web_extra_params = {
                 'tbm': 'nws',  # news only
             }
             self.web_tbs = 'qdr:m'  # last month only
-            self.db_search_query = f"important fragments of {prompt_core}"
+            self.db_search_query = f"{prompt_core} news and innovations"
             self.db_save_file_extension = f"_news_{datetime.date.today().strftime('%Y_%m_%d').lower()}"
 
         elif query_type == 'docs':
             self.web_query = 'documentation ' + prompt_core
-            self.db_embedding_prefix = '```'
-            self.db_embedding_postfix = '``` [documentation]'
+            # self.db_embedding_prefix = '```'
+            # self.db_embedding_postfix = '``` [documentation]'
             self.db_save_file_extension = f"_docs"

@@ -1,5 +1,6 @@
 from typing import List
 
+import requests.exceptions
 import tiktoken
 from colorama import Fore, Style
 from googlesearch import search
@@ -13,7 +14,7 @@ from core.models.embeddings import embedding_model_safe_name, embeddings_article
     embeddings_chunk_size, embeddings_chunk_overlap, embeddings
 from core.tools.dbops import get_db_by_name
 from core.tools.query import WebQuery
-from core.tools.utils import is_text_junk, remove
+from core.tools.utils import is_text_junk, remove, timeout_function
 
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
@@ -42,41 +43,53 @@ def rag_query_lookup(prompt_text: str) -> str:
 def populate_db_with_google_search(database: FAISS, query: WebQuery):
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", query.web_query)
 
-    url_list = list(
-        search(
-            query=query.web_query,
-            stop=embeddings_article_limit,
-            lang='en',
-            safe='off',
-            tbs=query.web_tbs,
-            extra_params=query.web_extra_params))
+    url_list = search(
+        query=query.web_query,
+        stop=embeddings_article_limit,
+        lang='en',
+        safe='off',
+        tbs=query.web_tbs,
+        extra_params=query.web_extra_params)
 
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
 
     for url in url_list:
-        documents = WebBaseLoader(url).load_and_split(RecursiveCharacterTextSplitter(
+        url_handle = WebBaseLoader(url)
+
+        # try downloading web content
+        try:
+            # fixme: certain sites load forever, soft-locking this loop (prompt example: car)
+            document = timeout_function(url_handle.load())
+        except requests.exceptions.ConnectionError:
+            continue
+
+        if document is None:
+            continue
+
+        text_splitter = RecursiveCharacterTextSplitter(
             separators=embeddings_buffer_stops,
             chunk_size=embeddings_chunk_size,
             chunk_overlap=embeddings_chunk_overlap,
             keep_separator=False,
-            strip_whitespace=True))
+            strip_whitespace=True)
 
-        for document in documents:
-            if is_text_junk(document.page_content):
-                documents.remove(document)
-                if len(documents) == 0:
-                    continue
+        chunks = text_splitter.split_documents(document)
 
-            document.page_content = remove(document.page_content, ['\n', '`'])
-            document.page_content = (query.db_embedding_prefix +
-                                     document.page_content +
-                                     query.db_embedding_postfix)
+        for chunk in chunks:
+            if is_text_junk(chunk.page_content):
+                chunks.remove(chunk)
+                continue
 
-        if len(documents) != 0:
-            database.add_documents(documents=documents, embeddings=embeddings)
+            chunk.page_content = remove(chunk.page_content, ['\n', '`'])
+            chunk.page_content = (query.db_embedding_prefix +
+                                  chunk.page_content +
+                                  query.db_embedding_postfix)
+
+        if len(chunks) != 0:
+            database.add_documents(documents=chunks, embeddings=embeddings)
 
     db_name = embedding_model_safe_name + query.db_save_file_extension
-    database.save_local(folder_path='store', index_name=db_name)
+    database.save_local(folder_path='store/vector', index_name=db_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
@@ -94,5 +107,3 @@ def web_query_google_lookup(query: WebQuery, token_limit: int = 2048):
     print(f"{Fore.CYAN}Database search completed.{Fore.RESET}")
 
     return docs_to_context(docs_and_scores, token_limit)
-
-
