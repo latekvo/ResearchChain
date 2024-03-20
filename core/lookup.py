@@ -7,7 +7,7 @@ from langchain_core.runnables import RunnableLambda
 # TODO: replace with puppeteer, this one gets blocked occasionally
 from googlesearch import search
 
-from core.chainables.web import web_docs_lookup
+from core.chainables.web import web_docs_lookup, web_wiki_lookup, web_news_lookup
 from core.models.base_model import llm
 from core.tools.dbops import get_db_by_name
 from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, embeddings
@@ -43,6 +43,15 @@ def web_chain_function(prompt_dict: dict):
     def get_user_prompt(_: dict):
         return prompt_dict['input']
 
+    def use_selected_mode(user_prompt: str):
+        if prompt_dict['mode'] == "news":
+            return web_news_lookup(user_prompt)
+        elif prompt_dict['mode'] == "docs":
+            return web_docs_lookup(user_prompt)
+        else:
+            return web_wiki_lookup(user_prompt)
+
+
     # NOTE: a detour has been performed here, more details:
     #       web_chain_function will soon become just a tool playing a part of a larger mechanism.
     #       prompt creation will be taken over by prompt sentiment extractor which will extract all researchable
@@ -51,7 +60,7 @@ def web_chain_function(prompt_dict: dict):
 
     chain = (
         {
-            "search_data": RunnableLambda(get_user_prompt) | RunnableLambda(web_docs_lookup),
+            "search_data": RunnableLambda(get_user_prompt) | RunnableLambda(use_selected_mode),
             # this has to be a RunnableLambda, it cannot be a string
             "user_request": RunnableLambda(get_user_prompt)
         } |
