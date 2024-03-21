@@ -11,5 +11,4 @@ EMBEDDINGS_CHUNK_OVERLAP = 200
 
 EMBEDDING_MODEL_NAME = "nomic-embed-text"  # this is not a good model, change asap
 EMBEDDING_MODEL_SAFE_NAME = purify_name(EMBEDDING_MODEL_NAME)
-TOKEN_LIMIT = 8192
 embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)

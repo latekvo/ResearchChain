@@ -10,7 +10,8 @@ from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
 from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, EMBEDDINGS_ARTICLE_LIMIT, EMBEDDINGS_BUFFER_STOPS, \
-    EMBEDDINGS_CHUNK_SIZE, EMBEDDINGS_CHUNK_OVERLAP, TOKEN_LIMIT, embeddings
+    EMBEDDINGS_CHUNK_SIZE, EMBEDDINGS_CHUNK_OVERLAP, embeddings
+from core.models.base_model import MODEL_TOKEN_LIMIT
 from core.tools.dbops import get_db_by_name
 from core.tools.query import WebQuery
 from core.tools.utils import is_text_junk, remove, timeout_function
@@ -93,7 +94,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
-def web_query_google_lookup(query: WebQuery, token_limit: int = TOKEN_LIMIT):
+def web_query_google_lookup(query: WebQuery, token_limit: int = MODEL_TOKEN_LIMIT):
     db_name = EMBEDDING_MODEL_SAFE_NAME + query.db_save_file_extension
     db = get_db_by_name(db_name, embeddings)
 
