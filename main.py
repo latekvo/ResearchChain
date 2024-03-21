@@ -32,21 +32,23 @@ def print_menu(stdscr, selected_row_idx, options):
         x = w//2 - len(option)//2
         y = h//2 - len(options)//2 + idx
         if idx == selected_row_idx:
+            stdscr.attron(curses.color_pair(1))
+            stdscr.addstr(y, x, option)
+            stdscr.attroff(curses.color_pair(1))
+        else:
             stdscr.attron(curses.color_pair(2))
             stdscr.addstr(y, x, option)
             stdscr.attroff(curses.color_pair(2))
-        else:
-            stdscr.addstr(y, x, option)
 
     stdscr.refresh()
 
 def main(stdscr):
     curses.curs_set(0)  # Hide cursor
-    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
-
+    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
     stdscr.keypad(True)  # Enable keypad for non-character keys
 
-    options = ["news", "docs", "wiki", "Exit"]
+    options = ["News", "Docs", "Wiki", "Exit"]
     selected_row_idx = 0
 
     print_menu(stdscr, selected_row_idx, options)
@@ -60,7 +62,7 @@ def main(stdscr):
             selected_row_idx += 1
         elif key == curses.KEY_ENTER or key in [10, 13]:
             if selected_row_idx == len(options) - 1:
-                break
+                exit()
             else:
                 stdscr.clear()
                 stdscr.border()
@@ -86,8 +88,11 @@ def print_input_field(stdscr, text_input):
     stdscr.addstr(1, w // 2 - len(title) // 2, title)
 
     # Print text input field
-    stdscr.addstr(h // 2, w // 2 - 20, "Enter text:")
+    stdscr.addstr(h // 2, w // 2 - 20, "Enter Text:")
+    stdscr.attron(curses.color_pair(1))
     stdscr.addstr(h // 2, w // 2 - 8, text_input)
+    stdscr.attroff(curses.color_pair(1))
+
 
     stdscr.refresh()
 
@@ -101,7 +106,7 @@ def main2(stdscr):
 
             if key == curses.KEY_ENTER or key in [10, 13]:
                 break
-            elif key == curses.KEY_BACKSPACE:
+            elif key == curses.KEY_BACKSPACE or key == 127:
                 # Handle backspace to delete characters from the text input
                 text_input = text_input[:-1]
             elif key >= 32 and key <= 126:
@@ -112,8 +117,8 @@ def main2(stdscr):
 
         return text_input
 
-    curses.curs_set(1)  # Show cursor
-    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    curses.curs_set(2)  # Show cursor
+    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
     stdscr.keypad(True)  # Enable keypad for non-character keys
 
     text_input = get_input()

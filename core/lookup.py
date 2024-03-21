@@ -44,9 +44,9 @@ def web_chain_function(prompt_dict: dict):
         return prompt_dict['input']
 
     def use_selected_mode(user_prompt: str):
-        if prompt_dict['mode'] == "news":
+        if prompt_dict['mode'] == "News":
             return web_news_lookup(user_prompt)
-        elif prompt_dict['mode'] == "docs":
+        elif prompt_dict['mode'] == "Docs":
             return web_docs_lookup(user_prompt)
         else:
             return web_wiki_lookup(user_prompt)
