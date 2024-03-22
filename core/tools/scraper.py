@@ -10,7 +10,7 @@ from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
 from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, EMBEDDINGS_ARTICLE_LIMIT, EMBEDDINGS_BUFFER_STOPS, \
-    EMBEDDINGS_CHUNK_SIZE, EMBEDDINGS_CHUNK_OVERLAP, embeddings
+    EMBEDDINGS_CHUNK_SIZE, EMBEDDINGS_CHUNK_OVERLAP, EMBEDDINGS_MODEL_TOKEN_LIMIT, embeddings
 from core.models.base_model import MODEL_TOKEN_LIMIT
 from core.tools.dbops import get_db_by_name
 from core.tools.query import WebQuery
@@ -68,7 +68,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
 
         text_splitter = RecursiveCharacterTextSplitter(
             separators=EMBEDDINGS_BUFFER_STOPS,
-            chunk_size=EMBEDDINGS_CHUNK_SIZE,
+            chunk_size=query.db_chunk_size,
             chunk_overlap=EMBEDDINGS_CHUNK_OVERLAP,
             keep_separator=False,
             strip_whitespace=True)
@@ -94,7 +94,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
-def web_query_google_lookup(query: WebQuery, token_limit: int = MODEL_TOKEN_LIMIT):
+def web_query_google_lookup(query: WebQuery, token_limit: int = EMBEDDINGS_MODEL_TOKEN_LIMIT):
     db_name = EMBEDDING_MODEL_SAFE_NAME + query.db_save_file_extension
     db = get_db_by_name(db_name, embeddings)
 
@@ -106,4 +106,4 @@ def web_query_google_lookup(query: WebQuery, token_limit: int = MODEL_TOKEN_LIMI
 
     print(f"{Fore.CYAN}Database search completed.{Fore.RESET}")
 
-    return docs_to_context(docs_and_scores, token_limit)
+    return docs_to_context(docs_and_scores, MODEL_TOKEN_LIMIT)
