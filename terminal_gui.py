@@ -83,7 +83,7 @@ def print_input_field(stdscr, text_input_value):
     stdscr.refresh()
 
 
-def text_input(stdscr):
+def user_input(stdscr):
     def get_input():
         text = ""
         print_input_field(stdscr, text)
