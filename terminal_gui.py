@@ -1,34 +1,42 @@
 import curses
 
+HIGHLIGHTED_COLOR_ID = 1
+TEXT_COLOR_ID = 2
+
 def print_menu(stdscr, selected_row_idx, options):
     stdscr.clear()
     h, w = stdscr.getmaxyx()
+    h = h // 2
+    w = w // 2
 
     # Draw border
     stdscr.border()
 
     # Print title
     title = "Research Chain"
-    stdscr.addstr(1, w // 2 - len(title) // 2, title)
+    title_id = 1
+
+    stdscr.addstr(title_id, w - len(title) // 2, title)
 
     for idx, option in enumerate(options):
-        x = w//2 - len(option)//2
-        y = h//2 - len(options)//2 + idx
+        x = w - len(option) // 2
+        y = h - len(options) // 2 + idx
         if idx == selected_row_idx:
-            stdscr.attron(curses.color_pair(1))
+            stdscr.attron(curses.color_pair(HIGHLIGHTED_COLOR_ID))
             stdscr.addstr(y, x, option)
-            stdscr.attroff(curses.color_pair(1))
+            stdscr.attroff(curses.color_pair(HIGHLIGHTED_COLOR_ID))
         else:
-            stdscr.attron(curses.color_pair(2))
+            stdscr.attron(curses.color_pair(TEXT_COLOR_ID))
             stdscr.addstr(y, x, option)
-            stdscr.attroff(curses.color_pair(2))
+            stdscr.attroff(curses.color_pair(TEXT_COLOR_ID))
 
     stdscr.refresh()
 
+
 def select_input(stdscr):
     curses.curs_set(0)  # Hide cursor
-    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    curses.init_pair(HIGHLIGHTED_COLOR_ID, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(TEXT_COLOR_ID, curses.COLOR_WHITE, curses.COLOR_BLACK)
     stdscr.keypad(True)  # Enable keypad for non-character keys
 
     options = ["News", "Docs", "Wiki", "Exit"]
@@ -51,28 +59,30 @@ def select_input(stdscr):
 
         print_menu(stdscr, selected_row_idx, options)
 
-
     return options[selected_row_idx]
+
 
 def print_input_field(stdscr, text_input_value):
     stdscr.clear()
     h, w = stdscr.getmaxyx()
+    w = w // 2
+    h = h // 2
 
     # Draw border
     stdscr.border()
 
     # Print title
     title = "Research Chain"
-    stdscr.addstr(1, w // 2 - len(title) // 2, title)
+    stdscr.addstr(1, w - len(title) // 2, title)
 
     # Print text input field
-    stdscr.addstr(h // 2, w // 2 - 20, "Enter Text:")
-    stdscr.attron(curses.color_pair(1))
-    stdscr.addstr(h // 2, w // 2 - 8, text_input_value)
-    stdscr.attroff(curses.color_pair(1))
-
+    stdscr.addstr(h, w - 20, "Enter Text:")
+    stdscr.attron(curses.color_pair(HIGHLIGHTED_COLOR_ID))
+    stdscr.addstr(h, w - 8, text_input_value)
+    stdscr.attroff(curses.color_pair(HIGHLIGHTED_COLOR_ID))
 
     stdscr.refresh()
+
 
 def text_input(stdscr):
     def get_input():
@@ -90,7 +100,7 @@ def text_input(stdscr):
         return text
 
     curses.curs_set(2)  # Show cursor
-    curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(HIGHLIGHTED_COLOR_ID, curses.COLOR_CYAN, curses.COLOR_BLACK)
     stdscr.keypad(True)  # Enable keypad for non-character keys
 
     text_input_value = get_input()
