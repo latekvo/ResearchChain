@@ -4,7 +4,7 @@ import requests
 from colorama import init as colorama_init, Fore, Style
 from core.lookup import web_lookup
 from langchain_core.output_parsers import StrOutputParser
-from terminalGui import text_input, select_input
+from terminal_gui import text_input, select_input
 
 colorama_init()
 
