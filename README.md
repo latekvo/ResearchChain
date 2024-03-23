@@ -10,7 +10,7 @@
 
 #### Other notes
 
-The default model is hardcoded into the `lookup.py` file.
+The default models are hardcoded in the `core/models` folder.
 
 # Future of this project
 
