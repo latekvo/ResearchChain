@@ -48,8 +48,10 @@ def web_chain_function(prompt_dict: dict):
             return web_news_lookup(user_prompt)
         elif prompt_dict['mode'] == "Docs":
             return web_docs_lookup(user_prompt)
-        else:
+        elif prompt_dict['mode'] == "Wiki":
             return web_wiki_lookup(user_prompt)
+        else:
+            return web_docs_lookup(user_prompt)
 
 
     # NOTE: a detour has been performed here, more details:
