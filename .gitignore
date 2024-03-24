@@ -4,4 +4,4 @@
 .store
 .pylintrc
 store/*
-store/*/*
+__pycache__
