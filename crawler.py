@@ -1,8 +1,11 @@
 import datetime
 
 from langchain_community.document_loaders import WebBaseLoader
+
 from tinydb import TinyDB, Query
 from core.tools import utils
+from core.tools.query import WebQuery
+from core.tools.scraper import query_for_urls
 
 # must-haves:
 # - live user prompt interaction+injection,
@@ -19,11 +22,16 @@ db_url_path = 'store/data/url_store.json'
 db_url = TinyDB(db_url_path)
 
 # 100 links max, then put new ones in db
-# this ensures a good balance of broadness and deepness
-# todo: add this feature
+# this does not increase access speed,
+# it only encourages a better mix of broadness and deepness of links
 url_queue_limit = 100
 url_rapid_queue = []
 
+requested_query_queue = [
+    WebQuery('basic', 'go lang tutorial', priority=4),
+    WebQuery('basic', 'javascript tutorial', priority=8),
+    WebQuery('basic', 'c++ tutorial', priority=2),
+]
 
 # url order:
 # 0. use short memory urls
@@ -33,7 +41,7 @@ url_rapid_queue = []
 
 def db_add_url(url: str, parent_id: str | None):
     new_url_id = utils.gen_uuid()
-    current_date = datetime.datetime.now()
+    current_date = datetime.datetime.now().isoformat()
 
     # todo: transition to data classes once a solid protocol is defined
     entry = {
@@ -48,6 +56,20 @@ def db_add_url(url: str, parent_id: str | None):
 
     db_url.insert(entry)
     return new_url_id
+
+
+def db_get_not_downloaded() -> list[str]:
+    db_query = Query()
+    db_results = db_url.search(db_query.is_downloaded == False)
+    url_ids = []
+    for result in db_results:
+        url_ids.append(result['uuid'])
+
+    return url_ids
+
+
+def db_get_not_embedded(model: str) -> list[str]:
+    pass
 
 
 def db_set_url_embedded(url_id: str, embedding_model: str):
@@ -78,32 +100,42 @@ def db_is_url_present(url: str):
     return record is not None
 
 
-def rq_is_url_present(url: str):
-    # todo: add rapid queue
-    return False
+def rq_refill(seed_prompt: str | None = None, use_google: bool = True):
+    global url_rapid_queue
 
-
-def rq_push_url(url: str):
-    # todo: add rapid queue
-    pass
-
-
-def rq_refill(use_google: bool = True):
-    # todo: add rapid queue
     # 0. check for space
-    # 1. fill from db
-    # 2. fill from google
-    return False
+    space_left = url_queue_limit - len(url_rapid_queue)
+    if space_left < 1:
+        return
+
+    # 1. get from db
+    # todo: currently downloaded = embedded, be careful here when adding separate embedder
+    db_url_ids = db_get_not_downloaded()
+    space_left = space_left - len(db_url_ids)
+
+    # 2. get from google
+    google_url_ids = []
+    if use_google and seed_prompt is not None:
+        url_query = WebQuery('basic', seed_prompt)
+        google_urls = query_for_urls(url_query, space_left)
+        for url in google_urls:
+            new_url_id = db_add_url(url, parent_id=None)
+            google_url_ids.append(new_url_id)
+
+    # 3. fill from db + google
+    url_rapid_queue = url_rapid_queue + db_url_ids
+    url_rapid_queue = url_rapid_queue + google_url_ids
+
+    return
 
 
 def url_save(url: str, parent_id: str | None):
     # 0. check if url was already saved
-    if rq_is_url_present(url):
+    if db_is_url_present(url):
         return
 
     # 1. add to the db
-    if not db_is_url_present(url):
-        db_add_url(url, parent_id)
+    db_add_url(url, parent_id)
 
     # 2. place in short-term memory (if there is any space left)
     if len(url_rapid_queue) < url_queue_limit:
@@ -115,6 +147,7 @@ def url_download(url_id: str) -> str:
     record = db_url.get(query.uuid == url_id)
     url = record['url']
 
+    # todo: check if document is PDF
     document = WebBaseLoader(url).load()[0]
     document_text = document.page_content
 
@@ -143,8 +176,9 @@ def process_url(url_id: str):
 
 
 def processing_iteration():
-    if len(url_rapid_queue) is 0:
-        rq_refill()
+    rq_refill(seed_prompt='llm research filetype:pdf')
+
+    if len(url_rapid_queue) == 0:
         return
 
     url_id = url_rapid_queue.pop(0)
