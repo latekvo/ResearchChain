@@ -71,7 +71,7 @@ def timeout_function(task, timeout=2.0):
 
 
 def extract_links(text: str):
-    return re.findall(r'(https?://\S+)', text)
+    return re.findall(r'(https?://\S+\.\S+/)', text)
 
 
 def gen_uuid() -> str:

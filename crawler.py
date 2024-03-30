@@ -1,6 +1,7 @@
 import datetime
+from typing import List
 
-from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 
 from tinydb import TinyDB, Query
 from core.tools import utils
@@ -33,13 +34,14 @@ requested_query_queue = [
     WebQuery('basic', 'c++ tutorial', priority=2),
 ]
 
+
 # url order:
 # 0. use short memory urls
 # 1. refill with non-researched db urls
 # 2. refill with google search
 
 
-def db_add_url(url: str, parent_id: str | None):
+def db_add_url(url: str, parent_id: str = None):
     new_url_id = utils.gen_uuid()
     current_date = datetime.datetime.now().isoformat()
 
@@ -51,6 +53,7 @@ def db_add_url(url: str, parent_id: str | None):
         'url': url,
         'date_added': current_date,
         'is_downloaded': False,
+        'is_rubbish': False,
         'embedded_by': []
     }
 
@@ -58,9 +61,9 @@ def db_add_url(url: str, parent_id: str | None):
     return new_url_id
 
 
-def db_get_not_downloaded() -> list[str]:
+def db_get_not_downloaded() -> List[str]:
     db_query = Query()
-    db_results = db_url.search(db_query.is_downloaded == False)
+    db_results = db_url.search(db_query.fragment({'is_downloaded': False, 'is_rubbish': False}))
     url_ids = []
     for result in db_results:
         url_ids.append(result['uuid'])
@@ -68,7 +71,7 @@ def db_get_not_downloaded() -> list[str]:
     return url_ids
 
 
-def db_get_not_embedded(model: str) -> list[str]:
+def db_get_not_embedded(model: str) -> List[str]:
     pass
 
 
@@ -93,6 +96,15 @@ def db_set_url_downloaded(url_id: str):
     db_url.update({'is_downloaded': True}, query.uuid == url_id)
 
 
+def db_set_url_rubbish(url_id: str):
+    query = Query()
+    record = db_url.get(query.uuid == url_id)
+    if record is None:
+        return
+
+    db_url.update({'is_rubbish': True}, query.uuid == url_id)
+
+
 def db_is_url_present(url: str):
     # check db_url for presence
     query = Query()
@@ -100,7 +112,7 @@ def db_is_url_present(url: str):
     return record is not None
 
 
-def rq_refill(seed_prompt: str | None = None, use_google: bool = True):
+def rq_refill(seed_prompt: str = None, use_google: bool = True):
     global url_rapid_queue
 
     # 0. check for space
@@ -119,7 +131,7 @@ def rq_refill(seed_prompt: str | None = None, use_google: bool = True):
         url_query = WebQuery('basic', seed_prompt)
         google_urls = query_for_urls(url_query, space_left)
         for url in google_urls:
-            new_url_id = db_add_url(url, parent_id=None)
+            new_url_id = db_add_url(url)
             google_url_ids.append(new_url_id)
 
     # 3. fill from db + google
@@ -129,7 +141,7 @@ def rq_refill(seed_prompt: str | None = None, use_google: bool = True):
     return
 
 
-def url_save(url: str, parent_id: str | None):
+def url_save(url: str, parent_id: str = None):
     # 0. check if url was already saved
     if db_is_url_present(url):
         return
@@ -142,13 +154,31 @@ def url_save(url: str, parent_id: str | None):
         url_rapid_queue.append(url)
 
 
-def url_download(url_id: str) -> str:
+def get_document(url: str):
+    # we expect the document might not be a pdf from PyPDFLoader
+    # and expect that the site might block us from WebBaseLoader
+    try:
+        document = PyPDFLoader(url).load()
+    except Exception:
+        try:
+            document = WebBaseLoader(url).load()
+        except Exception:
+            return None
+
+    return document[0]
+
+
+def url_download(url_id: str):
     query = Query()
     record = db_url.get(query.uuid == url_id)
     url = record['url']
 
-    # todo: check if document is PDF
-    document = WebBaseLoader(url).load()[0]
+    # PDF files require special parser, and are exceptionally common
+    document = get_document(url)
+    if document is None:
+        db_set_url_rubbish(url_id)
+        return None
+
     document_text = document.page_content
 
     with open('store/data/' + url_id, 'w') as f:
@@ -163,6 +193,10 @@ def process_url(url_id: str):
     # 0. download article
     document_text = url_download(url_id)
 
+    # download failed
+    if document_text is None:
+        return
+
     # 1. extract all links
     url_list = utils.extract_links(document_text)
 
@@ -176,7 +210,7 @@ def process_url(url_id: str):
 
 
 def processing_iteration():
-    rq_refill(seed_prompt='llm research filetype:pdf')
+    rq_refill(seed_prompt='llm language models vulnerabilities filetype:pdf')
 
     if len(url_rapid_queue) == 0:
         return
@@ -185,6 +219,17 @@ def processing_iteration():
     process_url(url_id)
 
 
-# repeat for testing
-for _ in range(3):
+processing_iteration()
+while len(url_rapid_queue) > 0:
     processing_iteration()
+
+    """ debug, progress tracker
+    db_query = Query()
+    db_not_downloaded = db_url.search(db_query.fragment({'is_downloaded': False, 'is_rubbish': False}))
+    db_rubbish = db_url.search(db_query.fragment({'is_downloaded': False, 'is_rubbish': False}))
+    db_total = db_url.all()
+
+    print("urls left to be downloaded:", len(db_not_downloaded))
+    print("urls marked rubbish:", len(db_rubbish))
+    print("url running total:", len(db_total))
+    """

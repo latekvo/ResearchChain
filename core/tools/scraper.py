@@ -40,7 +40,7 @@ def rag_query_lookup(prompt_text: str) -> str:
     pass
 
 
-def query_for_urls(query: WebQuery, url_amount=EMBEDDINGS_ARTICLE_LIMIT) -> list[str]:
+def query_for_urls(query: WebQuery, url_amount=EMBEDDINGS_ARTICLE_LIMIT) -> List[str]:
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", query.web_query)
     url_list = search(
         query=query.web_query,
