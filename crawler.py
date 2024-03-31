@@ -29,9 +29,13 @@ url_queue_limit = 100
 url_rapid_queue = []
 
 requested_query_queue = [
-    WebQuery('basic', 'go lang tutorial', priority=4),
-    WebQuery('basic', 'javascript tutorial', priority=8),
-    WebQuery('basic', 'c++ tutorial', priority=2),
+    WebQuery('basic', 'llm site:arxiv.org', priority=5),
+    WebQuery('basic', 'language models site:arxiv.org', priority=5),
+    WebQuery('basic', 'machine learning site:arxiv.org', priority=5),
+    WebQuery('basic', 'ai site:arxiv.org', priority=5),
+    WebQuery('basic', 'llm issues site:arxiv.org', priority=5),
+    WebQuery('basic', 'language models', priority=1),
+    WebQuery('basic', 'machine learning', priority=1),
 ]
 
 
@@ -45,7 +49,6 @@ def db_add_url(url: str, parent_id: str = None):
     new_url_id = utils.gen_uuid()
     current_date = datetime.datetime.now().isoformat()
 
-    # todo: transition to data classes once a solid protocol is defined
     entry = {
         'uuid': new_url_id,
         'parent_uuid': parent_id,  # will be useful for url crawling analysis & visualization
@@ -112,7 +115,7 @@ def db_is_url_present(url: str):
     return record is not None
 
 
-def rq_refill(seed_prompt: str = None, use_google: bool = True):
+def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
     global url_rapid_queue
 
     # 0. check for space
@@ -127,12 +130,21 @@ def rq_refill(seed_prompt: str = None, use_google: bool = True):
 
     # 2. get from google
     google_url_ids = []
-    if use_google and seed_prompt is not None:
-        url_query = WebQuery('basic', seed_prompt)
-        google_urls = query_for_urls(url_query, space_left)
+    if use_google and seed_query is not None:
+        google_urls = query_for_urls(seed_query, space_left)
+
+        idx = 0  # using index to avoid converting this generator to list
         for url in google_urls:
+            if db_is_url_present(url):
+                continue
             new_url_id = db_add_url(url)
             google_url_ids.append(new_url_id)
+            idx += 1
+
+        # no more new search results are present
+        if idx == 0:
+            requested_query_queue.remove(seed_query)
+            print('removed exhausted query:', seed_query.web_query)
 
     # 3. fill from db + google
     url_rapid_queue = url_rapid_queue + db_url_ids
@@ -171,9 +183,13 @@ def get_document(url: str):
 def url_download(url_id: str):
     query = Query()
     record = db_url.get(query.uuid == url_id)
+
+    if record is None:
+        db_set_url_rubbish(url_id)
+        return None
+
     url = record['url']
 
-    # PDF files require special parser, and are exceptionally common
     document = get_document(url)
     if document is None:
         db_set_url_rubbish(url_id)
@@ -210,7 +226,10 @@ def process_url(url_id: str):
 
 
 def processing_iteration():
-    rq_refill(seed_prompt='llm language models vulnerabilities filetype:pdf')
+    if len(requested_query_queue) == 0:
+        return
+
+    rq_refill(seed_query=requested_query_queue[0])
 
     if len(url_rapid_queue) == 0:
         return
