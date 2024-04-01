@@ -8,9 +8,8 @@ from langchain_core.runnables import RunnableLambda
 from googlesearch import search
 
 from core.chainables.web import web_docs_lookup, web_wiki_lookup, web_news_lookup
-from core.models.ollama_models.base_model import llm
 from core.tools.dbops import get_db_by_name
-from core.models.ollama_models.embeddings import EMBEDDING_MODEL_SAFE_NAME, embeddings
+from core.models.ollama_params import EMBEDDING_MODEL_SAFE_NAME, llm, embeddings
 
 
 output_parser = StrOutputParser()
