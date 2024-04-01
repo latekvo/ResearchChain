@@ -1,20 +1,32 @@
-from huggingface_hub import hf_hub_download
-from llama_cpp import Llama
 import torch
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms.ollama import Ollama
+from huggingface_hub import hf_hub_download
+from llama_cpp import Llama
+from core.models.configurations import (
+    llm_ollama_heavy,
+    embedder_ollama_heavy,
+    llm_hugging_face_heavy,
+)
 
 
-def load_base_ollama_model(MODEL_NAME: str):
-    llm = Ollama(model=MODEL_NAME)
-    return llm
+def load_model(use_ollama: bool):
+    if use_ollama:
+        return load_ollama_model()
+    else:
+        return load_hugging_face_model()
 
-def load_embeddings_ollama_model(EMBEDDING_MODEL_NAME: str):
-    embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL_NAME)
-    return embeddings
 
-def load_huging_face_model(MODEL_NAME: str, MODEL_FILE: str):
-    model_path = hf_hub_download(MODEL_NAME, filename=MODEL_FILE)
+def load_ollama_model():
+    llm = Ollama(model=llm_ollama_heavy.model_name)
+    embeddings = OllamaEmbeddings(model=embedder_ollama_heavy.model_name)
+    return llm, embeddings
+
+
+def load_hugging_face_model():
+    model_path = hf_hub_download(
+        llm_hugging_face_heavy.model_file, filename=llm_hugging_face_heavy.model_name
+    )
     ## Instantiate model from downloaded file
     llm = Llama(
         model_path=model_path,
