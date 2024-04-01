@@ -45,4 +45,3 @@ class WebQuery:
             self.web_query = 'documentation ' + prompt_core
             self.db_save_file_extension = "_docs"
             self.db_chunk_size = 600
-

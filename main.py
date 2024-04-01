@@ -1,5 +1,5 @@
-import _curses
 import curses
+import _curses
 import requests
 
 from colorama import init as colorama_init, Fore, Style

@@ -9,9 +9,9 @@ from langchain_community.vectorstores.faiss import FAISS
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
-from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, EMBEDDINGS_ARTICLE_LIMIT, EMBEDDINGS_BUFFER_STOPS, \
+from core.models.ollama_models.embeddings import EMBEDDING_MODEL_SAFE_NAME, EMBEDDINGS_ARTICLE_LIMIT, EMBEDDINGS_BUFFER_STOPS, \
     EMBEDDINGS_CHUNK_OVERLAP, EMBEDDINGS_MODEL_TOKEN_LIMIT, embeddings
-from core.models.base_model import MODEL_TOKEN_LIMIT
+from core.models.ollama_models.base_model import MODEL_TOKEN_LIMIT
 from core.tools.dbops import get_db_by_name
 from core.tools.query import WebQuery
 from core.tools.utils import is_text_junk, remove, timeout_function
