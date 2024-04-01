@@ -1,6 +1,5 @@
 from core.tools.utils import purify_name
-from model_loader import load_base_ollama_model
-from model_loader import load_embeddings_ollama_model
+from core.tools.model_loader import load_base_ollama_model, load_embeddings_ollama_model
 
 # TODO: move hardcoded values from here and from embeddings.py into a standalone configuration file, preferably yaml
 MODEL_NAME = "mixtral:8x7b-instruct-v0.1-q5_K_M"  # "llama2-uncensored:7b"

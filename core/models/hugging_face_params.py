@@ -1,5 +1,5 @@
 from core.tools.utils import purify_name
-from model_loader import load_huging_face_model
+from core.tools.model_loader import load_huging_face_model
 
 # TODO: move hardcoded values from here and from embeddings.py into a standalone configuration file, preferably yaml
 MODEL_NAME = "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF"
