@@ -7,6 +7,8 @@ from typing import List
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 
 from tinydb import TinyDB, Query
+
+from core.classes.traffic_manager import TrafficManager
 from core.tools import utils
 from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
@@ -46,6 +48,8 @@ requested_query_queue = [
 # 0. use short memory urls
 # 1. refill with non-researched db urls
 # 2. refill with google search
+
+google_traffic_manager = TrafficManager()
 
 
 def db_add_url(url: str, parent_id: str = None):
@@ -135,32 +139,29 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
     # 2. get from google
     google_url_ids = []
     if use_google and seed_query is not None:
-        google_urls = query_for_urls(seed_query, space_left)
-
-        # random +0-50%, this makes it much harder for google to detect us
-        random_deviation = random.randrange(10, 15, 1) / 10
-        max_requests_per_second = 8
-        time_delay = 1 / max_requests_per_second * random_deviation
-        long_time_delay = (
-            60  # todo: this delay should be self-incrementing on every fail
-        )
-
-        idx = 0  # using index to avoid converting this generator to list
         quit_unexpectedly = False
 
-        try:
-            for url in google_urls:
-                if db_is_url_present(url):
-                    continue
-                new_url_id = db_add_url(url)
-                google_url_ids.append(new_url_id)
-                idx += 1
-                sleep(time_delay)
-        except HTTPError:
-            # google requires a long delay after getting timeout
-            print("Google timeout, waiting for:", long_time_delay, "seconds")
+        if google_traffic_manager.is_timeout_active():
             quit_unexpectedly = True
-            sleep(long_time_delay)
+
+        google_urls = query_for_urls(seed_query, space_left)
+
+        idx = 0  # using index to avoid converting this generator to list
+
+        if not quit_unexpectedly:
+            try:
+                for url in google_urls:
+                    if db_is_url_present(url):
+                        continue
+                    new_url_id = db_add_url(url)
+                    google_url_ids.append(new_url_id)
+                    idx += 1
+                google_traffic_manager.report_no_timeout()
+            except HTTPError:
+                # google requires a long delay after getting timeout
+                print("Google timeout")
+                quit_unexpectedly = True
+                google_traffic_manager.report_timeout()
 
         # no more new search results are present
         if idx == 0 and not quit_unexpectedly:

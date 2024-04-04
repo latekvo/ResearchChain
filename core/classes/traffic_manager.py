@@ -30,6 +30,6 @@ class TrafficManager:
         sleep_duration = self._delay_per_request * current_variation
         time.sleep(sleep_duration)
 
-    def is_ban_active(self):
+    def is_timeout_active(self):
         current_date = time.time()
         return self._timeout_date_end > current_date
