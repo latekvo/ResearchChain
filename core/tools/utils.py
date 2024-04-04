@@ -2,17 +2,24 @@ import asyncio
 import multiprocessing
 import re
 import uuid
+import os, sys
 
 
 def purify_name(name):
-    return '_'.join('_'.join(name.split(':')).split('-'))
+    return "_".join("_".join(name.split(":")).split("-"))
 
 
 def is_text_junk(text: str):
     # checks if text contains any of junky keywords eg: privacy policy, subscribe, cookies etc.
     # do not expand this list, it has to be small to be efficient, and these words are grouped either way.
     trigger_list = [
-        'sign in', 'privacy policy', 'skip to', 'newsletter', 'subscribe', 'related tags', 'share price'
+        "sign in",
+        "privacy policy",
+        "skip to",
+        "newsletter",
+        "subscribe",
+        "related tags",
+        "share price",
     ]
     low_text = text.lower()
     for trigger in trigger_list:
@@ -37,14 +44,14 @@ def reduce(text: str, goal: str, match: str):
 
 def remove(text: str, wordlist: list):
     for word in wordlist:
-        text = ''.join(text.split(word))
+        text = "".join(text.split(word))
     return text
 
 
 def timeout_function(task, timeout=2.0):
     # FIXME: THIS FUNCTION MAY BE BROKEN, TEST THIS
 
-    ctx = multiprocessing.get_context('spawn')
+    ctx = multiprocessing.get_context("spawn")
     q = ctx.Queue()
 
     def wrapper(q):
@@ -71,8 +78,18 @@ def timeout_function(task, timeout=2.0):
 
 
 def extract_links(text: str):
-    return re.findall(r'(https?://\S+\.\S+/)', text)
+    return re.findall(r"(https?://\S+\.\S+/)", text)
 
 
 def gen_uuid() -> str:
     return uuid.uuid4().hex
+
+
+class hide_prints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, "w")
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
