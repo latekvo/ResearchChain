@@ -1,12 +1,16 @@
 import datetime
+import random
+from urllib.error import HTTPError
+from time import sleep
 from typing import List
 
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 
 from tinydb import TinyDB, Query
 from core.tools import utils
-from core.tools.query import WebQuery
+from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
+from core.tools.utils import hide_prints
 
 # must-haves:
 # - live user prompt interaction+injection,
@@ -19,7 +23,7 @@ from core.tools.scraper import query_for_urls
 #       this will allow for automatic re-vectorization in case we get a new embed model.
 
 # todo: tinydb is a temporary solution, it does not support multithreading, relations or indexing
-db_url_path = 'store/data/url_store.json'
+db_url_path = "store/data/url_store.json"
 db_url = TinyDB(db_url_path)
 
 # 100 links max, then put new ones in db
@@ -29,15 +33,14 @@ url_queue_limit = 100
 url_rapid_queue = []
 
 requested_query_queue = [
-    WebQuery('basic', 'llm site:arxiv.org', priority=5),
-    WebQuery('basic', 'language models site:arxiv.org', priority=5),
-    WebQuery('basic', 'machine learning site:arxiv.org', priority=5),
-    WebQuery('basic', 'ai site:arxiv.org', priority=5),
-    WebQuery('basic', 'llm issues site:arxiv.org', priority=5),
-    WebQuery('basic', 'language models', priority=1),
-    WebQuery('basic', 'machine learning', priority=1),
+    WebQuery("basic", "python site:arxiv.org", priority=5),
+    WebQuery("basic", "typescript site:arxiv.org", priority=5),
+    WebQuery("basic", "java site:arxiv.org", priority=5),
+    WebQuery("basic", "nvidia site:arxiv.org", priority=5),
+    WebQuery("basic", "google site:arxiv.org", priority=5),
+    WebQuery("news", "llm news", priority=1),
+    WebQuery("news", "ai news", priority=1),
 ]
-
 
 # url order:
 # 0. use short memory urls
@@ -50,14 +53,13 @@ def db_add_url(url: str, parent_id: str = None):
     current_date = datetime.datetime.now().isoformat()
 
     entry = {
-        'uuid': new_url_id,
-        'parent_uuid': parent_id,  # will be useful for url crawling analysis & visualization
-
-        'url': url,
-        'date_added': current_date,
-        'is_downloaded': False,
-        'is_rubbish': False,
-        'embedded_by': []
+        "uuid": new_url_id,
+        "parent_uuid": parent_id,  # will be useful for url crawling analysis & visualization
+        "url": url,
+        "date_added": current_date,
+        "is_downloaded": False,
+        "is_rubbish": False,
+        "embedded_by": [],
     }
 
     db_url.insert(entry)
@@ -66,10 +68,12 @@ def db_add_url(url: str, parent_id: str = None):
 
 def db_get_not_downloaded() -> List[str]:
     db_query = Query()
-    db_results = db_url.search(db_query.fragment({'is_downloaded': False, 'is_rubbish': False}))
+    db_results = db_url.search(
+        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
+    )
     url_ids = []
     for result in db_results:
-        url_ids.append(result['uuid'])
+        url_ids.append(result["uuid"])
 
     return url_ids
 
@@ -84,10 +88,10 @@ def db_set_url_embedded(url_id: str, embedding_model: str):
     if record is None:
         return
 
-    embedded_by = record['embedded_by']
+    embedded_by = record["embedded_by"]
     embedded_by.append(embedding_model)
 
-    db_url.update({'embedded_by': embedded_by}, query.uuid == url_id)
+    db_url.update({"embedded_by": embedded_by}, query.uuid == url_id)
 
 
 def db_set_url_downloaded(url_id: str):
@@ -96,7 +100,7 @@ def db_set_url_downloaded(url_id: str):
     if record is None:
         return
 
-    db_url.update({'is_downloaded': True}, query.uuid == url_id)
+    db_url.update({"is_downloaded": True}, query.uuid == url_id)
 
 
 def db_set_url_rubbish(url_id: str):
@@ -105,7 +109,7 @@ def db_set_url_rubbish(url_id: str):
     if record is None:
         return
 
-    db_url.update({'is_rubbish': True}, query.uuid == url_id)
+    db_url.update({"is_rubbish": True}, query.uuid == url_id)
 
 
 def db_is_url_present(url: str):
@@ -133,18 +137,35 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
     if use_google and seed_query is not None:
         google_urls = query_for_urls(seed_query, space_left)
 
+        # random +0-50%, this makes it much harder for google to detect us
+        random_deviation = random.randrange(10, 15, 1) / 10
+        max_requests_per_second = 8
+        time_delay = 1 / max_requests_per_second * random_deviation
+        long_time_delay = (
+            60  # todo: this delay should be self-incrementing on every fail
+        )
+
         idx = 0  # using index to avoid converting this generator to list
-        for url in google_urls:
-            if db_is_url_present(url):
-                continue
-            new_url_id = db_add_url(url)
-            google_url_ids.append(new_url_id)
-            idx += 1
+        quit_unexpectedly = False
+
+        try:
+            for url in google_urls:
+                if db_is_url_present(url):
+                    continue
+                new_url_id = db_add_url(url)
+                google_url_ids.append(new_url_id)
+                idx += 1
+                sleep(time_delay)
+        except HTTPError:
+            # google requires a long delay after getting timeout
+            print("Google timeout, waiting for:", long_time_delay, "seconds")
+            quit_unexpectedly = True
+            sleep(long_time_delay)
 
         # no more new search results are present
-        if idx == 0:
+        if idx == 0 and not quit_unexpectedly:
             requested_query_queue.remove(seed_query)
-            print('removed exhausted query:', seed_query.web_query)
+            print("removed exhausted query:", seed_query.web_query)
 
     # 3. fill from db + google
     url_rapid_queue = url_rapid_queue + db_url_ids
@@ -169,13 +190,14 @@ def url_save(url: str, parent_id: str = None):
 def get_document(url: str):
     # we expect the document might not be a pdf from PyPDFLoader
     # and expect that the site might block us from WebBaseLoader
-    try:
-        document = PyPDFLoader(url).load()
-    except Exception:
+    with hide_prints():
         try:
-            document = WebBaseLoader(url).load()
+            document = PyPDFLoader(url).load()
         except Exception:
-            return None
+            try:
+                document = WebBaseLoader(url).load()
+            except Exception:
+                return None
 
     return document[0]
 
@@ -188,7 +210,7 @@ def url_download(url_id: str):
         db_set_url_rubbish(url_id)
         return None
 
-    url = record['url']
+    url = record["url"]
 
     document = get_document(url)
     if document is None:
@@ -197,7 +219,7 @@ def url_download(url_id: str):
 
     document_text = document.page_content
 
-    with open('store/data/' + url_id, 'w') as f:
+    with open("store/data/" + url_id, "w") as f:
         f.write(document_text)
 
     db_set_url_downloaded(url_id)
@@ -220,16 +242,14 @@ def process_url(url_id: str):
     for link in url_list:
         url_save(link, url_id)
 
-    # 3. update own db record with data
-    # ^  uuid (key), url (old), date, file_hash, [embedded_by, ...]
-    db_set_url_embedded(url_id, 'placeholder')
-
 
 def processing_iteration():
-    if len(requested_query_queue) == 0:
-        return
+    seed_query = None
 
-    rq_refill(seed_query=requested_query_queue[0])
+    if len(requested_query_queue) > 0:
+        seed_query = requested_query_queue[0]
+
+    rq_refill(seed_query=seed_query)
 
     if len(url_rapid_queue) == 0:
         return
