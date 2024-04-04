@@ -13,7 +13,7 @@ from core.models.embeddings import EMBEDDING_MODEL_SAFE_NAME, EMBEDDINGS_ARTICLE
     EMBEDDINGS_CHUNK_OVERLAP, EMBEDDINGS_MODEL_TOKEN_LIMIT, embeddings
 from core.models.base_model import MODEL_TOKEN_LIMIT
 from core.tools.dbops import get_db_by_name
-from core.tools.query import WebQuery
+from core.classes.query import WebQuery
 from core.tools.utils import is_text_junk, remove, timeout_function
 
 encoder = tiktoken.get_encoding("cl100k_base")
