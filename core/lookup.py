@@ -78,3 +78,5 @@ def web_chain_function(prompt_dict: dict):
 
 
 web_lookup = RunnableLambda(web_chain_function)
+
+chain = web_lookup | output_parser

@@ -1,3 +1,4 @@
+import argparse
 import curses
 
 HIGHLIGHTED_COLOR_ID = 1
@@ -98,9 +99,20 @@ def user_input(stdscr):
             print_input_field(stdscr, text)
         return text
 
-    curses.curs_set(2)  # Show cursor
+    curses.curs_set(1)  # Show cursor
     stdscr.keypad(True)  # Enable keypad for non-character keys
 
     text_input_value = get_input()
     curses.endwin()  # End curses window
     return text_input_value
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-O',
+    '--use-ollama',
+    dest='use_ollama',
+    action="store_true",
+    help='Use Ollama as the model provider'
+)
+USE_OLLAMA = parser.parse_args().use_ollama

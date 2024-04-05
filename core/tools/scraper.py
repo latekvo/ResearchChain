@@ -13,7 +13,7 @@ from core.tools.model_loader import load_model
 from core.models.configurations import use_configuration
 from core.tools.utils import purify_name
 from core.tools.dbops import get_db_by_name
-from core.tools.query import WebQuery
+from core.classes.query import WebQuery
 from core.tools.utils import is_text_junk, remove, timeout_function
 
 encoder = tiktoken.get_encoding("cl100k_base")

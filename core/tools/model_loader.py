@@ -9,11 +9,11 @@ from core.models.configurations import (
     llm_hugging_face_heavy,
     embedder_hugging_face_heavy,
 )
+from terminal_gui import USE_OLLAMA
 
 
 def load_model():
-    use_ollama = True
-    if use_ollama:
+    if USE_OLLAMA:
         return load_ollama_model()
     else:
         return load_hugging_face_model()
@@ -41,7 +41,7 @@ def load_hugging_face_model():
     # Instantiate model from downloaded file
     embeddings = Llama(
         model_path=embedder_model_path,
-        n_ctx=16000,  # Context length to use
+        n_ctx=4000,  # Context length to use
         torch_dtype=torch.float16,
     )
     # Generation kwargs

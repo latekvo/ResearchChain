@@ -1,18 +1,11 @@
 import curses
-import _curses
 import requests
 
 from colorama import init as colorama_init, Fore, Style
-from core.lookup import web_lookup
-from langchain_core.output_parsers import StrOutputParser
+from core.lookup import chain
 from terminal_gui import user_input, select_input
 
 colorama_init()
-
-# llm = Ollama(model=MODEL_NAME) this is not necessary, but without this line the code does not work
-output_parser = StrOutputParser()
-
-chain = web_lookup | output_parser
 
 try:
     try:

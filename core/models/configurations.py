@@ -1,5 +1,6 @@
 from core.models.configuration_objects.llm_configuration import LlmConfiguration
 from core.models.configuration_objects.embedder_configuration import EmbedderConfiguration
+from terminal_gui import USE_OLLAMA
 
 llm_ollama_heavy = LlmConfiguration(
     supplier="ollama",
@@ -36,8 +37,7 @@ embedder_hugging_face_heavy = EmbedderConfiguration(
 
 
 def use_configuration():
-  use_ollama = True
-  if use_ollama:
-    return llm_ollama_heavy, embedder_ollama_heavy
-  else:
-    return llm_hugging_face_heavy, embedder_hugging_face_heavy
+    if USE_OLLAMA:
+        return llm_ollama_heavy, embedder_ollama_heavy
+    else:
+        return llm_hugging_face_heavy, embedder_hugging_face_heavy
