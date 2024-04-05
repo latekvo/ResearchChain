@@ -4,7 +4,13 @@ from typing import Literal, Union
 
 class WebQuery:
     """class for bundling all data required for embedding and search operations"""
-    query_type: Literal['wiki', 'news', 'docs']
+    # Small chunks make it impossible to deduct full context in presence of millions of other unrelated texts
+    # Small chunks are meaningful only when talking about a single topic
+    _DEFAULT_INFO_CHUNK_LENGTH = 800
+    _DEFAULT_STORY_CHUNK_LENGTH = 1200
+    _DEFAULT_PRIORITY = 1
+
+    query_type: str
 
     prompt_core: str = ''
 
