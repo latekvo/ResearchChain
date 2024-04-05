@@ -6,6 +6,7 @@
 - Create new environment: `conda env create -f environment.yml`
 - Activate the new environment: `conda activate ResearchChain`
 - Pull the model you intend to use: `ollama pull zephyr:7b-beta-q5_K_M` (default)
+- Pull an embedding model you: `ollama pull nomic-embed-text` (default)
 - Run: `python3 main.py`
 
 #### Other notes
@@ -29,3 +30,6 @@ to create large hierarchical structures of LLMs and the tools they are using
 
 A service launching for a set period of time, and then allowing the user to summarize
 either the entire output of the tree, or a small, selected subset of it's structure.
+
+THIS SOFTWARE IS INTENDED FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY.
+WE ARE NOT RESPONSIBLE FOR ANY ILLICIT USES OF THIS SOFTWARE.
