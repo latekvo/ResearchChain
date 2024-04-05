@@ -7,10 +7,12 @@ from core.models.configurations import (
     llm_ollama_heavy,
     embedder_ollama_heavy,
     llm_hugging_face_heavy,
+    embedder_hugging_face_heavy,
 )
 
 
-def load_model(use_ollama: bool):
+def load_model():
+    use_ollama = True
     if use_ollama:
         return load_ollama_model()
     else:
@@ -24,17 +26,25 @@ def load_ollama_model():
 
 
 def load_hugging_face_model():
-    model_path = hf_hub_download(
+    base_model_path = hf_hub_download(
         llm_hugging_face_heavy.model_file, filename=llm_hugging_face_heavy.model_name
     )
-    ## Instantiate model from downloaded file
+    # Instantiate model from downloaded file
     llm = Llama(
-        model_path=model_path,
+        model_path=base_model_path,
         n_ctx=16000,  # Context length to use
         torch_dtype=torch.float16,
     )
-
-    ## Generation kwargs
+    embedder_model_path = hf_hub_download(
+        embedder_hugging_face_heavy.model_file, filename=embedder_hugging_face_heavy.model_name
+    )
+    # Instantiate model from downloaded file
+    embeddings = Llama(
+        model_path=embedder_model_path,
+        n_ctx=16000,  # Context length to use
+        torch_dtype=torch.float16,
+    )
+    # Generation kwargs
     # generation_kwargs = {
     #     "max_tokens": 20000,
     #     "stop": ["</s>"],
@@ -49,4 +59,4 @@ def load_hugging_face_model():
     # ## Unpack and the generated text from the LLM response dictionary and print it
     # print(res["choices"][0]["text"])
     # # res is short for result
-    return llm
+    return llm, embeddings

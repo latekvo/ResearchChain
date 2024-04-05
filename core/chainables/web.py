@@ -1,6 +1,7 @@
 from core.tools.scraper import web_query_google_lookup
 from core.tools.query import WebQuery
 
+
 def web_news_lookup(prompt_text: str):
     query = WebQuery('news', prompt_core=prompt_text)
     return web_query_google_lookup(query)

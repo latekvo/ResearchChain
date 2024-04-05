@@ -28,7 +28,6 @@ class WebQuery:
             self.db_save_file_extension = '_facts'
             self.db_chunk_size = 400
 
-
         elif query_type == 'news':
             # this prompt works well for Google News searches
             self.web_query = f"{prompt_core} news comprehensive overview "
@@ -39,7 +38,6 @@ class WebQuery:
             self.db_search_query = f"{prompt_core} news and innovations"
             self.db_save_file_extension = f"_news_{datetime.date.today().strftime('%Y_%m_%d').lower()}"
             self.db_chunk_size = 1000
-
 
         elif query_type == 'docs':
             self.web_query = 'documentation ' + prompt_core

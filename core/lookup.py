@@ -3,21 +3,26 @@ import datetime
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
+from core.tools.utils import purify_name
+from core.models.configurations import use_configuration
 
 # TODO: replace with puppeteer, this one gets blocked occasionally
 from googlesearch import search
 
 from core.chainables.web import web_docs_lookup, web_wiki_lookup, web_news_lookup
 from core.tools.dbops import get_db_by_name
-from core.models.ollama_params import EMBEDDING_MODEL_SAFE_NAME, llm, embeddings
+from core.tools.model_loader import load_model
 
 
 output_parser = StrOutputParser()
 
+llm, embeddings = load_model()
+llm_config, embed_config = use_configuration()
+embedding_model_safe_name = purify_name(embed_config.model_name)
 
 # this general db will be used to save AI responses,
 # might become useful as the responses are better than the input
-results_db = get_db_by_name(EMBEDDING_MODEL_SAFE_NAME, embeddings)
+results_db = get_db_by_name(embedding_model_safe_name, embeddings)
 
 
 def web_chain_function(prompt_dict: dict):
@@ -51,7 +56,6 @@ def web_chain_function(prompt_dict: dict):
             return web_wiki_lookup(user_prompt)
         else:
             return web_docs_lookup(user_prompt)
-
 
     # NOTE: a detour has been performed here, more details:
     #       web_chain_function will soon become just a tool playing a part of a larger mechanism.

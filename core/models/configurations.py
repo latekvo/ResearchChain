@@ -23,3 +23,21 @@ llm_hugging_face_heavy = LlmConfiguration(
     model_file="TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF",
     model_token_limit=30720,
 )
+
+embedder_hugging_face_heavy = EmbedderConfiguration(
+    supplier="hugging_face",
+    model_name="nomic-embed-text-v1.5-GGUF",
+    model_file="nomic-ai/nomic-embed-text-v1.5-GGUF",
+    model_token_limit=8192,
+    article_limit=10,
+    buffer_stops=["\n\n\n", "\n\n", "\n", ". ", ", ", " ", ""],
+    chunk_overlap=200,
+)
+
+
+def use_configuration():
+  use_ollama = True
+  if use_ollama:
+    return llm_ollama_heavy, embedder_ollama_heavy
+  else:
+    return llm_hugging_face_heavy, embedder_hugging_face_heavy
