@@ -1,7 +1,5 @@
 import datetime
-import random
 from urllib.error import HTTPError
-from time import sleep
 from typing import List
 
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
