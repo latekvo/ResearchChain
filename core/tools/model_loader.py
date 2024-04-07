@@ -3,46 +3,44 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
-from core.models.configurations import (
-    llm_ollama_heavy,
-    embedder_ollama_heavy,
-    llm_hugging_face_heavy,
-    embedder_hugging_face_heavy,
-)
-from terminal_gui import USE_OLLAMA
+from terminal_gui import USE_HUGGING_FACE
+from core.models.configurations import use_configuration
+llm_config, embed_config = use_configuration()
 
 
 def load_model():
-    if USE_OLLAMA:
-        return load_ollama_model()
-    else:
+    if USE_HUGGING_FACE:
         return load_hugging_face_model()
+    else:
+        return load_ollama_model()
 
 
 def load_ollama_model():
-    llm = Ollama(model=llm_ollama_heavy.model_name)
-    embeddings = OllamaEmbeddings(model=embedder_ollama_heavy.model_name)
+    llm = Ollama(model=llm_config.model_name)
+    embeddings = OllamaEmbeddings(model=embed_config.model_name)
     return llm, embeddings
 
 
 def load_hugging_face_model():
     base_model_path = hf_hub_download(
-        llm_hugging_face_heavy.model_file, filename=llm_hugging_face_heavy.model_name
+        llm_config.model_file, filename=llm_config.model_name
     )
     # Instantiate model from downloaded file
     llm = Llama(
         model_path=base_model_path,
-        n_ctx=16000,  # Context length to use
-        torch_dtype=torch.float16,
+        n_gpu_layers=-1,
+        n_batch=llm_config.model_token_limit,
+        verbose=True,
     )
     embedder_model_path = hf_hub_download(
-        embedder_hugging_face_heavy.model_file, filename=embedder_hugging_face_heavy.model_name
+        embed_config.model_file, filename=embed_config.model_name
     )
     # Instantiate model from downloaded file
     embeddings = Llama(
         model_path=embedder_model_path,
-        n_ctx=4000,  # Context length to use
-        torch_dtype=torch.float16,
+        n_gpu_layers=-1,
+        n_batch=embed_config.model_token_limit,
+        verbose=True,
     )
     # Generation kwargs
     # generation_kwargs = {
