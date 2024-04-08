@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import multiprocessing
 import re
 import uuid
@@ -83,6 +84,10 @@ def extract_links(text: str):
 
 def gen_uuid() -> str:
     return uuid.uuid4().hex
+
+
+def gen_unix_time() -> float:
+    return datetime.datetime.utcnow().timestamp()
 
 
 class hide_prints:
