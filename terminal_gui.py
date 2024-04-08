@@ -91,7 +91,7 @@ def user_input(stdscr):
             char = stdscr.getch()
             if char in [curses.KEY_ENTER, 10, 13]:
                 break
-            elif char in [curses.KEY_BACKSPACE, 127]:
+            elif char in [curses.KEY_BACKSPACE, 8, 127]:
                 text = text[:-1]
             elif 32 <= char <= 126:
                 text += chr(char)
