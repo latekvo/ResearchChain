@@ -2,10 +2,15 @@ import curses
 import requests
 
 from colorama import init as colorama_init, Fore, Style
-from core.lookup import chain
 from terminal_gui import user_input, select_input
+from langchain_core.output_parsers import StrOutputParser
+from core.lookup import web_lookup
 
 colorama_init()
+
+output_parser = StrOutputParser()
+
+chain = web_lookup | output_parser
 
 try:
     try:

@@ -42,19 +42,5 @@ def load_hugging_face_model():
         n_batch=embed_config.model_token_limit,
         verbose=True,
     )
-    # Generation kwargs
-    # generation_kwargs = {
-    #     "max_tokens": 20000,
-    #     "stop": ["</s>"],
-    #     "echo": False,  # Echo the prompt in the output
-    #     "top_k": 1,  # This is essentially greedy decoding, since the model will always return the highest-probability token. Set this value > 1 for sampling decoding
-    # }
 
-    # ## Run inference
-    # prompt = "The meaning of life is "
-    # res = llm(prompt, **generation_kwargs)  # Res is a dictionary
-
-    # ## Unpack and the generated text from the LLM response dictionary and print it
-    # print(res["choices"][0]["text"])
-    # # res is short for result
     return llm, embeddings
