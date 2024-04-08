@@ -3,14 +3,9 @@ import requests
 
 from colorama import init as colorama_init, Fore, Style
 from terminal_gui import user_input, select_input
-from langchain_core.output_parsers import StrOutputParser
 from core.lookup import web_lookup
 
 colorama_init()
-
-output_parser = StrOutputParser()
-
-chain = web_lookup | output_parser
 
 try:
     try:
@@ -27,7 +22,7 @@ try:
         mode_input = "Wiki"
         text_input = input(f"{Fore.GREEN}{Style.BRIGHT}(user){Fore.RESET} ")
 
-    chain_output = chain.invoke({"input": text_input, "mode": mode_input})
+    chain_output = web_lookup.invoke({"input": text_input, "mode": mode_input})
     print(f"{Fore.GREEN}{Style.BRIGHT}(llm){Fore.RESET} ", end="")
     print(chain_output, end="", flush=True)
     print(end="\n")

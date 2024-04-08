@@ -15,4 +15,4 @@ def create_db_if_not_exists(db_name: str, embeddings: Embeddings):
 
 def get_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
     create_db_if_not_exists(db_name, embeddings)
-    return FAISS.load_local(folder_path='store/vector', embeddings=embeddings, index_name=db_name, allow_dangerous_deserialization=True)
+    return FAISS.load_local(folder_path='store/vector', embeddings=embeddings, index_name=db_name)
