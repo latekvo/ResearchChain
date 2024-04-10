@@ -5,7 +5,7 @@ import { Button, Input, Switch, Tab, Tabs, cn } from "@nextui-org/react";
 
 function PromptyInput() {
   return (
-    <div className="w-2/3 h-1/4 p-8 rounded-2xl flex flex-col justify-around  bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+    <div className="w-1/2 h-1/5 p-5 rounded-2xl flex flex-col justify-between backdrop-blur-sm bg-gradient-to-tr from-purple-700 to-purple-400 text-white shadow-md drop-shadow-input ">
       <Input
         label="Topic of research:"
         isClearable
@@ -29,15 +29,12 @@ function PromptyInput() {
             "backdrop-saturate-200",
             "hover:bg-default-200/70",
             "dark:hover:bg-default/70",
-            "group-data-[focused=true]:bg-default-200/50",
+            "group-data-[focused=true]:bg-default-200/70",
             "dark:group-data-[focused=true]:bg-default/60",
             "!cursor-text",
           ],
         }}
         placeholder="Type to search..."
-        // startContent={
-        //   <SearchIcon className="text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0" />
-        // }
       />
       <div className="w-full flex justify-between">
         <Tabs
@@ -58,6 +55,7 @@ function PromptyInput() {
             size="lg"
             type="submit"
             className="ml-4 shadow-xl bg-default-200/70 dark:bg-default/70 backdrop-blur-xl backdrop-saturate-200 hover:bg-default-200/70 dark:hover:bg-default/70"
+            // endContent={<SearchIcon className="text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0" />}
           >
             Search
           </Button>
