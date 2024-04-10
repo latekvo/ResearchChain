@@ -1,5 +1,6 @@
 from tinydb import TinyDB, Query
 
+from core.databases import defaults
 from core.tools import utils
 
 db_name = "completion_tasks"
@@ -23,11 +24,19 @@ def db_add_completion_task(prompt):
     return new_uuid
 
 
-def db_get_completion_tasks_by_page(prompt):
+def db_get_completion_tasks_by_page(page: int, per_page: int = defaults.ITEMS_PER_PAGE):
 
     # returns all as TinyDB does not support pagination
     # we'll be moving to SQLite or Cassandra soon enough
     results = db.all()
+
+    return results
+
+
+def db_get_incomplete_completion_task():
+    fields = Query()
+
+    results = db.get(fields.completed is False)
 
     return results
 
