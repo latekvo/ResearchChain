@@ -1,12 +1,12 @@
 import { Button } from "@nextui-org/react";
+import PromptyInput from "./components/PrompyInput";
 
 export default function Page() {
-
   return (
-    <div>
-      <Button radius="full" className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
-      Button
-      </Button>
-    </div>
+    <>
+      <section className="w-screen h-screen flex justify-center items-center">
+        <PromptyInput />
+      </section>
+    </>
   );
 }
