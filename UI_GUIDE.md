@@ -32,8 +32,12 @@ you'll also make use of:
 * `db_get_crawl_history_by_page` to see the crawls you scheduled, and their status
 
 #### Important notes
-Currently, there is no system present which would automatically populate
+* Currently, there is no system present which would automatically populate
 the embeddings database after scheduling a completion task.
 This means, that the UI has to ensure all the databases are appropriately populated.
 As a result, before requesting a summary, it's necessary to perform crawls
 to give our summaries enough context to work with.
+
+* All db calls return lists of entire objects, unless it's specified otherwise.
+This is the default since we're prioritizing speed and minimal latency over 
+security.
