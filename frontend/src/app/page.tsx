@@ -1,5 +1,5 @@
 import { Button } from "@nextui-org/react";
-import PromptyInput from "./components/PrompyInput";
+import PromptyInput from "./components/PromptInput";
 
 export default function Page() {
   return (
