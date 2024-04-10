@@ -131,11 +131,11 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
 
     # 1. get from db
     # todo: currently downloaded = embedded, be careful here when adding separate embedder
-    db_url_ids = db_get_not_downloaded()
-    space_left = space_left - len(db_url_ids)
+    db_url_objects = db_get_not_downloaded()
+    space_left = space_left - len(db_url_objects)
 
     # 2. get from google
-    google_url_ids = []
+    google_url_objects = []
     if use_google and seed_query is not None:
         quit_unexpectedly = False
 
@@ -151,8 +151,8 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
                 for url in google_urls:
                     if db_is_url_present(url):
                         continue
-                    new_url_id = db_add_url(url)
-                    google_url_ids.append(new_url_id)
+                    new_url_object = db_add_url(url)
+                    google_url_objects.append(new_url_object)
                     idx += 1
                 google_traffic_manager.report_no_timeout()
             except HTTPError:
@@ -167,8 +167,8 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
             print("removed exhausted query:", seed_query.web_query)
 
     # 3. fill from db + google
-    url_rapid_queue = url_rapid_queue + db_url_ids
-    url_rapid_queue = url_rapid_queue + google_url_ids
+    url_rapid_queue = url_rapid_queue + db_url_objects
+    url_rapid_queue = url_rapid_queue + google_url_objects
 
     return
 
@@ -201,34 +201,27 @@ def get_document(url: str):
     return document[0]
 
 
-def url_download(url_id: str):
-    query = Query()
-    record = db_url.get(query.uuid == url_id)
-
-    if record is None:
-        db_set_url_rubbish(url_id)
-        return None
-
-    url = record["url"]
-
+def url_download(url_uuid: str, url: str):
     document = get_document(url)
     if document is None:
-        db_set_url_rubbish(url_id)
+        db_set_url_rubbish(url_uuid)
         return None
 
     document_text = document.page_content
 
-    with open("store/data/" + url_id, "w") as f:
+    with open("store/data/" + url_uuid, "w") as f:
         f.write(document_text)
 
-    db_set_url_downloaded(url_id)
+    db_set_url_downloaded(url_uuid)
     return document_text
 
 
-def process_url(url_id: str):
-    # todo: use uuid for input, operate closely with db to only modify records
+def process_url(url_object):
+    url_uuid = url_object.uuid
+    url_addr = url_object.url
+
     # 0. download article
-    document_text = url_download(url_id)
+    document_text = url_download(url_uuid, url_addr)
 
     # download failed
     if document_text is None:
@@ -239,7 +232,7 @@ def process_url(url_id: str):
 
     # 2. save all links
     for link in url_list:
-        url_save(link, url_id)
+        url_save(link, url_uuid)
 
 
 def processing_iteration():
@@ -253,8 +246,8 @@ def processing_iteration():
     if len(url_rapid_queue) == 0:
         return
 
-    url_id = url_rapid_queue.pop(0)
-    process_url(url_id)
+    url_object = url_rapid_queue.pop(0)
+    process_url(url_object)
 
 
 processing_iteration()
