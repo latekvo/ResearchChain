@@ -15,6 +15,7 @@ class WebQuery:
     prompt_core: str = ''
 
     web_query: str = ''
+
     web_extra_params: Union[dict, None] = None
     web_tbs = 0
 
