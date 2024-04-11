@@ -176,9 +176,7 @@ while len(url_rapid_queue) > 0:
     db_not_downloaded = db_url_pool.db.search(
         db_query.fragment({"is_downloaded": False, "is_rubbish": False})
     )
-    db_rubbish = db_url_pool.db.search(
-        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
-    )
+    db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
     db_total = db_url_pool.db.all()
 
     print("urls left to be downloaded:", len(db_not_downloaded))

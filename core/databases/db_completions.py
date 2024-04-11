@@ -5,12 +5,12 @@ from tinydb import TinyDB, Query
 from core.databases import defaults
 from core.tools import utils
 
-data_path = "../../store/data/"
+data_path = defaults.DATA_PATH
 if not os.path.exists(data_path):
     os.makedirs(data_path)
 
 db_name = "completions"
-db_path = "../../store/data/{}.json".format(db_name)
+db_path = data_path + "{}.json".format(db_name)
 db = TinyDB(db_path)
 
 # we have to use a document database with this one,
