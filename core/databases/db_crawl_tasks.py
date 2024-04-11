@@ -1,17 +1,11 @@
 import os
 
-from tinydb import TinyDB, Query
+from tinydb import Query
 
-from core.databases import defaults
 from core.tools import utils
+from core.tools.utils import use_tinydb
 
-data_path = defaults.DATA_PATH
-if not os.path.exists(data_path):
-    os.makedirs(data_path)
-
-db_name = "crawl_tasks"
-db_path = data_path + "{}.json".format(db_name)
-db = TinyDB(db_path)
+db = use_tinydb("crawl_tasks")
 
 # we have to heartbeat our workers once we run out of tasks, websocks should suffice
 

@@ -1,17 +1,10 @@
-import os
-
-from tinydb import TinyDB, Query
+from tinydb import Query
 
 from core.databases import defaults
 from core.tools import utils
+from core.tools.utils import use_tinydb
 
-data_path = defaults.DATA_PATH
-if not os.path.exists(data_path):
-    os.makedirs(data_path)
-
-db_name = "completions"
-db_path = data_path + "{}.json".format(db_name)
-db = TinyDB(db_path)
+db = use_tinydb("completions")
 
 # we have to use a document database with this one,
 # as completions will be large chunks of data of variable size

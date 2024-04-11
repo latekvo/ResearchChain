@@ -94,8 +94,6 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
     url_rapid_queue = url_rapid_queue + db_url_objects
     url_rapid_queue = url_rapid_queue + google_url_objects
 
-    print("queue", url_rapid_queue)
-
     return
 
 

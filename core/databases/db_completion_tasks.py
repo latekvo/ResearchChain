@@ -1,24 +1,15 @@
-import os
-
-from tinydb import TinyDB, Query
+from tinydb import Query
 
 from core.databases import defaults
 from core.tools import utils
+from core.tools.utils import use_tinydb
 
-data_path = defaults.DATA_PATH
-if not os.path.exists(data_path):
-    os.makedirs(data_path)
-
-db_name = "completion_tasks"
-db_path = data_path + "{}.json".format(db_name)
-db = TinyDB(db_path)
+db = use_tinydb("completion_tasks")
 
 
 def db_add_completion_task(prompt):
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
-
-    print("inserting completion task: ", prompt)
 
     db.insert(
         {
@@ -51,8 +42,7 @@ def db_get_incomplete_completion_task():
 
 """
 def db_add_smart_completion_task(prompt):
-    # todo: this functions should automatically check completed crawls 
-    #       to see if it's necessary to perform a crawl before doing a summary
+    # todo: this functions should automatically dispatch crawl tasks if they are needed 
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
 

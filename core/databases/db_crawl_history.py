@@ -1,18 +1,8 @@
-import os
-
-from tinydb import TinyDB
-
 from core.databases import defaults
 from core.tools import utils
+from core.tools.utils import use_tinydb
 
-data_path = defaults.DATA_PATH
-if not os.path.exists(data_path):
-    os.makedirs(data_path)
-
-db_name = "crawl_history"
-db_path = data_path + "{}.json".format(db_name)
-db = TinyDB(db_path)
-
+db = use_tinydb("crawl_history")
 
 # this db is completely optional, only used by the UI, and so it's development can be delayed
 # most sensible solution here is to make items of the url_database point to entries of this database
