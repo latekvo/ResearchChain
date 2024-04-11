@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import { Button, Input, Switch, Tab, Tabs, cn } from "@nextui-org/react";
+import { Button, Input, Tab, Tabs } from "@nextui-org/react";
 // import {SearchIcon} from "./SearchIcon";
 
 function PromptyInput() {
   return (
-    <div className="w-1/2 h-1/5 p-5 rounded-2xl flex flex-col justify-between backdrop-blur-sm bg-gradient-to-tr from-purple-700 to-purple-400 text-white shadow-md drop-shadow-input ">
+    <div className="w-1/2 h-1/4 p-5 rounded-2xl flex flex-col justify-between backdrop-blur-md bgcolor bg-black/50 drop-shadow-xl">
       <Input
         label="Topic of research:"
         isClearable
