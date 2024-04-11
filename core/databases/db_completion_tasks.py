@@ -23,7 +23,7 @@ def db_add_completion_task(prompt):
     return new_uuid
 
 
-def db_get_completion_tasks_by_page(page: int, per_page: int = defaults.ITEMS_PER_PAGE):
+def db_get_completion_tasks_by_page(page: int = defaults.PAGE, per_page: int = defaults.ITEMS_PER_PAGE):
 
     # returns all as TinyDB does not support pagination
     # we'll be moving to SQLite or Cassandra soon enough
