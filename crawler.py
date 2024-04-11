@@ -1,4 +1,5 @@
 import datetime
+import os
 from urllib.error import HTTPError
 from typing import List
 
@@ -22,8 +23,12 @@ from core.tools.utils import hide_prints
 #       the embedding one will look through db_url for any not vectorized articles.
 #       this will allow for automatic re-vectorization in case we get a new embed model.
 
+data_path = "store/data/"
+if not os.path.exists(data_path):
+    os.makedirs(data_path)
+
 # todo: tinydb is a temporary solution, it does not support multithreading, relations or indexing
-db_url_path = "store/data/url_store.json"
+db_url_path = data_path + "url_store.json"
 db_url = TinyDB(db_url_path)
 
 # 100 links max, then put new ones in db
@@ -33,13 +38,8 @@ url_queue_limit = 100
 url_rapid_queue = []
 
 requested_query_queue = [
-    WebQuery("basic", "python site:arxiv.org", priority=5),
-    WebQuery("basic", "typescript site:arxiv.org", priority=5),
-    WebQuery("basic", "java site:arxiv.org", priority=5),
-    WebQuery("basic", "nvidia site:arxiv.org", priority=5),
-    WebQuery("basic", "google site:arxiv.org", priority=5),
-    WebQuery("news", "llm news", priority=1),
-    WebQuery("news", "ai news", priority=1),
+    WebQuery("news", "llm", priority=1),
+    WebQuery("news", "ai", priority=1),
 ]
 
 # url order:
@@ -68,20 +68,13 @@ def db_add_url(url: str, parent_id: str = None):
     return new_url_id
 
 
-def db_get_not_downloaded() -> List[str]:
+def db_get_not_downloaded() -> list:
     db_query = Query()
     db_results = db_url.search(
         db_query.fragment({"is_downloaded": False, "is_rubbish": False})
     )
-    url_ids = []
-    for result in db_results:
-        url_ids.append(result["uuid"])
 
-    return url_ids
-
-
-def db_get_not_embedded(model: str) -> List[str]:
-    pass
+    return db_results
 
 
 def db_set_url_embedded(url_id: str, embedding_model: str):
@@ -170,6 +163,8 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
     url_rapid_queue = url_rapid_queue + db_url_objects
     url_rapid_queue = url_rapid_queue + google_url_objects
 
+    print("queue", url_rapid_queue)
+
     return
 
 
@@ -201,8 +196,10 @@ def get_document(url: str):
     return document[0]
 
 
-def url_download(url_uuid: str, url: str):
-    document = get_document(url)
+def url_download(url_object):
+    url_uuid = url_object["uuid"]
+    url_addr = url_object["url"]
+    document = get_document(url_addr)
     if document is None:
         db_set_url_rubbish(url_uuid)
         return None
@@ -217,8 +214,8 @@ def url_download(url_uuid: str, url: str):
 
 
 def process_url(url_object):
-    url_uuid = url_object.uuid
-    url_addr = url_object.url
+    url_uuid = url_object["uuid"]
+    url_addr = url_object["url"]
 
     # 0. download article
     document_text = url_download(url_uuid, url_addr)
