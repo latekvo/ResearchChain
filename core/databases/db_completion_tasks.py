@@ -1,7 +1,13 @@
+import os
+
 from tinydb import TinyDB, Query
 
 from core.databases import defaults
 from core.tools import utils
+
+data_path = "../../store/data/"
+if not os.path.exists(data_path):
+    os.makedirs(data_path)
 
 db_name = "completion_tasks"
 db_path = "../../store/data/{}.json".format(db_name)

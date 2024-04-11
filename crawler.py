@@ -1,13 +1,11 @@
-import datetime
 import os
 from urllib.error import HTTPError
-from typing import List
 
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
-
-from tinydb import TinyDB, Query
+from tinydb import Query
 
 from core.classes.traffic_manager import TrafficManager
+from core.databases import db_url_pool
 from core.tools import utils
 from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
@@ -26,10 +24,6 @@ from core.tools.utils import hide_prints
 data_path = "store/data/"
 if not os.path.exists(data_path):
     os.makedirs(data_path)
-
-# todo: tinydb is a temporary solution, it does not support multithreading, relations or indexing
-db_url_path = data_path + "url_store.json"
-db_url = TinyDB(db_url_path)
 
 # 100 links max, then put new ones in db
 # this does not increase access speed,
@@ -50,70 +44,6 @@ requested_query_queue = [
 google_traffic_manager = TrafficManager()
 
 
-def db_add_url(url: str, parent_id: str = None):
-    new_url_id = utils.gen_uuid()
-    current_date = datetime.datetime.now().isoformat()
-
-    entry = {
-        "uuid": new_url_id,
-        "parent_uuid": parent_id,  # will be useful for url crawling analysis & visualization
-        "url": url,
-        "date_added": current_date,
-        "is_downloaded": False,
-        "is_rubbish": False,
-        "embedded_by": [],
-    }
-
-    db_url.insert(entry)
-    return new_url_id
-
-
-def db_get_not_downloaded() -> list:
-    db_query = Query()
-    db_results = db_url.search(
-        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
-    )
-
-    return db_results
-
-
-def db_set_url_embedded(url_id: str, embedding_model: str):
-    query = Query()
-    record = db_url.get(query.uuid == url_id)
-    if record is None:
-        return
-
-    embedded_by = record["embedded_by"]
-    embedded_by.append(embedding_model)
-
-    db_url.update({"embedded_by": embedded_by}, query.uuid == url_id)
-
-
-def db_set_url_downloaded(url_id: str):
-    query = Query()
-    record = db_url.get(query.uuid == url_id)
-    if record is None:
-        return
-
-    db_url.update({"is_downloaded": True}, query.uuid == url_id)
-
-
-def db_set_url_rubbish(url_id: str):
-    query = Query()
-    record = db_url.get(query.uuid == url_id)
-    if record is None:
-        return
-
-    db_url.update({"is_rubbish": True}, query.uuid == url_id)
-
-
-def db_is_url_present(url: str):
-    # check db_url for presence
-    query = Query()
-    record = db_url.get(query.url == url)
-    return record is not None
-
-
 def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
     global url_rapid_queue
 
@@ -124,7 +54,7 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
 
     # 1. get from db
     # todo: currently downloaded = embedded, be careful here when adding separate embedder
-    db_url_objects = db_get_not_downloaded()
+    db_url_objects = db_url_pool.db_get_not_downloaded()
     space_left = space_left - len(db_url_objects)
 
     # 2. get from google
@@ -142,9 +72,10 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
         if not quit_unexpectedly:
             try:
                 for url in google_urls:
-                    if db_is_url_present(url):
+                    if db_url_pool.db_is_url_present(url):
                         continue
-                    new_url_object = db_add_url(url)
+                    prompt = seed_query.web_query
+                    new_url_object = db_url_pool.db_add_url(url, prompt, None)
                     google_url_objects.append(new_url_object)
                     idx += 1
                 google_traffic_manager.report_no_timeout()
@@ -170,18 +101,14 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
 
 def url_save(url: str, parent_id: str = None):
     # 0. check if url was already saved
-    if db_is_url_present(url):
+    if db_url_pool.db_is_url_present(url):
         return
 
     # 1. add to the db
-    db_add_url(url, parent_id)
-
-    # 2. place in short-term memory (if there is any space left)
-    if len(url_rapid_queue) < url_queue_limit:
-        url_rapid_queue.append(url)
+    db_url_pool.db_add_url(url, parent_id)
 
 
-def get_document(url: str):
+def url_download_text(url: str):
     # we expect the document might not be a pdf from PyPDFLoader
     # and expect that the site might block us from WebBaseLoader
     with hide_prints():
@@ -199,26 +126,22 @@ def get_document(url: str):
 def url_download(url_object):
     url_uuid = url_object["uuid"]
     url_addr = url_object["url"]
-    document = get_document(url_addr)
+    document = url_download_text(url_addr)
     if document is None:
-        db_set_url_rubbish(url_uuid)
+        db_url_pool.db_set_url_rubbish(url_uuid)
         return None
 
     document_text = document.page_content
 
-    with open("store/data/" + url_uuid, "w") as f:
-        f.write(document_text)
-
-    db_set_url_downloaded(url_uuid)
+    db_url_pool.db_set_url_downloaded(url_uuid, document_text)
     return document_text
 
 
 def process_url(url_object):
     url_uuid = url_object["uuid"]
-    url_addr = url_object["url"]
 
     # 0. download article
-    document_text = url_download(url_uuid, url_addr)
+    document_text = url_download(url_object)
 
     # download failed
     if document_text is None:
@@ -249,15 +172,17 @@ def processing_iteration():
 
 processing_iteration()
 while len(url_rapid_queue) > 0:
-    processing_iteration()
-
-    """ debug, progress tracker
     db_query = Query()
-    db_not_downloaded = db_url.search(db_query.fragment({'is_downloaded': False, 'is_rubbish': False}))
-    db_rubbish = db_url.search(db_query.fragment({'is_downloaded': False, 'is_rubbish': False}))
-    db_total = db_url.all()
+    db_not_downloaded = db_url_pool.db.search(
+        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
+    )
+    db_rubbish = db_url_pool.db.search(
+        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
+    )
+    db_total = db_url_pool.db.all()
 
     print("urls left to be downloaded:", len(db_not_downloaded))
     print("urls marked rubbish:", len(db_rubbish))
     print("url running total:", len(db_total))
-    """
+
+    processing_iteration()

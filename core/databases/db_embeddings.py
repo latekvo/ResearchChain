@@ -1,5 +1,6 @@
 from tinydb import TinyDB
 
+
 db_name = "embeddings"
 db_path = "../../store/data/{}.json".format(db_name)
 db = TinyDB(db_path)

@@ -1,6 +1,12 @@
+import os
+
 from tinydb import TinyDB, Query
 
 from core.tools import utils
+
+data_path = "../../store/data/"
+if not os.path.exists(data_path):
+    os.makedirs(data_path)
 
 db_name = "url_pool"
 db_path = "../../store/data/{}.json".format(db_name)
@@ -12,7 +18,7 @@ db = TinyDB(db_path)
 # and a tiny global kv cache just to prevent duplicate urls
 
 
-def db_add_url(url, prompt, parent_uuid=None):
+def db_add_url(url: str, prompt: str, parent_uuid: str = None):
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
 
@@ -21,6 +27,7 @@ def db_add_url(url, prompt, parent_uuid=None):
         "parent_uuid": parent_uuid,
         "prompt": prompt,
         "url": url,
+        "text": None,
         "is_downloaded": False,
         "is_rubbish": False,
         "embedded_by": [],
@@ -60,13 +67,13 @@ def db_set_url_embedded(url_id: str, embedding_model: str):
     db.update({"embedded_by": embedded_by}, query.uuid == url_id)
 
 
-def db_set_url_downloaded(url_id: str):
+def db_set_url_downloaded(url_id: str, text: str):
     query = Query()
     record = db.get(query.uuid == url_id)
     if record is None:
         return
 
-    db.update({"is_downloaded": True}, query.uuid == url_id)
+    db.update({"is_downloaded": True, "text": text}, query.uuid == url_id)
 
 
 def db_set_url_rubbish(url_id: str):
