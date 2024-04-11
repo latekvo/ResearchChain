@@ -4,7 +4,7 @@ from terminal_gui import USE_HUGGING_FACE
 
 llm_ollama_heavy = LlmConfiguration(
     supplier="ollama",
-    model_name="zephyr:7b-beta-q5_K_M",
+    model_name="zephyr:7b-beta-q3_K_M",
     model_token_limit=4096,
     model_file=""
 )
