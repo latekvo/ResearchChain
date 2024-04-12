@@ -47,7 +47,7 @@ def web_chain_function(prompt_dict: dict):
         else:
             return web_docs_lookup(user_prompt)
 
-    def interpret_prompt_mode() -> ChatPromptTemplate[BaseChatPromptTemplate]:
+    def interpret_prompt_mode():
         if prompt_dict["mode"] == "News":
             return web_news_lookup_prompt()
         elif prompt_dict["mode"] == "Docs":
@@ -56,7 +56,7 @@ def web_chain_function(prompt_dict: dict):
             return web_wiki_lookup_prompt()
         else:
             return web_docs_lookup_prompt()
-
+    web_interpret_prompt_mode = interpret_prompt_mode()
     # NOTE: a detour has been performed here, more details:
     #       web_chain_function will soon become just a tool playing a part of a larger mechanism.
     #       prompt creation will be taken over by prompt sentiment extractor which will extract all researchable
@@ -70,7 +70,7 @@ def web_chain_function(prompt_dict: dict):
             # this has to be a RunnableLambda, it cannot be a string
             "user_request": RunnableLambda(get_user_prompt),
         }
-        | RunnableLambda(interpret_prompt_mode)
+        | web_interpret_prompt_mode
         | llm
         | output_parser
     )
