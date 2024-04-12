@@ -13,7 +13,8 @@ from core.chainables.web import (
     web_news_lookup,
     web_docs_lookup_prompt,
     web_news_lookup_prompt,
-    web_wiki_lookup_prompt)
+    web_wiki_lookup_prompt,
+)
 from core.tools.dbops import get_db_by_name
 from core.tools.model_loader import load_model
 
@@ -47,7 +48,7 @@ def web_chain_function(prompt_dict: dict):
         else:
             return web_docs_lookup(user_prompt)
 
-    def interpret_prompt_mode() -> ChatPromptTemplate[BaseChatPromptTemplate]:
+    def interpret_prompt_mode():
         if prompt_dict["mode"] == "News":
             return web_news_lookup_prompt()
         elif prompt_dict["mode"] == "Docs":
@@ -56,6 +57,8 @@ def web_chain_function(prompt_dict: dict):
             return web_wiki_lookup_prompt()
         else:
             return web_docs_lookup_prompt()
+
+    web_interpret_prompt = interpret_prompt_mode()
 
     # NOTE: a detour has been performed here, more details:
     #       web_chain_function will soon become just a tool playing a part of a larger mechanism.
@@ -70,7 +73,7 @@ def web_chain_function(prompt_dict: dict):
             # this has to be a RunnableLambda, it cannot be a string
             "user_request": RunnableLambda(get_user_prompt),
         }
-        | RunnableLambda(interpret_prompt_mode)
+        | web_interpret_prompt
         | llm
         | output_parser
     )
