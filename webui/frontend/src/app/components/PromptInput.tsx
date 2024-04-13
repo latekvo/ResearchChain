@@ -1,9 +1,14 @@
 "use client";
-import React from "react";
+import React, {useState} from "react";
 import { Button, Input, Tab, Tabs } from "@nextui-org/react";
 // import {SearchIcon} from "./SearchIcon";
-
+type data_to_search_type = {
+    prompt: string,
+    search_type:string
+}
 function PromptyInput() {
+const [data_to_search, set_data_to_search] = React.useState<data_to_search_type>({prompt: "",
+    search_type: ""});
   return (
     <div className="w-1/2 h-1/4 p-5 rounded-2xl flex flex-col justify-between backdrop-blur-md bgcolor bg-black/50 drop-shadow-xl">
       <Input
@@ -35,11 +40,13 @@ function PromptyInput() {
           ],
         }}
         placeholder="Type to search..."
+        onChange={(e) =>  set_data_to_search({...data_to_search, prompt: e.target.value}) }
       />
       <div className="w-full flex justify-between">
         <Tabs
           size="lg"
           aria-label="Options"
+          onSelectionChange={(e) => set_data_to_search({...data_to_search, search_type: e.toString()})}
           classNames={{
             tabList:
               "shadow-xl dark:text-white/90 bg-default-200/70 dark:bg-default/70 backdrop-blur-xl backdrop-saturate-200",
