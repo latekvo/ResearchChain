@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 @dataclass
 class EmbedderConfiguration:
-    supplier: Literal['ollama', 'hugging_face']
+    supplier: Literal["ollama", "hugging_face"]
     model_name: str
     model_token_limit: int
     article_limit: int
