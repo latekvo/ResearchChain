@@ -109,15 +109,15 @@ def user_input(stdscr):
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '-H',
-    '--use-hugging-face',
-    dest='use_hugging_face',
+    "-H",
+    "--use-hugging-face",
+    dest="use_hugging_face",
     action="store_true",
-    help='Use Hugging Face as the model provider'
+    help="Use Hugging Face as the model provider",
 )
 USE_HUGGING_FACE = parser.parse_args().use_hugging_face
 
-'''
+"""
 parser.add_argument(
     '-O',
     '--use-ollama',
@@ -126,4 +126,4 @@ parser.add_argument(
     help='Use Ollama as the model provider'
 )
 USE_OLLAMA = parser.parse_args().use_ollama
-'''
+"""

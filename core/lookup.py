@@ -13,7 +13,8 @@ from core.chainables.web import (
     web_news_lookup,
     web_docs_lookup_prompt,
     web_news_lookup_prompt,
-    web_wiki_lookup_prompt)
+    web_wiki_lookup_prompt,
+)
 from core.tools.dbops import get_db_by_name
 from core.tools.model_loader import load_model
 
@@ -56,6 +57,7 @@ def web_chain_function(prompt_dict: dict):
             return web_wiki_lookup_prompt()
         else:
             return web_docs_lookup_prompt()
+
     web_interpret_prompt_mode = interpret_prompt_mode()
     # NOTE: a detour has been performed here, more details:
     #       web_chain_function will soon become just a tool playing a part of a larger mechanism.
