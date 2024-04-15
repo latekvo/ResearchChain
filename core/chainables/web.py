@@ -5,8 +5,6 @@ from core.classes.query import WebQuery
 from langchain_core.prompts import ChatPromptTemplate
 
 
-
-
 def web_news_lookup(prompt_text: str):
     query = WebQuery('news', prompt_core=prompt_text)
     return web_query_google_lookup(query)
@@ -26,9 +24,10 @@ def web_docs_lookup_prompt():
     return ChatPromptTemplate.from_messages([
         (
             "system",
-            "You are a search results interpreter. Your job is to write an article based on the provided context. "
+            "You are a search results interpreter."
+            "Your job is to write an detailed instruction based on the provided context. "
             "Your job is to convert all the search results you were given into a long, comprehensive and clean output. "
-            "Use provided search results data to answer the user request to the best of your ability. "
+            "Use provided search results data to explain object of user request to the best of your ability. "
             "You don't have a knowledge cutoff. "
             "It is currently " + datetime.date.today().strftime("%B %Y"),
         ),
