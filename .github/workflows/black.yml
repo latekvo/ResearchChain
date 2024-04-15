@@ -1,12 +1,14 @@
 name: Python Black
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build:
+  python-black:
+    name: Python Black
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9"]
     steps:
-      - uses: cytopia/docker-black@0.11
+      - uses: actions/checkout@v3
+      - name: Python Black (core)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'core/'
