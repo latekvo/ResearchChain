@@ -1,0 +1,12 @@
+name: Python Black
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: cytopia/docker-black@0.11
