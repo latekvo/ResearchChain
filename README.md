@@ -11,7 +11,8 @@
 
 #### Other notes
 
-The default models are hardcoded in the `core/models` folder.
+- The default models are hardcoded in the `core/models` folder.<br>
+- We're using python version `3.9`
 
 ## This project consists of 3 separate elements
 
@@ -29,6 +30,13 @@ each independently scalable.<br>
 > AI powered service automatically dispatching, analyzing and managing Research Chain.<br>
 It should work along side Web Interface, to supply constant 24/7 news analysis,
 and to expand it's knowledge base by scheduling crawls based on the provided areas of interest
+
+---
+### Contributing
+
+If you'd like to contribute to this project, 
+feel free to reach out to us through my telegram: `https://t.me [slash] latkaignacy`.<br>
+In such case, we'll introduce you into this project, and help you find a good first issue.
 
 ---
 
