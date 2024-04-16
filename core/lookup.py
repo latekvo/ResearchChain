@@ -6,9 +6,6 @@ from langchain_core.runnables import RunnableLambda
 from core.tools.utils import purify_name
 from core.models.configurations import use_configuration
 
-# TODO: replace with puppeteer, this one gets blocked occasionally
-from googlesearch import search
-
 from core.chainables.web import web_docs_lookup, web_wiki_lookup, web_news_lookup
 from core.tools.dbops import get_db_by_name
 from core.tools.model_loader import load_model

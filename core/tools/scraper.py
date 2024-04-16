@@ -14,7 +14,7 @@ from core.models.configurations import use_configuration
 from core.tools.utils import purify_name
 from core.tools.dbops import get_db_by_name
 from core.classes.query import WebQuery
-from core.tools.utils import is_text_junk, remove, timeout_function
+from core.tools.utils import is_text_junk, remove
 
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
@@ -35,7 +35,9 @@ def docs_to_context(docs_and_scores: List[Document], token_limit: int) -> str:
         if document_index >= len(docs_and_scores):
             break
 
-    print(f"{Fore.CYAN}Used {document_index + 1} snippets with a total of {token_count} tokens as context.{Fore.RESET}")
+    print(
+        f"{Fore.CYAN}Used {document_index + 1} snippets with a total of {token_count} tokens as context.{Fore.RESET}"
+    )
     print(f"{Fore.CYAN}Context itself: {Fore.RESET}", context_text)
     return context_text
 
@@ -49,11 +51,12 @@ def query_for_urls(query: WebQuery, url_amount=embed_config.article_limit) -> Li
 
     url_list = search(
         query=query.web_query,
-        stop= url_amount,
-        lang='en',
-        safe='off',
+        stop=url_amount,
+        lang="en",
+        safe="off",
         tbs=query.web_tbs,
-        extra_params=query.web_extra_params)
+        extra_params=query.web_extra_params,
+    )
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
     return url_list
 
@@ -79,7 +82,8 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
             chunk_size=query.db_chunk_size,
             chunk_overlap=embed_config.chunk_overlap,
             keep_separator=False,
-            strip_whitespace=True)
+            strip_whitespace=True,
+        )
 
         chunks = text_splitter.split_documents(document)
 
@@ -88,21 +92,25 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
                 chunks.remove(chunk)
                 continue
 
-            chunk.page_content = remove(chunk.page_content, ['\n', '`'])
-            chunk.page_content = (query.db_embedding_prefix +
-                                  chunk.page_content +
-                                  query.db_embedding_postfix)
+            chunk.page_content = remove(chunk.page_content, ["\n", "`"])
+            chunk.page_content = (
+                query.db_embedding_prefix
+                + chunk.page_content
+                + query.db_embedding_postfix
+            )
 
         if len(chunks) != 0:
             database.add_documents(documents=chunks, embeddings=embeddings)
 
     db_name = embedding_model_safe_name + query.db_save_file_extension
-    database.save_local(folder_path='store/vector', index_name=db_name)
+    database.save_local(folder_path="store/vector", index_name=db_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
-def web_query_google_lookup(query: WebQuery, token_limit: int = embed_config.model_token_limit):
+def web_query_google_lookup(
+    query: WebQuery, token_limit: int = embed_config.model_token_limit
+):
     db_name = embedding_model_safe_name + query.db_save_file_extension
     db = get_db_by_name(db_name, embeddings)
 
@@ -110,7 +118,9 @@ def web_query_google_lookup(query: WebQuery, token_limit: int = embed_config.mod
 
     # return the document with the highest prompt similarity score (for now only browsing the first search result)
     embedding_vector = embeddings.embed_query(query.db_embed_query)
-    docs_and_scores = db.similarity_search_by_vector(embedding_vector, k=round(token_limit / 64))
+    docs_and_scores = db.similarity_search_by_vector(
+        embedding_vector, k=round(token_limit / 64)
+    )
 
     print(f"{Fore.CYAN}Database search completed.{Fore.RESET}")
 
