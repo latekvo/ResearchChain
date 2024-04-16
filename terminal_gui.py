@@ -115,7 +115,20 @@ parser.add_argument(
     action="store_true",
     help="Use Hugging Face as the model provider",
 )
-USE_HUGGING_FACE = parser.parse_args().use_hugging_face
+parser.add_argument(
+    "-M",
+    "--pick-model",
+    type=str,
+    dest="pick_model",
+    choices=["small", "large"],
+    default="default",
+    help="Pick a model size (small or large)",
+)
+
+args = parser.parse_args()
+
+USE_HUGGING_FACE = args.use_hugging_face
+PICK_MODEL = args.pick_model
 
 """
 parser.add_argument(
