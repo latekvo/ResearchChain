@@ -35,7 +35,7 @@ def db_get_completion_tasks_by_page(page: int = defaults.PAGE, per_page: int = d
 def db_get_incomplete_completion_task():
     fields = Query()
 
-    results = db.get(fields.completed is False)
+    results = db.get(fields.completed == False)
 
     return results
 
