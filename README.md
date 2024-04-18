@@ -13,6 +13,7 @@
 
 - The default models are hardcoded in the `core/models` folder.<br>
 - We're using python version `3.9`
+- `environment.yml` is the linux env, but for macOS and windows there are other available
 
 ## This project consists of 3 separate elements
 
@@ -28,15 +29,16 @@ each independently scalable.<br>
 
 > #### Research Loop
 > AI powered service automatically dispatching, analyzing and managing Research Chain.<br>
-It should work along side Web Interface, to supply constant 24/7 news analysis,
-and to expand it's knowledge base by scheduling crawls based on the provided areas of interest
+It should work alongside Web Interface, to supply constant 24/7 news analysis,
+and to expand its knowledge base by scheduling crawls based on the provided areas of interest
 
 ---
 ### Contributing
 
 If you'd like to contribute to this project, 
 feel free to reach out to us through my telegram: `https://t.me [slash] latkaignacy`.<br>
-In such case, we'll introduce you into this project, and help you find a good first issue.
+In such case, we'll introduce you into this project, 
+fix any issues that you may encounter and help you find a good first issue.
 
 ---
 

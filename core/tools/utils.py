@@ -47,7 +47,7 @@ def reduce(text: str, goal: str, match: str):
     return goal.join(text.split(match))
 
 
-def remove(text: str, wordlist: list):
+def remove(text: str, wordlist: list[str]):
     for word in wordlist:
         text = "".join(text.split(word))
     return text
