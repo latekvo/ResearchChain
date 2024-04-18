@@ -5,10 +5,10 @@ import { Button, Input, Tab, Tabs } from "@nextui-org/react";
 
 function PromptyInput() {
   return (
-    <div className="w-1/2 h-1/4 p-5 shadow-xl bg-black bg-opacity-45 z-10 flex flex-col justify-between">
+    <div className="w-1/2 p-5 shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-55 z-10 flex flex-col justify-between">
       <Input
         variant="underlined"
-        placeholder="Type to search..."
+        placeholder="Ask a question :)"
         color="secondary"
         size="lg"
         className="text-gray-300 px-3"
@@ -24,7 +24,7 @@ function PromptyInput() {
           <Tab key="docs" title="Docs" />
           <Tab key="wiki" title="Wiki" />
         </Tabs>
-        <div className="w-2/3 flex flex-row-reverse">
+        <div className="w-2/3 mr-3 flex flex-row-reverse">
           <Button
             size="lg"
             type="submit"
