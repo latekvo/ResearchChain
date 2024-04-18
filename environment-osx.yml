@@ -74,4 +74,3 @@ dependencies:
   - zlib=1.2.13=h4dc903c_0
   - pip:
       - faiss-cpu==1.8.0
-prefix: /usr/local/Caskroom/miniconda/base/envs/ResearchChain
