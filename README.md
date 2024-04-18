@@ -14,6 +14,8 @@
 - The default models are hardcoded in the `core/models` folder.<br>
 - We're using python version `3.9`
 - `environment.yml` is the linux env, but for macOS and windows there are other available
+- Apple intel is not supported anymore, but you can still get it working by manually installing
+  any missing package that comes up during the program execution.
 
 ## This project consists of 3 separate elements
 
