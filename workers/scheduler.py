@@ -60,6 +60,9 @@ For function-calling reference see OpenBMB/ChatDev
 import queue
 from dataclasses import dataclass
 
+# auto-dispatching worker
+# INPUTS: topics_of_interest, summaries
+# TASK: deepens
 
 @dataclass
 class ThreadObject:
