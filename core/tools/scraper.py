@@ -1,5 +1,3 @@
-from typing import List
-
 import requests.exceptions
 import tiktoken
 from googlesearch import search
@@ -14,7 +12,7 @@ from core.models.configurations import use_configuration
 from core.tools.utils import purify_name
 from core.tools.dbops import get_db_by_name
 from core.classes.query import WebQuery
-from core.tools.utils import is_text_junk, remove, timeout_function
+from core.tools.utils import is_text_junk, remove
 
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
@@ -24,7 +22,7 @@ llm_config, embed_config = use_configuration()
 embedding_model_safe_name = purify_name(embed_config.model_name)
 
 
-def docs_to_context(docs_and_scores: List[Document], token_limit: int) -> str:
+def docs_to_context(docs_and_scores: list[Document], token_limit: int) -> str:
     context_text = ""
     token_count = 0
     document_index = 0
@@ -46,7 +44,7 @@ def rag_query_lookup(prompt_text: str) -> str:
     pass
 
 
-def query_for_urls(query: WebQuery, url_amount=embed_config.article_limit) -> List[str]:
+def query_for_urls(query: WebQuery, url_amount=embed_config.article_limit) -> list[str]:
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", query.web_query)
 
     url_list = search(
