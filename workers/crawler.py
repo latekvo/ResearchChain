@@ -11,6 +11,7 @@ from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
 from core.tools.utils import hide_prints
 
+
 # must-haves:
 # - live user prompt interaction+injection,
 # - dispatching summarizations,
@@ -28,7 +29,7 @@ if not os.path.exists(data_path):
 # 100 links max, then put new ones in db
 # this does not increase access speed,
 # it only encourages a better mix of broadness and deepness of links
-url_queue_limit = 100
+url_queue_limit = 80
 url_rapid_queue = []
 
 requested_query_queue = [

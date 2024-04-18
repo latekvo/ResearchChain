@@ -64,6 +64,7 @@ from dataclasses import dataclass
 # INPUTS: topics_of_interest, summaries
 # TASK: deepens
 
+
 @dataclass
 class ThreadObject:
     pass
