@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import datetime
-from typing import Literal, Union
+from typing import Literal
 
 from core.tools import utils
 
@@ -20,7 +22,7 @@ class WebQuery:
 
     web_query: str = ""
 
-    web_extra_params: Union[dict, None] = None
+    web_extra_params: dict[str, str | int] | None = None
     web_tbs = 0
 
     db_search_query: str = ""  # query to search by
