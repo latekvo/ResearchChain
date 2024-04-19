@@ -16,7 +16,7 @@ def create_db_if_not_exists(db_name: str, embeddings: Embeddings):
         print("Already exists:", db_name + ".faiss")
 
 
-def get_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
+def get_vec_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
     create_db_if_not_exists(db_name, embeddings)
 
     try:

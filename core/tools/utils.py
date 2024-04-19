@@ -8,6 +8,8 @@ import os, sys
 from tinydb import TinyDB
 
 from core.databases import defaults
+from core.tools.dbops import get_vec_db_by_name
+from core.tools.model_loader import load_model
 
 
 def purify_name(name):
@@ -110,8 +112,10 @@ def use_faiss(db_name, model_name):
     if not os.path.exists(data_path):
         os.makedirs(data_path)
 
-    db_path = data_path + "{}.json".format(db_name)
-    db = TinyDB(db_path)
+    _, embedder = load_model()
+
+    db_path = data_path + "{}_{}.faiss".format(db_name, model_name)
+    db = get_vec_db_by_name(db_path, embedder)
 
     return db
 
