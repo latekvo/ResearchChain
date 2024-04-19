@@ -119,16 +119,16 @@ parser.add_argument(
     "-M",
     "--pick-model",
     type=str,
-    dest="pick_model",
-    choices=["small", "large"],
+    dest="model_choice",
+    choices=["default", "small", "large"],
     default="default",
-    help="Pick a model size (small or large)",
+    help="Select model configuration",
 )
 
 args = parser.parse_args()
 
 USE_HUGGING_FACE = args.use_hugging_face
-PICK_MODEL = args.pick_model
+MODEL_CHOICE = args.model_choice
 
 """
 parser.add_argument(
