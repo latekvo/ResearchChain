@@ -2,7 +2,7 @@ from core.models.configuration_objects.llm_configuration import LlmConfiguration
 from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
 )
-from terminal_gui import USE_HUGGING_FACE, MODEL_CHOICE
+from arguments import USE_HUGGING_FACE, MODEL_CHOICE
 
 llm_ollama_default = LlmConfiguration(
     supplier="ollama",
