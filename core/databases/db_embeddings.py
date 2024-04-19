@@ -1,7 +1,6 @@
-from core.tools.utils import use_tinydb
+from core.tools.utils import use_faiss
 
-db = use_tinydb("embeddings")
-
+vector_db = use_faiss("embeddings", "placeholder")
 
 # this global db has to actually be a set of multiple
 # separate dbs, each associated with its own embed model

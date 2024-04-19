@@ -105,6 +105,17 @@ def use_tinydb(db_name):
     return db
 
 
+def use_faiss(db_name, model_name):
+    data_path = defaults.DATA_PATH
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+
+    db_path = data_path + "{}.json".format(db_name)
+    db = TinyDB(db_path)
+
+    return db
+
+
 class hide_prints:
     def __enter__(self):
         self._original_stdout = sys.stdout
