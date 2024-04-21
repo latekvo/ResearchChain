@@ -1,10 +1,10 @@
-import torch
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 from terminal_gui import USE_HUGGING_FACE
 from core.models.configurations import use_configuration
+
 llm_config, embed_config = use_configuration()
 
 

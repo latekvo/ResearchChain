@@ -1,4 +1,4 @@
-name: ResearchChainModern
+name: ResearchChain
 channels:
   - defaults
 dependencies:

@@ -11,25 +11,38 @@
 
 #### Other notes
 
-The default models are hardcoded in the `core/models` folder.
+- The default models are hardcoded in the `core/models` folder.<br>
+- We're using python version `3.9`
+- `environment.yml` is the linux env, but for macOS and windows there are other available
+- Apple intel is not supported anymore, but you can still get it working by manually installing
+  any missing package that comes up during the program execution.
 
-# Future of this project
+## This project consists of 3 separate elements
 
-## I want to convert this project into 3 layers of separate complexity.
+> #### Research Chain
+> Receives and completes basic summary task.<br>
+It's built as a loop, with integrated perpetual crawler, web analyzer and embedder,<br>
+to populate its RAG database with any lacking data that it may require.<br>
+It's a standalone service composed of 5 databases and 4 containers,
+each independently scalable.<br>
 
-#### Research Chain
+> #### Web Interface
+> Human-readable way to interact with every element of Research Chain
 
-A set of tools to give LLMs research capabilities.
+> #### Research Loop
+> AI powered service automatically dispatching, analyzing and managing Research Chain.<br>
+It should work alongside Web Interface, to supply constant 24/7 news analysis,
+and to expand its knowledge base by scheduling crawls based on the provided areas of interest
 
-#### Research Tree
+---
+### Contributing
 
-A recursive tree structure granting Research Chain the ability
-to create large hierarchical structures of LLMs and the tools they are using
+If you'd like to contribute to this project, 
+feel free to reach out to us through my telegram: `https://t.me [slash] latkaignacy`.<br>
+In such case, we'll introduce you into this project, 
+fix any issues that you may encounter and help you find a good first issue.
 
-#### Research Loop
-
-A service launching for a set period of time, and then allowing the user to summarize
-either the entire output of the tree, or a small, selected subset of it's structure.
+---
 
 THIS SOFTWARE IS INTENDED FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY.
 WE ARE NOT RESPONSIBLE FOR ANY ILLICIT USES OF THIS SOFTWARE.

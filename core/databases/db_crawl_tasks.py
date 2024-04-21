@@ -1,5 +1,3 @@
-import os
-
 from tinydb import Query
 
 from core.tools import utils
@@ -18,6 +16,7 @@ def db_add_crawl_task(prompt):
         {
             "uuid": new_uuid,
             "prompt": prompt,
+            "type": None,  # todo: choose 'news', 'wiki', 'docs', use WebQuery
             "completed": False,
             "executing": False,
             "completion_date": 0,  # time completed
