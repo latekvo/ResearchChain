@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import date
 
 
 class CrawlTask(BaseModel):
@@ -9,4 +8,4 @@ class CrawlTask(BaseModel):
     executing: bool
     completion_date: float
     execution_date: float
-    timestamp: date
+    timestamp: float

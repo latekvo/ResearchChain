@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
-from typing import Optional
 
 
 class UrlCreator(BaseModel):
     url: str
     prompt: str
-    parent_uuid: Optional[str] = None
+    parent_uuid: str | None = None
 
 
 class Embedded(BaseModel):

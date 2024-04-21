@@ -1,12 +1,11 @@
 from pydantic import BaseModel
-from datetime import date
 
 
 class CompletionTask(BaseModel):
     uuid: str
     prompt: str
     completed: bool
-    timestamp: date
+    timestamp: float
 
 
 class TaskCreator(BaseModel):
@@ -14,4 +13,4 @@ class TaskCreator(BaseModel):
     mode: str
 
 
-# the TaskCreator class is going to be more generic class
+# TaskCreator will is more generic

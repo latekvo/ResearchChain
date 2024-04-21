@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import APIRouter
 from core.databases.db_url_pool import (
     db_add_url,
@@ -27,13 +29,13 @@ def get_not_downloaded():
 
 
 @router.get("/url/embedded")
-def get_not_embedded(model: Union[str, None] = None):
+def get_not_embedded(model: str | None = None):
     result = db_get_not_embedded(model)
     return {"result": result}
 
 
 @router.get("/url/present")
-def get_present_urls(url: Union[str, None] = None):
+def get_present_urls(url: str | None = None):
     result = db_is_url_present(url)
     return {"url": result}
 
@@ -51,6 +53,3 @@ def set_downloaded_url(body: Downloaded):
 @router.put("/url/rubbish/{url_id}")
 def set_url_rubbish(url_id: str):
     db_set_url_rubbish(url_id)
-
-
-# TODO: fix the type error with union type
