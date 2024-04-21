@@ -1,5 +1,6 @@
-from pydantic import BaseModel 
+from pydantic import BaseModel
 from datetime import date
+
 
 class CrawlTask(BaseModel):
     uuid: str
@@ -9,5 +10,3 @@ class CrawlTask(BaseModel):
     completion_date: float
     execution_date: float
     timestamp: date
-
-
