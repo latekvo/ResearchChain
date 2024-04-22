@@ -1,27 +1,36 @@
 "use client";
 
 import React from 'react';
-import { Button, Tab, Tabs } from "@nextui-org/react";
+import { Button, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, Tab, Tabs } from "@nextui-org/react";
 
 const Header = () => {
   return (
-    <div className="flex shadow-xl w-full border-b border-opacity-10 border-gray-400 bg-black bg-opacity-65 z-20 p-5 justify-between">
-        <Tabs
-          size="lg"
-          aria-label="Options"
-          variant="underlined"
-          color="secondary"
-          className='pl-6'
-          classNames={{
-            tab: "text-white",
-          }}
-        >
-          <Tab className='text-xl px-4 ' key="add_task" title="Add task" />
-          <Tab className='text-xl px-4' key="crawl_history" title="Crawl history" />
-          <Tab className='text-xl px-4' key="summarize_history" title="Summarize history" />
-        </Tabs>
-      </div>
+    <Navbar>
+      <NavbarBrand>
+        <h1 className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-purple-700 bg-clip-text">
+            Research Chain
+        </h1>
+      </NavbarBrand>
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarItem isActive>
+          <Link href="#" aria-current="page">
+            Add task
+          </Link>
+        </NavbarItem>
+        <NavbarItem >
+          <Link color="foreground" href="#">
+            Crawl history
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="#">
+            Summarize history
+          </Link>
+        </NavbarItem>
+      </NavbarContent>
+    </Navbar>
   );
-};
+}
+
 
 export default Header;
