@@ -6,7 +6,7 @@ from terminal_gui import USE_HUGGING_FACE, PICK_MODEL
 
 llm_ollama_default = LlmConfiguration(
     supplier="ollama",
-    model_name="zephyr:7b-beta-q3_K_M",
+    model_name="zephyr:7b-beta-q5_K_M",
     model_token_limit=4096,
     model_file="",
 )
