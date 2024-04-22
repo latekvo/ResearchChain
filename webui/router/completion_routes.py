@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("/task")
 def get_tasks_by_page():
-    result = db_get_completion_tasks_by_page()
+    result = db_get_completion_tasks_by_page(0)
     return {"tasks": result}
 
 

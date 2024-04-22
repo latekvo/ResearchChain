@@ -11,7 +11,6 @@ from core.databases.db_url_pool import (
     db_set_url_rubbish,
 )
 from webui.models.url_pool import UrlCreator, Downloaded, Embedded
-from typing import Union
 
 router = APIRouter()
 

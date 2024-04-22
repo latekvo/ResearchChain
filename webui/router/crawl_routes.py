@@ -5,7 +5,7 @@ from core.databases.db_crawl_tasks import (
     db_set_crawl_completed,
     db_get_incomplete_completion_task,
 )
-from webui.models.completion_task import TaskCreator
+from webui.models.crawl_task import CrawlCreator
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ def get_crawl_task():
 
 
 @router.post("/crawl")
-def add_crawl_task(crawl_task: TaskCreator):
+def add_crawl_task(crawl_task: CrawlCreator):
     result = db_add_crawl_task(crawl_task.prompt)
     return {"result": result}
 

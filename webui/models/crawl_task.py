@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class CrawlCreator(BaseModel):
+    prompt: str
+
+
 class CrawlTask(BaseModel):
     uuid: str
     prompt: str
