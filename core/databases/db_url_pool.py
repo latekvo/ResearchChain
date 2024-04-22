@@ -42,11 +42,11 @@ def db_get_not_downloaded() -> list:
 
 
 def db_get_not_embedded(model) -> list:
-    
+
     fields = Query()
 
     db_results = db.search(~fields.embedded_by.any(model))
-    
+
     return db_results
 
 
