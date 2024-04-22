@@ -35,15 +35,14 @@ def db_set_crawl_completed(uuid: str):
 
 def db_get_crawl_task():
     fields = Query()
-    crawl_task = db.get(fields.completed is False)
+    crawl_task = db.get(fields.completed == False)
 
     return crawl_task
 
 
 def db_get_incomplete_completion_task():
     fields = Query()
-    task = db.get(fields.completed is False and fields.executing is False)
-
+    task = db.get(fields.completed == False and fields.executing == False)
     task_uuid = task
     db.update({"executing": True}, fields.uuid == task_uuid)
 

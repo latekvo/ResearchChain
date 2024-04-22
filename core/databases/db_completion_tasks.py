@@ -7,7 +7,7 @@ from core.tools.utils import use_tinydb
 db = use_tinydb("completion_tasks")
 
 
-def db_add_completion_task(prompt):
+def db_add_completion_task(prompt, mode):
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
 
@@ -15,6 +15,7 @@ def db_add_completion_task(prompt):
         {
             "uuid": new_uuid,
             "prompt": prompt,
+            "mode": mode,
             "completed": False,
             "timestamp": timestamp,
         }
@@ -35,7 +36,7 @@ def db_get_completion_tasks_by_page(page: int, per_page: int = defaults.ITEMS_PE
 def db_get_incomplete_completion_task():
     fields = Query()
 
-    results = db.get(fields.completed is False)
+    results = db.get(fields.completed == False)
 
     return results
 

@@ -41,9 +41,11 @@ def db_get_not_downloaded() -> list:
     return db_results
 
 
-def db_get_not_embedded(model: str) -> list:
+def db_get_not_embedded(model) -> list:
+
     fields = Query()
-    db_results = db.search(fields.embedded_by.contains(model) is not True)
+
+    db_results = db.search(~fields.embedded_by.any(model))
 
     return db_results
 
