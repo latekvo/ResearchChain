@@ -5,6 +5,7 @@ from colorama import init as colorama_init, Fore, Style
 from terminal_gui import user_input, select_input
 from core.lookup import web_lookup
 
+
 colorama_init()
 
 try:
