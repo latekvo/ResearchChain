@@ -114,8 +114,8 @@ def use_faiss(db_name, model_name):
 
     _, embedder = load_model()
 
-    db_path = data_path + "{}_{}.faiss".format(db_name, model_name)
-    db = get_vec_db_by_name(db_path, embedder)
+    db_full_name = db_name + "_" + model_name
+    db = get_vec_db_by_name(db_full_name, embedder)
 
     return db
 

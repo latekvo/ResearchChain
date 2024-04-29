@@ -2,10 +2,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
 from core.tools.utils import purify_name
 from core.models.configurations import use_configuration
-from langchain_core.prompts import ChatPromptTemplate, BaseChatPromptTemplate
-
-# TODO: replace with puppeteer, this one gets blocked occasionally
-from googlesearch import search
 
 from core.chainables.web import (
     web_docs_lookup,

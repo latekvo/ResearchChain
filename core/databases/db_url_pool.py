@@ -45,7 +45,7 @@ def db_get_not_downloaded() -> list:
 
 def db_get_not_embedded(model: str, per_page=defaults.ITEMS_PER_PAGE) -> list[Document]:
     fields = Query()
-    db_results = db.search(fields.embedded_by.contains(model) is not True)
+    db_results = db.search(fields.embedded_by.contains(model) == False)
 
     return db_results
 
