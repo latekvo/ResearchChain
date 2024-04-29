@@ -1,4 +1,5 @@
 from tinydb import Query
+from tinydb.table import Document
 
 from core.databases import defaults
 from core.tools import utils
@@ -42,7 +43,7 @@ def db_get_not_downloaded() -> list:
     return db_results
 
 
-def db_get_not_embedded(model: str, per_page=defaults.ITEMS_PER_PAGE) -> list:
+def db_get_not_embedded(model: str, per_page=defaults.ITEMS_PER_PAGE) -> list[Document]:
     fields = Query()
     db_results = db.search(fields.embedded_by.contains(model) is not True)
 
