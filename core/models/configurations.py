@@ -2,6 +2,7 @@ from core.models.configuration_objects.llm_configuration import LlmConfiguration
 from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
 )
+
 from arguments import USE_HUGGING_FACE, MODEL_CHOICE
 
 llm_ollama_default = LlmConfiguration(
@@ -141,6 +142,7 @@ def use_configuration():
     llm_ollama, embedder_ollama, llm_hugging_face, embedder_hugging_face = (
         get_model_by_choice()
     )
+
     if USE_HUGGING_FACE:
         return llm_hugging_face, embedder_hugging_face
     else:
