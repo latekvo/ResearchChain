@@ -18,19 +18,18 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 
-def db_add_text_batch(text: str, source_uuid: str):
+def db_add_text_batch(text: str, db_full_name: str):
     # automatically splits text before embedding it
     chunks = text_splitter.split_text(text)
 
     for chunk in chunks:
-        if is_text_junk(chunk.page_content):
+        if is_text_junk(chunk):
             chunks.remove(chunk)
             continue
 
-        chunk.page_content = remove_characters(chunk.page_content, ["\n", "`"])
-        chunk.page_content = chunk.page_content
-
     if len(chunks) != 0:
-        vector_db.add_texts(documents=chunks, embeddings=embedder)
+        vector_db.add_texts(texts=chunks, embeddings=embedder)
+
+    vector_db.save_local(folder_path="store/vector", index_name=db_full_name)
 
     pass

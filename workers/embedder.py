@@ -6,6 +6,7 @@ from tinydb.table import Document
 
 from core.databases import db_url_pool, db_embeddings
 from core.models.configurations import use_configuration
+from core.tools import utils
 
 rapid_queue_limit = 40
 rapid_queue: list[Document] = []
@@ -19,18 +20,17 @@ llm_config, embedder_config = use_configuration()
 
 
 def processing_iteration():
-    global rapid_queue
+    embed_model_name = embedder_config.model_name
 
-    url_queue_remaining_space = rapid_queue_limit - len(rapid_queue)
-    if url_queue_remaining_space < rapid_queue_limit:
-        rapid_queue += db_url_pool.db_get_not_embedded(embedder_config.model_name)
+    embedding_queue = db_url_pool.db_get_not_embedded(embed_model_name)
 
-    for url_object in rapid_queue:
-        print(url_object.values)
-        document = url_object.text
-        document_uuid = url_object.parent_uuid
+    for url_object in embedding_queue:
+        print("embedding document:", url_object)
+        document = url_object["text"]
 
-        db_embeddings.db_add_text_batch(document, document_uuid)
+        db_full_name = utils.gen_vec_db_full_name("embeddings", embed_model_name)
+        db_embeddings.db_add_text_batch(document, db_full_name)
+        db_url_pool.db_set_url_embedded(url_object["uuid"], embed_model_name)
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 

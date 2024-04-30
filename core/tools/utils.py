@@ -107,6 +107,10 @@ def use_tinydb(db_name):
     return db
 
 
+def gen_vec_db_full_name(db_name, model_name):
+    return db_name + "_" + model_name
+
+
 def use_faiss(db_name, model_name):
     data_path = defaults.DATA_PATH
     if not os.path.exists(data_path):
@@ -114,7 +118,7 @@ def use_faiss(db_name, model_name):
 
     _, embedder = load_model()
 
-    db_full_name = db_name + "_" + model_name
+    db_full_name = gen_vec_db_full_name(db_name, model_name)
     db = get_vec_db_by_name(db_full_name, embedder)
 
     return db
