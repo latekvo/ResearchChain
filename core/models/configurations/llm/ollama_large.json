@@ -1,0 +1,6 @@
+{
+      "supplier": "ollama",
+      "model_name": "mixtral:8x7b-instruct-v0.1-q5_K_M",
+      "model_token_limit": 32768,
+      "model_file": ""
+}

@@ -4,9 +4,9 @@ from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
 from arguments import USE_HUGGING_FACE
-from core.models.configurations import use_configuration
+from core.models.configurations import load_llm_config
 
-llm_config, embed_config = use_configuration()
+llm_config, embed_config = load_llm_config()
 
 
 def load_ollama_model():
