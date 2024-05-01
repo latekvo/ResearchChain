@@ -10,9 +10,9 @@ from colorama import Fore, Style
 from core.tools.model_loader import load_model
 from core.models.configurations import use_configuration
 from core.tools.utils import purify_name
-from core.tools.dbops import get_db_by_name
+from core.tools.dbops import get_vec_db_by_name
 from core.classes.query import WebQuery
-from core.tools.utils import is_text_junk, remove
+from core.tools.utils import is_text_junk, remove_characters
 
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
@@ -90,7 +90,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
                 chunks.remove(chunk)
                 continue
 
-            chunk.page_content = remove(chunk.page_content, ["\n", "`"])
+            chunk.page_content = remove_characters(chunk.page_content, ["\n", "`"])
             chunk.page_content = (
                 query.db_embedding_prefix
                 + chunk.page_content
@@ -110,7 +110,7 @@ def web_query_google_lookup(
     query: WebQuery, token_limit: int = embed_config.model_token_limit
 ):
     db_name = embedding_model_safe_name + query.db_save_file_extension
-    db = get_db_by_name(db_name, embeddings)
+    db = get_vec_db_by_name(db_name, embeddings)
 
     populate_db_with_google_search(db, query)
 

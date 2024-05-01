@@ -2,7 +2,8 @@ from core.models.configuration_objects.llm_configuration import LlmConfiguration
 from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
 )
-from terminal_gui import USE_HUGGING_FACE, PICK_MODEL
+
+from arguments import USE_HUGGING_FACE, MODEL_CHOICE
 
 llm_ollama_default = LlmConfiguration(
     supplier="ollama",
@@ -109,23 +110,26 @@ embedder_hugging_face_large = EmbedderConfiguration(
     chunk_overlap=200,
 )
 
+# todo: urgent, move all configs to separate default_hf, default_ollama, large_hf ... files,
+#       make them json files, and add fromJson() to LlmConfiguration & EmbedderConfiguration
 
-def pick_model():
-    if PICK_MODEL == "default":
+
+def get_model_by_choice():
+    if MODEL_CHOICE == "default":
         return (
             llm_ollama_default,
             embedder_ollama_default,
             llm_hugging_face_default,
             embedder_hugging_face_default,
         )
-    if PICK_MODEL == "small":
+    if MODEL_CHOICE == "small":
         return (
             llm_ollama_small,
             embedder_ollama_small,
             llm_hugging_face_small,
             embedder_hugging_face_small,
         )
-    if PICK_MODEL == "large":
+    if MODEL_CHOICE == "large":
         return (
             llm_ollama_large,
             embedder_ollama_large,
@@ -135,7 +139,10 @@ def pick_model():
 
 
 def use_configuration():
-    llm_ollama, embedder_ollama, llm_hugging_face, embedder_hugging_face = pick_model()
+    llm_ollama, embedder_ollama, llm_hugging_face, embedder_hugging_face = (
+        get_model_by_choice()
+    )
+
     if USE_HUGGING_FACE:
         return llm_hugging_face, embedder_hugging_face
     else:

@@ -2,17 +2,11 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
-from terminal_gui import USE_HUGGING_FACE
+
+from arguments import USE_HUGGING_FACE
 from core.models.configurations import use_configuration
 
 llm_config, embed_config = use_configuration()
-
-
-def load_model():
-    if USE_HUGGING_FACE:
-        return load_hugging_face_model()
-    else:
-        return load_ollama_model()
 
 
 def load_ollama_model():
@@ -22,6 +16,7 @@ def load_ollama_model():
 
 
 def load_hugging_face_model():
+    # todo: for this to be error-proof, we have to cache returns as singletons, and serve them
     base_model_path = hf_hub_download(
         llm_config.model_file, filename=llm_config.model_name
     )
@@ -44,3 +39,10 @@ def load_hugging_face_model():
     )
 
     return llm, embeddings
+
+
+def load_model():
+    if USE_HUGGING_FACE:
+        return load_hugging_face_model()
+    else:
+        return load_ollama_model()

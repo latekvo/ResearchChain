@@ -107,29 +107,6 @@ def user_input(stdscr):
     return text_input_value
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-H",
-    "--use-hugging-face",
-    dest="use_hugging_face",
-    action="store_true",
-    help="Use Hugging Face as the model provider",
-)
-parser.add_argument(
-    "-M",
-    "--pick-model",
-    type=str,
-    dest="pick_model",
-    choices=["small", "large"],
-    default="default",
-    help="Pick a model size (small or large)",
-)
-
-args = parser.parse_args()
-
-USE_HUGGING_FACE = args.use_hugging_face
-PICK_MODEL = args.pick_model
-
 """
 parser.add_argument(
     '-O',

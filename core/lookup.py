@@ -2,10 +2,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
 from core.tools.utils import purify_name
 from core.models.configurations import use_configuration
-from langchain_core.prompts import ChatPromptTemplate, BaseChatPromptTemplate
-
-# TODO: replace with puppeteer, this one gets blocked occasionally
-from googlesearch import search
 
 from core.chainables.web import (
     web_docs_lookup,
@@ -15,7 +11,7 @@ from core.chainables.web import (
     web_news_lookup_prompt,
     web_wiki_lookup_prompt,
 )
-from core.tools.dbops import get_db_by_name
+from core.tools.dbops import get_vec_db_by_name
 from core.tools.model_loader import load_model
 
 
@@ -27,7 +23,7 @@ embedding_model_safe_name = purify_name(embed_config.model_name)
 
 # this general db will be used to save AI responses,
 # might become useful as the responses are better than the input
-results_db = get_db_by_name(embedding_model_safe_name, embeddings)
+results_db = get_vec_db_by_name(embedding_model_safe_name, embeddings)
 
 
 def web_chain_function(prompt_dict: dict):
