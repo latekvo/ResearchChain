@@ -35,7 +35,6 @@ def processing_iteration():
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
-processing_iteration()
 while True:
     db_query = Query()
     db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
