@@ -105,15 +105,3 @@ def user_input(stdscr):
     text_input_value = get_input()
     curses.endwin()  # End curses window
     return text_input_value
-
-
-"""
-parser.add_argument(
-    '-O',
-    '--use-ollama',
-    dest='use_ollama',
-    action="store_true",
-    help='Use Ollama as the model provider'
-)
-USE_OLLAMA = parser.parse_args().use_ollama
-"""

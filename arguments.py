@@ -13,8 +13,15 @@ parser.add_argument(
     "--pick-model",
     type=str,
     dest="model_choice",
-    choices=["default", "small", "large"],
-    default="default",
+    choices=[
+        "ollama_medium",
+        "ollama_small",
+        "ollama_large",
+        "hugging_face_medium",
+        "hugging_face_small",
+        "hugging_face_large",
+    ],
+    default="ollama_medium",
     help="Select model configuration",
 )
 
