@@ -19,4 +19,12 @@ jobs:
       - name: Python Black (crawler)
         uses: cytopia/docker-black@0.8
         with:
-          path: 'crawler.py'
+          path: 'workers/crawler.py'
+      - name: Python Black (embedder)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'workers/embedder.py'
+      - name: Python Black (scheduler)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'workers/scheduler.py'
