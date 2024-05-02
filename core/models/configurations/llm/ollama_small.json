@@ -1,0 +1,6 @@
+{
+      "supplier": "ollama",
+      "model_name": "zephyr:7b-beta-q3_K_M",
+      "model_token_limit": 4096,
+      "model_file": ""
+}

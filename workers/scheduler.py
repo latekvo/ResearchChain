@@ -56,8 +56,13 @@ It's just important to be very descriptive, often because of how tokenization wo
 models will not recognize the name of the function itself.
 For function-calling reference see OpenBMB/ChatDev
 """
+
 import queue
 from dataclasses import dataclass
+
+# auto-dispatching worker
+# INPUTS: topics_of_interest, summaries
+# TASK: deepens
 
 
 @dataclass
@@ -76,8 +81,7 @@ thread_queue: queue.PriorityQueue
 
 def new_research_thread(prompt: str, remaining_depth: int) -> str:
     if remaining_depth <= 0:
-        return 'SYSTEM ERROR cannot perform operation maximum search depth reached'
-
+        return "SYSTEM ERROR cannot perform operation maximum search depth reached"
 
 
 def research_loop() -> str:

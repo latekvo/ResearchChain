@@ -1,0 +1,30 @@
+name: Python Black
+
+on: [pull_request]
+
+jobs:
+  python-black:
+    name: Python Black
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Python Black (core)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'core/'
+      - name: Python Black (main)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'main.py'
+      - name: Python Black (crawler)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'workers/crawler.py'
+      - name: Python Black (embedder)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'workers/embedder.py'
+      - name: Python Black (scheduler)
+        uses: cytopia/docker-black@0.8
+        with:
+          path: 'workers/scheduler.py'

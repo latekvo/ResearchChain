@@ -1,8 +1,15 @@
 import asyncio
+import datetime
 import multiprocessing
 import re
 import uuid
 import os, sys
+
+from tinydb import TinyDB
+
+from core.databases import defaults
+from core.tools.dbops import get_vec_db_by_name
+from core.tools.model_loader import load_model
 
 
 def purify_name(name):
@@ -42,7 +49,7 @@ def reduce(text: str, goal: str, match: str):
     return goal.join(text.split(match))
 
 
-def remove(text: str, wordlist: list):
+def remove_characters(text: str, wordlist: list[str]):
     for word in wordlist:
         text = "".join(text.split(word))
     return text
@@ -83,6 +90,38 @@ def extract_links(text: str):
 
 def gen_uuid() -> str:
     return uuid.uuid4().hex
+
+
+def gen_unix_time() -> float:
+    return datetime.datetime.utcnow().timestamp()
+
+
+def use_tinydb(db_name):
+    data_path = defaults.DATA_PATH
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+
+    db_path = data_path + "{}.json".format(db_name)
+    db = TinyDB(db_path)
+
+    return db
+
+
+def gen_vec_db_full_name(db_name, model_name):
+    return db_name + "_" + model_name
+
+
+def use_faiss(db_name, model_name):
+    data_path = defaults.DATA_PATH
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+
+    _, embedder = load_model()
+
+    db_full_name = gen_vec_db_full_name(db_name, model_name)
+    db = get_vec_db_by_name(db_full_name, embedder)
+
+    return db
 
 
 class hide_prints:

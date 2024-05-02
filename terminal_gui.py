@@ -92,7 +92,7 @@ def user_input(stdscr):
             char = stdscr.getch()
             if char in [curses.KEY_ENTER, 10, 13]:
                 break
-            elif char in [curses.KEY_BACKSPACE, 127]:
+            elif char in [curses.KEY_BACKSPACE, 8, 127]:
                 text = text[:-1]
             elif 32 <= char <= 126:
                 text += chr(char)
@@ -105,25 +105,3 @@ def user_input(stdscr):
     text_input_value = get_input()
     curses.endwin()  # End curses window
     return text_input_value
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    '-H',
-    '--use-hugging-face',
-    dest='use_hugging_face',
-    action="store_true",
-    help='Use Hugging Face as the model provider'
-)
-USE_HUGGING_FACE = parser.parse_args().use_hugging_face
-
-'''
-parser.add_argument(
-    '-O',
-    '--use-ollama',
-    dest='use_ollama',
-    action="store_true",
-    help='Use Ollama as the model provider'
-)
-USE_OLLAMA = parser.parse_args().use_ollama
-'''
