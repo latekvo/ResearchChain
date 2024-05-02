@@ -1,4 +1,4 @@
-import PromptyInput from "./components/PromptInput";
+import PromptInput from "./components/PromptInput";
 import Header from "./components/Header";
 
 export default function Page() {
@@ -8,7 +8,7 @@ export default function Page() {
         <Header></Header>
       </div>
       <div className="h-4/5 flex justify-center items-center">
-        <PromptyInput />
+        <PromptInput />
       </div>
     </div>
   );

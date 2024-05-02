@@ -2,7 +2,7 @@
 import React from "react";
 import { Button, Tab, Tabs, Textarea } from "@nextui-org/react";
 
-function PromptyInput() {
+function PromptInput() {
   return (
     <div className="w-1/2 p-5 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between">
       <Textarea
@@ -40,4 +40,4 @@ function PromptyInput() {
   );
 }
 
-export default PromptyInput;
+export default PromptInput;

@@ -6,7 +6,7 @@ from terminal_gui import user_input, select_input
 from core.lookup import web_lookup
 import os
 
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 
 colorama_init()
