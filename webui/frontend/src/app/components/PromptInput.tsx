@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
-import { Button, Input, Tab, Tabs, Textarea } from "@nextui-org/react";
-// import {SearchIcon} from "./SearchIcon";
+import { Button, Tab, Tabs, Textarea } from "@nextui-org/react";
 
 function PromptyInput() {
   return (
@@ -11,7 +10,8 @@ function PromptyInput() {
         placeholder="Ask a question :)"
         color="default"
         size="lg"
-        className="text-gray-300 px-3 whitespace-normal"
+        minRows={1}
+        className="text-gray-300 px-3 text-large whitespace-normal"
       />
       <div className="w-full mt-4 flex justify-between">
         <Tabs
@@ -30,7 +30,7 @@ function PromptyInput() {
             type="submit"
             color="default"
             variant="bordered"
-            // endContent={<SearchIcon className="text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0" />}
+            className="w-2/3 mr-3 flex flex-row-reverse"
           >
             Search
           </Button>

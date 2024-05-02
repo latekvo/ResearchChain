@@ -1,7 +1,5 @@
-"use client";
-
 import React from 'react';
-import { Button, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, Tab, Tabs } from "@nextui-org/react";
+import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
 
 const Header = () => {
   return (
@@ -13,7 +11,7 @@ const Header = () => {
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem isActive>
-          <Link href="#" aria-current="page">
+          <Link href="#" aria-current="page" className='text-blue-500'>
             Add task
           </Link>
         </NavbarItem>
