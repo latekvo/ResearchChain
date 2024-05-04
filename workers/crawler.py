@@ -32,8 +32,13 @@ google_traffic_manager = TrafficManager()
 def rq_refill(seed_task, use_google: bool = True):
     global url_rapid_queue
 
+    print("loaded task:", seed_task)
+
     # adapt crawl_task to web_query
-    seed_query = WebQuery(query_type=seed_task.type, prompt_core=seed_task.prompt)
+    seed_query = None
+
+    if seed_task is not None:
+        seed_query = WebQuery(query_type=seed_task.type, prompt_core=seed_task.prompt)
 
     # 0. check for space
     url_space_left = url_queue_limit - len(url_rapid_queue)
