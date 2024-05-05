@@ -12,13 +12,12 @@ from langchain_core.output_parsers import StrOutputParser
 
 output_parser = StrOutputParser()
 
-llm = load_model()
+llm, embeddings = load_model()
 
 
 def summarize():
 
-    #task = db_get_incomplete_completion_task()
-    task = {"prompt": "Elon Musk", "mode": "Wiki"}
+    task = db_get_incomplete_completion_task()
     print(task["prompt"])
 
     def get_query():
@@ -52,8 +51,7 @@ def summarize():
 
     chain = (
             {
-                "search_data": RunnableLambda(get_user_prompt)
-                | RunnableLambda(get_context),
+                "search_data": RunnableLambda(get_context),
                 # this has to be a RunnableLambda, it cannot be a string
                 "user_request": RunnableLambda(get_user_prompt),
             }
@@ -64,4 +62,4 @@ def summarize():
     return chain.invoke(task)
 
 
-print(summarize())
+print("Summarize:" + summarize())
