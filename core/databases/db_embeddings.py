@@ -33,3 +33,8 @@ def db_add_text_batch(text: str, db_full_name: str):
     vector_db.save_local(folder_path="store/vector", index_name=db_full_name)
 
     pass
+
+
+def db_search_for_similar_queries(query):
+    docs = vector_db.similarity_search(query)
+    return docs
