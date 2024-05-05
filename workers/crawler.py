@@ -18,7 +18,7 @@ url_queue_limit = 80
 url_rapid_queue = []
 
 # populated by db_crawl_tasks database
-requested_tasks_limit = 2  # each takes up to several minutes, no need in caching
+requested_tasks_limit = 1  # each takes up to several minutes, no need in caching
 requested_crawl_tasks = []
 
 # url order:
