@@ -1,0 +1,9 @@
+{
+      "supplier": "hugging_face",
+      "model_name": "nomic-embed-text-v1.5.Q6_K.gguf",
+      "model_file": "nomic-ai/nomic-embed-text-v1.5-GGUF",
+      "model_token_limit": 4096,
+      "article_limit": 10,
+      "buffer_stops": ["\n\n\n", "\n\n", "\n", ". ", ", ", " ", ""],
+      "chunk_overlap": 200
+}

@@ -5,14 +5,14 @@ from tinydb import Query
 from tinydb.table import Document
 
 from core.databases import db_url_pool, db_embeddings
-from core.models.configurations import use_configuration
+from core.models.configurations import load_llm_config
 from core.tools import utils
 
 rapid_queue_limit = 40
 rapid_queue: list[Document] = []
 
 # llm will be used - passed to an agentic preprocessor
-llm_config, embedder_config = use_configuration()
+llm_config, embedder_config = load_llm_config()
 
 # important note to remember for later
 # we can avoid the ... issue if we just lock the db for every transaction,
