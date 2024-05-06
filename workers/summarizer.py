@@ -1,5 +1,6 @@
 from core.databases.db_embeddings import db_search_for_similar_queries
-from core.databases.db_completion_tasks import db_get_incomplete_completion_task
+from core.databases.db_completion_tasks import (db_get_incomplete_completion_task,
+                                                db_update_completion_task_after_summarizing)
 from langchain_core.runnables import RunnableLambda
 from core.classes.query import WebQuery
 from core.chainables.web import (
@@ -10,6 +11,10 @@ from core.chainables.web import (
 from core.tools.model_loader import load_model
 from langchain_core.output_parsers import StrOutputParser
 
+from tinydb import Query
+from core.tools.utils import use_tinydb
+from colorama import Fore
+
 output_parser = StrOutputParser()
 
 llm, embeddings = load_model()
@@ -18,48 +23,55 @@ llm, embeddings = load_model()
 def summarize():
 
     task = db_get_incomplete_completion_task()
-    print(task["prompt"])
 
-    def get_query():
-        if task["mode"] == "News":
-            return WebQuery("news", prompt_core=task["prompt"])
-        elif task["mode"] == "Docs":
-            return WebQuery("docs", prompt_core=task["prompt"])
-        elif task["mode"] == "Wiki":
-            return WebQuery("wiki", prompt_core=task["prompt"])
+    if task is not None:
 
-    context = db_search_for_similar_queries(get_query())
-    print(context[0].page_content)
+        def get_query():
+            return WebQuery(task["mode"].lower(), prompt_core=task["prompt"])
 
-    def interpret_prompt_mode():
-        if task["mode"] == "News":
-            return web_news_lookup_prompt()
-        elif task["mode"] == "Docs":
-            return web_docs_lookup_prompt()
-        elif task["mode"] == "Wiki":
-            return web_wiki_lookup_prompt()
+        context = db_search_for_similar_queries(get_query())
 
-    def get_user_prompt(_: dict):
-        print(task["prompt"])
-        return task["prompt"]
+        def interpret_prompt_mode():
+            if task["mode"] == "News":
+                return web_news_lookup_prompt()
+            elif task["mode"] == "Docs":
+                return web_docs_lookup_prompt()
+            elif task["mode"] == "Wiki":
+                return web_wiki_lookup_prompt()
 
-    def get_context(_: dict):
-        print(context[0].page_content)
-        return context[0].page_content
+        def get_user_prompt(_: dict):
+            return task["prompt"]
 
-    web_interpret_prompt_mode = interpret_prompt_mode()
+        def get_context(_: dict):
+            return context[0].page_content
 
-    chain = (
-            {
-                "search_data": RunnableLambda(get_context),
-                # this has to be a RunnableLambda, it cannot be a string
-                "user_request": RunnableLambda(get_user_prompt),
-            }
-            | web_interpret_prompt_mode
-            | llm
-            | output_parser
-    )
-    return chain.invoke(task)
+        web_interpret_prompt_mode = interpret_prompt_mode()
+
+        print("Summarizing task with uuid: ", task["uuid"])
+        chain = (
+                {
+                    "search_data": RunnableLambda(get_context),
+                    # this has to be a RunnableLambda, it cannot be a string
+                    "user_request": RunnableLambda(get_user_prompt),
+                }
+                | web_interpret_prompt_mode
+                | llm
+                | output_parser
+        )
+        summary = chain.invoke(task)
+        db_update_completion_task_after_summarizing(summary, task["uuid"])
+
+        print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", task["uuid"])
 
 
-print("Summarize:" + summarize())
+previous_total_tasks = None
+
+while True:
+    db = use_tinydb("completion_tasks")
+    db_query = Query()
+    total_tasks = len(db.search(db_query.completed == False))
+    if total_tasks is not previous_total_tasks:
+        print("Number of uncompleted tasks: ", total_tasks)
+    previous_total_tasks = total_tasks
+
+    summarize()
