@@ -1,6 +1,8 @@
 from core.databases.db_embeddings import db_search_for_similar_queries
-from core.databases.db_completion_tasks import (db_get_incomplete_completion_task,
-                                                db_update_completion_task_after_summarizing)
+from core.databases.db_completion_tasks import (
+    db_get_incomplete_completion_task,
+    db_update_completion_task_after_summarizing,
+)
 from langchain_core.runnables import RunnableLambda
 from core.classes.query import WebQuery
 from core.chainables.web import (
@@ -49,14 +51,14 @@ def summarize():
 
         print("Summarizing task with uuid: ", task["uuid"])
         chain = (
-                {
-                    "search_data": RunnableLambda(get_context),
-                    # this has to be a RunnableLambda, it cannot be a string
-                    "user_request": RunnableLambda(get_user_prompt),
-                }
-                | web_interpret_prompt_mode
-                | llm
-                | output_parser
+            {
+                "search_data": RunnableLambda(get_context),
+                # this has to be a RunnableLambda, it cannot be a string
+                "user_request": RunnableLambda(get_user_prompt),
+            }
+            | web_interpret_prompt_mode
+            | llm
+            | output_parser
         )
         summary = chain.invoke(task)
         db_update_completion_task_after_summarizing(summary, task["uuid"])

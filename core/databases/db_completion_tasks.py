@@ -46,6 +46,7 @@ def db_update_completion_task_after_summarizing(summary: str, uuid: str):
     fields = Query()
     db.update({"completed": True, "completion_result": summary}, fields.uuid == uuid)
 
+
 """
 def db_add_smart_completion_task(prompt):
     # todo: this functions should automatically dispatch crawl tasks if they are needed 
