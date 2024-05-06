@@ -1,0 +1,8 @@
+{
+      "supplier": "ollama",
+      "model_name": "nomic-embed-text",
+      "model_token_limit": 4096,
+      "article_limit": 10,
+      "buffer_stops": ["\n\n\n", "\n\n", "\n", ". ", ", ", " ", ""],
+      "chunk_overlap": 200
+}
