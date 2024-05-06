@@ -17,6 +17,7 @@ def db_add_completion_task(prompt, mode):
             "prompt": prompt,
             "mode": mode,
             "completed": False,
+            "completion_result": None,
             "timestamp": timestamp,
         }
     )
@@ -40,6 +41,10 @@ def db_get_incomplete_completion_task():
 
     return results
 
+
+def db_update_completion_task_after_summarizing(summary: str, uuid: str):
+    fields = Query()
+    db.update({"completed": True, "completion_result": summary}, fields.uuid == uuid)
 
 """
 def db_add_smart_completion_task(prompt):
