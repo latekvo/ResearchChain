@@ -55,7 +55,6 @@ def db_get_crawl_task():
 def db_get_incomplete_completion_task():
     fields = Query()
     task = db.get(fields.completed == False and fields.executing == False)
-    task_uuid = task
-    db.update({"executing": True}, fields.uuid == task_uuid)
+    db.update({"executing": True}, fields.uuid == task.uuid)
 
     return task

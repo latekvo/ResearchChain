@@ -38,22 +38,3 @@ def db_get_incomplete_completion_task():
     results = db.get(fields.completed == False)
 
     return results
-
-
-"""
-def db_add_smart_completion_task(prompt):
-    # todo: this functions should automatically dispatch crawl tasks if they are needed 
-    new_uuid = utils.gen_uuid()
-    timestamp = utils.gen_unix_time()
-
-    db.insert(
-        {
-            "uuid": new_uuid,
-            "prompt": prompt,
-            "complete": False,
-            "timestamp": timestamp,
-        }
-    )
-
-    return new_uuid
-"""

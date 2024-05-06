@@ -96,7 +96,7 @@ def url_save(url: str, parent_id: str = None):
         return
 
     # 1. add to the db
-    db_url_pool.db_add_url(url, parent_id)
+    db_url_pool.db_add_url(url, "N/A", parent_id)
 
 
 def url_download_text(url: str):
