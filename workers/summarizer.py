@@ -71,7 +71,9 @@ previous_total_tasks = None
 while True:
     db = use_tinydb("completion_tasks")
     db_query = Query()
-    total_tasks = len(db.search(db_query.completed == False))
+    total_tasks = len(
+        db.search(db_query.completed == False and db_query.executing == False)
+    )
     if total_tasks is not previous_total_tasks:
         print("Number of uncompleted tasks: ", total_tasks)
     previous_total_tasks = total_tasks
