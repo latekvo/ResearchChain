@@ -5,26 +5,11 @@ from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 from tinydb import Query
 
 from core.classes.traffic_manager import TrafficManager
-from core.databases import db_url_pool
+from core.databases import db_url_pool, db_crawl_tasks
 from core.tools import utils
 from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
 from core.tools.utils import hide_prints
-
-
-# must-haves:
-# - live user prompt interaction+injection,
-# - dispatching summarizations,
-# - link crawling,
-# - link database
-
-# todo: we will split crawler into 2 runtimes, one for crawling, one for embedding.
-#       the embedding one will look through db_url for any not vectorized articles.
-#       this will allow for automatic re-vectorization in case we get a new embed model.
-
-data_path = "store/data/"
-if not os.path.exists(data_path):
-    os.makedirs(data_path)
 
 # 100 links max, then put new ones in db
 # this does not increase access speed,
@@ -32,10 +17,9 @@ if not os.path.exists(data_path):
 url_queue_limit = 80
 url_rapid_queue = []
 
-requested_query_queue = [
-    WebQuery("news", "llm", priority=1),
-    WebQuery("news", "ai", priority=1),
-]
+# populated by db_crawl_tasks database
+requested_tasks_limit = 1  # each takes up to several minutes, no need in caching
+requested_crawl_tasks = []
 
 # url order:
 # 0. use short memory urls
@@ -45,18 +29,25 @@ requested_query_queue = [
 google_traffic_manager = TrafficManager()
 
 
-def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
+def rq_refill(seed_task, use_google: bool = True):
     global url_rapid_queue
 
+    print("loaded task:", seed_task)
+
+    # adapt crawl_task to web_query
+    seed_query = None
+
+    if seed_task is not None:
+        seed_query = WebQuery(query_type=seed_task.type, prompt_core=seed_task.prompt)
+
     # 0. check for space
-    space_left = url_queue_limit - len(url_rapid_queue)
-    if space_left < 1:
+    url_space_left = url_queue_limit - len(url_rapid_queue)
+    if url_space_left < 1:
         return
 
     # 1. get from db
-    # todo: currently downloaded = embedded, be careful here when adding separate embedder
     db_url_objects = db_url_pool.db_get_not_downloaded()
-    space_left = space_left - len(db_url_objects)
+    url_space_left = url_space_left - len(db_url_objects)
 
     # 2. get from google
     google_url_objects = []
@@ -66,7 +57,7 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
         if google_traffic_manager.is_timeout_active():
             quit_unexpectedly = True
 
-        google_urls = query_for_urls(seed_query, space_left)
+        google_urls = query_for_urls(seed_query, url_space_left)
 
         idx = 0  # using index to avoid converting this generator to list
 
@@ -88,7 +79,8 @@ def rq_refill(seed_query: WebQuery = None, use_google: bool = True):
 
         # no more new search results are present
         if idx == 0 and not quit_unexpectedly:
-            requested_query_queue.remove(seed_query)
+            requested_crawl_tasks.remove(seed_task)
+            db_crawl_tasks.db_set_crawl_completed(seed_task.uuid)
             print("removed exhausted query:", seed_query.web_query)
 
     # 3. fill from db + google
@@ -104,7 +96,7 @@ def url_save(url: str, parent_id: str = None):
         return
 
     # 1. add to the db
-    db_url_pool.db_add_url(url, parent_id)
+    db_url_pool.db_add_url(url, "N/A", parent_id)
 
 
 def url_download_text(url: str):
@@ -155,12 +147,19 @@ def process_url(url_object):
 
 
 def processing_iteration():
-    seed_query = None
+    global requested_crawl_tasks
 
-    if len(requested_query_queue) > 0:
-        seed_query = requested_query_queue[0]
+    task_space_left = requested_tasks_limit - len(requested_crawl_tasks)
+    if task_space_left > 0:
+        new_tasks = db_crawl_tasks.db_get_crawl_task()
+        requested_crawl_tasks.append(new_tasks)
 
-    rq_refill(seed_query=seed_query)
+    seed_task = None
+
+    if len(requested_crawl_tasks) > 0:
+        seed_task = requested_crawl_tasks[0]
+
+    rq_refill(seed_task=seed_task)
 
     if len(url_rapid_queue) == 0:
         return
@@ -169,8 +168,7 @@ def processing_iteration():
     process_url(url_object)
 
 
-processing_iteration()
-while len(url_rapid_queue) > 0:
+while True:
     db_query = Query()
     db_not_downloaded = db_url_pool.db.search(
         db_query.fragment({"is_downloaded": False, "is_rubbish": False})

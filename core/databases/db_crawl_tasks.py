@@ -1,7 +1,7 @@
 from tinydb import Query
 
 from core.tools import utils
-from core.tools.utils import use_tinydb
+from core.tools.utils import use_tinydb, gen_unix_time
 
 db = use_tinydb("crawl_tasks")
 
@@ -28,22 +28,33 @@ def db_add_crawl_task(prompt):
     return new_uuid
 
 
+def db_set_crawl_executing(uuid: str):
+    fields = Query()
+    db.update(
+        {"executing": True, "execution_date": gen_unix_time()}, fields.uuid == uuid
+    )
+
+
 def db_set_crawl_completed(uuid: str):
     fields = Query()
-    db.update({"completed": True}, fields.uuid == uuid)
+    db.update(
+        {"completed": True, "completion_date": gen_unix_time()}, fields.uuid == uuid
+    )
 
 
 def db_get_crawl_task():
     fields = Query()
     crawl_task = db.get(fields.completed == False)
 
+    if crawl_task is not None:
+        db_set_crawl_executing(crawl_task.uuid)
+
     return crawl_task
 
 
-def db_get_incomplete_completion_task():
+def db_get_incomplete_crawl_task():
     fields = Query()
     task = db.get(fields.completed == False and fields.executing == False)
-    task_uuid = task
-    db.update({"executing": True}, fields.uuid == task_uuid)
+    db.update({"executing": True}, fields.uuid == task.uuid)
 
     return task

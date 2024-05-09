@@ -101,7 +101,7 @@ def use_tinydb(db_name):
     if not os.path.exists(data_path):
         os.makedirs(data_path)
 
-    db_path = data_path + "{}.json".format(db_name)
+    db_path = data_path + "/{}.json".format(db_name)
     db = TinyDB(db_path)
 
     return db
