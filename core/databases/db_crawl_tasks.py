@@ -52,7 +52,7 @@ def db_get_crawl_task():
     return crawl_task
 
 
-def db_get_incomplete_completion_task():
+def db_get_incomplete_crawl_task():
     fields = Query()
     task = db.get(fields.completed == False and fields.executing == False)
     db.update({"executing": True}, fields.uuid == task.uuid)
