@@ -1,9 +1,10 @@
 import asyncio
 import datetime
 import multiprocessing
+import os
 import re
+import sys
 import uuid
-import os, sys
 
 from tinydb import TinyDB
 
