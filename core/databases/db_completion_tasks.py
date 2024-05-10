@@ -55,5 +55,11 @@ def db_get_incomplete_completion_task():
 
 def db_update_completion_task_after_summarizing(summary: str, uuid: str):
     fields = Query()
-    db.update({"completed": True, "completion_result": summary, "completion_date": gen_unix_time()}, fields.uuid == uuid)
-
+    db.update(
+        {
+            "completed": True,
+            "completion_result": summary,
+            "completion_date": gen_unix_time(),
+        },
+        fields.uuid == uuid,
+    )
