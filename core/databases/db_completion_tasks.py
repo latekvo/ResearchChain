@@ -36,7 +36,7 @@ def db_get_completion_tasks_by_page(page: int, per_page: int = defaults.ITEMS_PE
     return results
 
 
-def db_set_incomplete_completion_task_executing(uuid: str):
+def db_set_completion_task_executing(uuid: str):
     fields = Query()
     db.update(
         {"executing": True, "execution_date": gen_unix_time()}, fields.uuid == uuid
@@ -48,7 +48,7 @@ def db_get_incomplete_completion_task():
 
     results = db.get(fields.completed == False and fields.executing == False)
     if results is not None:
-        db_set_incomplete_completion_task_executing(results["uuid"])
+        db_set_completion_task_executing(results["uuid"])
 
     return results
 
