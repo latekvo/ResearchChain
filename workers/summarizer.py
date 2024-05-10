@@ -80,6 +80,6 @@ while True:
     )
     if queued_tasks != previous_queued_tasks:
         print("Number of queued tasks: ", queued_tasks)
-    previous_total_tasks = queued_tasks
+    previous_queued_tasks = queued_tasks
 
     summarize()
