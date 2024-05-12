@@ -4,7 +4,7 @@ from colorama import Fore
 from tinydb import Query
 from tinydb.table import Document
 
-from core.databases import db_url_pool, db_embeddings
+from core.databases import db_url_pool, db_embeddings, db_crawl_tasks
 from core.models.configurations import load_llm_config
 from core.tools import utils
 
@@ -27,10 +27,15 @@ def processing_iteration():
     for url_object in embedding_queue:
         print("embedding document:", url_object)
         document = url_object["text"]
+        task_uuid = url_object["task_uuid"]
 
         db_full_name = utils.gen_vec_db_full_name("embeddings", embed_model_name)
+
         db_embeddings.db_add_text_batch(document, db_full_name)
         db_url_pool.db_set_url_embedded(url_object["uuid"], embed_model_name)
+        db_crawl_tasks.db_increment_task_embedding_progression(
+            task_uuid, embed_model_name
+        )
 
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
