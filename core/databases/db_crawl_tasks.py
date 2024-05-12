@@ -22,6 +22,8 @@ def db_add_crawl_task(prompt):
             "completion_date": 0,  # time completed
             "execution_date": 0,  # time started completion
             "timestamp": timestamp,  # time added
+            "base_amount_scheduled": 100,  # todo: replace with dynamically adjusted value
+            "embedding_progression": {},  # {model_name: count} | progress tracking
         }
     )
 
@@ -58,3 +60,30 @@ def db_get_incomplete_crawl_task():
     db.update({"executing": True}, fields.uuid == task.uuid)
 
     return task
+
+
+def db_is_crawl_task_fully_embedded(uuid: str, model_name: str):
+    fields = Query()
+    task = db.get(fields.uuid == uuid)
+
+    baseline_count = task.base_amount_scheduled
+    current_count = task.embedding_progression[model_name]
+
+    return current_count >= baseline_count
+
+
+def db_increment_task_embedding_progression(uuid: str, model_name: str):
+    fields = Query()
+    task = db.get(fields.uuid == uuid)
+
+    current_progression = task.embedding_progression
+    current_count = current_progression[model_name]
+
+    if current_count is not None:
+        current_count += 1
+    else:
+        current_count = 1
+
+    current_progression[model_name] = current_count
+
+    db.update({"embedding_progression": current_progression}, fields.uuid == task.uuid)
