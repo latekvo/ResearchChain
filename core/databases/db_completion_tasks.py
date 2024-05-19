@@ -19,6 +19,7 @@ def db_add_completion_task(prompt, mode):
             "completed": False,
             "completion_result": None,
             "executing": False,
+            "required_crawl_tasks": [],  # uuid list that has to be completed first
             "completion_date": 0,
             "execution_date": 0,
             "timestamp": timestamp,
@@ -43,14 +44,20 @@ def db_set_completion_task_executing(uuid: str):
     )
 
 
-def db_get_incomplete_completion_task():
+def db_get_incomplete_completion_tasks(amount: int = 1):
     fields = Query()
 
-    results = db.get(fields.completed == False and fields.executing == False)
-    if results is not None:
-        db_set_completion_task_executing(results["uuid"])
+    results = db.search(fields.completed == False and fields.executing == False)
+    results = results[:amount]
+
+    for task in results:
+        db_set_completion_task_executing(task["uuid"])
 
     return results
+
+
+def db_release_executing_tasks(uuid_list: list[str]):
+    pass
 
 
 def db_update_completion_task_after_summarizing(summary: str, uuid: str):

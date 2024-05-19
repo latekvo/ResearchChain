@@ -1,3 +1,5 @@
+from typing import Literal
+
 from tinydb import Query
 
 from core.tools import utils
@@ -8,7 +10,8 @@ db = use_tinydb("crawl_tasks")
 # we have to heartbeat our workers once we run out of tasks, websocks should suffice
 
 
-def db_add_crawl_task(prompt):
+def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
+    # todo: replace arguments with a single WebQuery
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
 
@@ -16,7 +19,7 @@ def db_add_crawl_task(prompt):
         {
             "uuid": new_uuid,
             "prompt": prompt,
-            "type": None,  # todo: choose 'news', 'wiki', 'docs', use WebQuery
+            "type": mode,
             "completed": False,
             "executing": False,
             "completion_date": 0,  # time completed
@@ -60,6 +63,26 @@ def db_get_incomplete_crawl_task():
     db.update({"executing": True}, fields.uuid == task.uuid)
 
     return task
+
+
+def db_is_task_completed(uuid: str):
+    fields = Query()
+    task = db.get(fields.uuid == uuid)
+
+    return task.completed
+
+
+def db_are_tasks_completed(uuid_list: list[str]):
+    # fixme: instead of multiple individual calls, make one composite one
+    #        for our current usage this is not necessary
+
+    total_completeness = True
+
+    for uuid in uuid_list:
+        task_completeness = db_is_task_completed(uuid)
+        total_completeness *= task_completeness
+
+    pass
 
 
 def db_is_crawl_task_fully_embedded(uuid: str, model_name: str):
