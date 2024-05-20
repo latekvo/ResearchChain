@@ -58,7 +58,7 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
 
 def db_release_executing_tasks(uuid_list: list[str]):
     fields = Query()
-    db.update({"executing": False}, fields.uuid.any(uuid_list))
+    db.update({"executing": False}, fields.uuid.one_of(uuid_list))
 
 
 def db_update_completion_task_after_summarizing(summary: str, uuid: str):
