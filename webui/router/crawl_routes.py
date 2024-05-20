@@ -3,8 +3,8 @@ from core.databases.db_crawl_tasks import (
     db_add_crawl_task,
     db_get_crawl_task,
     db_set_crawl_completed,
-    db_get_incomplete_completion_task,
 )
+from core.databases.db_completion_tasks import db_get_incomplete_completion_tasks
 from webui.models.crawl_task import CrawlCreator
 
 router = APIRouter()
@@ -29,5 +29,5 @@ def set_crawl_completed(uuid):
 
 @router.get("/crawl/incomplete")
 def get_inocmplete_completion_task():
-    result = db_get_incomplete_completion_task()
+    result = db_get_incomplete_completion_tasks()
     return {"task": result}
