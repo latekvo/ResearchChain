@@ -1,5 +1,11 @@
-from core.databases.db_crawl_tasks import db_are_tasks_completed
-from core.databases.db_embeddings import db_search_for_similar_queries
+from core.databases.db_crawl_tasks import (
+    db_are_tasks_completed,
+    db_are_crawl_tasks_fully_embedded,
+)
+from core.databases.db_embeddings import (
+    db_search_for_similar_queries,
+    db_get_currently_used_vector_model,
+)
 from core.databases.db_completion_tasks import (
     db_get_incomplete_completion_tasks,
     db_update_completion_task_after_summarizing,
@@ -41,12 +47,14 @@ def summarize():
     task_queue += db_get_incomplete_completion_tasks(queue_space)
     current_task = task_queue[0]
 
+    current_vec_db_model = db_get_currently_used_vector_model()
+
     # find the first task ready for execution, dismiss the others
     for task in task_queue:
         # check all dependencies for completeness
         dep_list = task["required_crawl_tasks"]
 
-        if db_are_tasks_completed(dep_list):
+        if db_are_crawl_tasks_fully_embedded(dep_list, current_vec_db_model):
             current_task = task
             task_queue.remove(task)
             task_uuid_list = list(map(extract_uuid, task_queue))

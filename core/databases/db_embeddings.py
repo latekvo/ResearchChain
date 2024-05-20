@@ -18,6 +18,10 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 
+def db_get_currently_used_vector_model():
+    return embedder_config.model_name
+
+
 def db_add_text_batch(text: str, db_full_name: str):
     # automatically splits text before embedding it
     chunks = text_splitter.split_text(text)

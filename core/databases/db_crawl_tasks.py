@@ -95,6 +95,15 @@ def db_is_crawl_task_fully_embedded(uuid: str, model_name: str):
     return current_count >= baseline_count
 
 
+def db_are_crawl_tasks_fully_embedded(uuid_list: str, model_name: str):
+    # todo: replace this naive approach with a one-query solution
+    for uuid in uuid_list:
+        if db_is_crawl_task_fully_embedded(uuid, model_name) is False:
+            return False
+
+    return True
+
+
 def db_increment_task_embedding_progression(uuid: str, model_name: str):
     fields = Query()
     task = db.get(fields.uuid == uuid)
