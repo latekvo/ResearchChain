@@ -45,7 +45,8 @@ def summarize():
 
     queue_space = task_queue_limit - len(task_queue)
     task_queue += db_get_incomplete_completion_tasks(queue_space)
-    current_task = task_queue[0]
+
+    current_task = None
 
     current_vec_db_model = db_get_currently_used_vector_model()
 
@@ -59,6 +60,9 @@ def summarize():
             task_queue.remove(task)
             task_uuid_list = list(map(extract_uuid, task_queue))
             db_release_executing_tasks(task_uuid_list)
+
+    if current_task is None:
+        return
 
     task_query = WebQuery(
         prompt_core=current_task["prompt"], query_type=current_task["mode"].lower()
