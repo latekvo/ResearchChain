@@ -1,4 +1,3 @@
-import os
 from urllib.error import HTTPError
 
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
@@ -64,12 +63,21 @@ def rq_refill(seed_task, use_google: bool = True):
         if not quit_unexpectedly:
             try:
                 for url in google_urls:
+
                     if db_url_pool.db_is_url_present(url):
                         continue
+
                     prompt = seed_query.web_query
-                    new_url_object = db_url_pool.db_add_url(url, prompt, None)
+                    new_url_object = db_url_pool.db_add_url(
+                        url=url,
+                        prompt=prompt,
+                        parent_uuid=None,
+                        task_uuid=seed_task.uuid,
+                    )
+
                     google_url_objects.append(new_url_object)
                     idx += 1
+
                 google_traffic_manager.report_no_timeout()
             except HTTPError:
                 # google requires a long delay after getting timeout
@@ -90,13 +98,15 @@ def rq_refill(seed_task, use_google: bool = True):
     return
 
 
-def url_save(url: str, parent_id: str = None):
+def url_save(url: str, parent_uuid: str = None, task_uuid: str = None):
     # 0. check if url was already saved
     if db_url_pool.db_is_url_present(url):
         return
 
     # 1. add to the db
-    db_url_pool.db_add_url(url, "N/A", parent_id)
+    db_url_pool.db_add_url(
+        url=url, prompt="N/A", parent_uuid=parent_uuid, task_uuid=task_uuid
+    )
 
 
 def url_download_text(url: str):
@@ -130,6 +140,7 @@ def url_download(url_object):
 
 def process_url(url_object):
     url_uuid = url_object["uuid"]
+    url_task_uuid = url_object["task_uuid"]
 
     # 0. download article
     document_text = url_download(url_object)
@@ -143,7 +154,7 @@ def process_url(url_object):
 
     # 2. save all links
     for link in url_list:
-        url_save(link, url_uuid)
+        url_save(url=link, parent_uuid=url_uuid, task_uuid=url_task_uuid)
 
 
 def processing_iteration():

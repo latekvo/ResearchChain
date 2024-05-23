@@ -13,13 +13,14 @@ db = use_tinydb("url_pool")
 # and a tiny global kv cache just to prevent duplicate urls
 
 
-def db_add_url(url: str, prompt: str, parent_uuid: str = None):
+def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = None):
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
 
     new_url_object = {
         "uuid": new_uuid,
         "parent_uuid": parent_uuid,
+        "task_uuid": task_uuid,
         "prompt": prompt,
         "url": url,
         "text": None,
