@@ -1,6 +1,7 @@
 import argparse
 from dataclasses import dataclass
 
+from core.classes.configuration import RuntimeConfiguration
 from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
 )
@@ -75,32 +76,13 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-@dataclass
-class RuntimeConfiguration:
-    worker_type: str
-    worker_config_path: str
-    llm_config_name: str
-    embedder_config_name: str
-    llm_config: LlmConfiguration
-    embedder_config: EmbedderConfiguration
-
-
 def get_runtime_config():
+    # todo: introduce caching, calculate once, distribute everywhere
     llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
     embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
 
     llm_config = LlmConfiguration(llm_path)
     embedder_config = EmbedderConfiguration(embed_path)
-
-    # hf or ollama (compatibility)
-    llm_supplier = llm_config.supplier
-    embedder_supplier = embedder_config.supplier
-
-    # todo: we should actually allow for this behaviour, should be a simple fix as well
-    if llm_supplier != embedder_supplier:
-        raise ValueError(
-            "LLM and EMBEDDER suppliers differ, please use the same supplier for both."
-        )
 
     worker_config_path = "configs/{}.json".format(args.worker_type)
 
