@@ -113,9 +113,3 @@ def get_runtime_config():
         llm_config=llm_config,
         embedder_config=embedder_config,
     )
-
-
-# todo: this is a legacy method of distributing config, remove ASAP
-LLM_CHOICE = args.llm_choice
-EMBEDDER_CHOICE = args.embed_choice
-USE_HUGGING_FACE = False  # temporarily disabled HF
