@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
 import multiprocessing
@@ -11,11 +13,6 @@ from tinydb import TinyDB
 from core.databases import defaults
 from core.tools.dbops import get_vec_db_by_name
 from core.tools.model_loader import load_embedder
-
-
-def purify_name(name):
-    # fixme awful code lol
-    return "_".join("_".join(name.split(":")).split("-"))
 
 
 def is_text_junk(text: str):
@@ -51,10 +48,17 @@ def reduce(text: str, goal: str, match: str):
     return goal.join(text.split(match))
 
 
-def remove_characters(text: str, wordlist: list[str]):
+def remove_characters(
+    text: str, wordlist: list[str], replacing_character: str = ""
+) -> str:
+    print("t", text, "wl", wordlist)
     for word in wordlist:
-        text = "".join(text.split(word))
+        text = "{}".format(replacing_character).join(text.split(word))
     return text
+
+
+def purify_name(name):
+    return remove_characters(name, ["_", "+", ":", "-"], "_")
 
 
 def timeout_function(task, timeout=2.0):

@@ -3,7 +3,7 @@ from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
-from arguments import get_runtime_config
+from configurator import get_runtime_config
 
 runtime_configuration = get_runtime_config()
 llm_config = runtime_configuration.llm_config

@@ -1,7 +1,7 @@
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
 
-from arguments import get_runtime_config
+from configurator import get_runtime_config
 from core.tools.model_loader import load_llm, load_embedder
 from core.tools.utils import purify_name
 

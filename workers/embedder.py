@@ -4,7 +4,7 @@ from colorama import Fore
 from tinydb import Query
 from tinydb.table import Document
 
-from arguments import get_runtime_config
+from configurator import get_runtime_config
 from core.databases import db_url_pool, db_embeddings, db_crawl_tasks
 from core.tools import utils
 

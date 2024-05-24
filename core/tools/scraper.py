@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests.exceptions
 import tiktoken
 from googlesearch import search
@@ -8,7 +10,7 @@ from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
 
-from arguments import get_runtime_config
+from configurator import get_runtime_config
 from core.tools.model_loader import load_embedder, load_llm
 from core.tools.utils import purify_name
 from core.tools.dbops import get_vec_db_by_name

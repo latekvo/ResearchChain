@@ -1,6 +1,6 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from arguments import get_runtime_config
+from configurator import get_runtime_config
 from core.tools.utils import use_faiss, is_text_junk
 
 runtime_configuration = get_runtime_config()
