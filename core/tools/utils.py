@@ -48,12 +48,9 @@ def reduce(text: str, goal: str, match: str):
     return goal.join(text.split(match))
 
 
-def remove_characters(
-    text: str, wordlist: list[str], replacing_character: str = ""
-) -> str:
-    print("t", text, "wl", wordlist)
+def remove_characters(text: str, wordlist: list[str], replace_with: str = "") -> str:
     for word in wordlist:
-        text = "{}".format(replacing_character).join(text.split(word))
+        text = "{}".format(replace_with).join(text.split(word))
     return text
 
 

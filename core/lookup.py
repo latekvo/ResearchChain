@@ -61,11 +61,6 @@ def web_chain_function(prompt_dict: dict):
             return web_docs_lookup_prompt()
 
     web_interpret_prompt_mode = interpret_prompt_mode()
-    # NOTE: a detour has been performed here, more details:
-    #       web_chain_function will soon become just a tool playing a part of a larger mechanism.
-    #       prompt creation will be taken over by prompt sentiment extractor which will extract all researchable
-    #       queries from the user prompt, and start separate chains performing those steps in parallel
-    #       until a satisfactory response is created.
 
     chain = (
         {
