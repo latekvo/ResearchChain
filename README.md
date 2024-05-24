@@ -36,7 +36,7 @@
 > and to expand its knowledge base by scheduling crawls based on the provided areas of interest.
 
 ### Flow of operations with WebUI app.
-![Flow chart explaining flow of research chain when WebUI is used as the scheduling app.](/home/armado/dev/ai/ResearchChain/assets/rc_flow.png "Research chain flow chart.")
+![Flow chart explaining flow of research chain when WebUI is used as the scheduling app.](./assets/rc_flow.png "Research chain flow chart.")
 
 ---
 ### Contributing
