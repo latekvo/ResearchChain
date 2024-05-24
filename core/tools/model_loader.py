@@ -25,10 +25,6 @@ def load_ollama_embedder():
     return OllamaEmbeddings(model=embedder_config.model_name)
 
 
-def load_ollama_model():
-    return load_ollama_llm(), load_ollama_embedder()
-
-
 def load_hf_llm():
     base_model_path = hf_hub_download(
         llm_config.model_file, filename=llm_config.model_name
@@ -51,18 +47,6 @@ def load_hf_embedder():
         n_batch=embedder_config.model_token_limit,
         verbose=True,
     )
-
-
-def load_hugging_face_model():
-    return load_hf_llm(), load_hf_embedder()
-
-
-def load_model():
-    # todo: split up into separate llm and embedder functions
-    if llm_config.supplier == "hugging_face":
-        return load_hugging_face_model()
-    else:
-        return load_ollama_model()
 
 
 def load_llm():

@@ -2,6 +2,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
 
 from arguments import get_runtime_config
+from core.tools.model_loader import load_llm, load_embedder
 from core.tools.utils import purify_name
 
 from core.chainables.web import (
@@ -13,12 +14,12 @@ from core.chainables.web import (
     web_wiki_lookup_prompt,
 )
 from core.tools.dbops import get_vec_db_by_name
-from core.tools.model_loader import load_model
 
 
 output_parser = StrOutputParser()
 
-llm, embeddings = load_model()
+llm = load_llm()
+embeddings = load_embedder()
 
 runtime_configuration = get_runtime_config()
 llm_config = runtime_configuration.llm_config

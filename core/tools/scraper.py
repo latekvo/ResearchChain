@@ -9,7 +9,7 @@ from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
 
 from arguments import get_runtime_config
-from core.tools.model_loader import load_model
+from core.tools.model_loader import load_embedder, load_llm
 from core.tools.utils import purify_name
 from core.tools.dbops import get_vec_db_by_name
 from core.classes.query import WebQuery
@@ -19,10 +19,13 @@ encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
 
 runtime_configuration = get_runtime_config()
+
 llm_config = runtime_configuration.llm_config
 embedder_config = runtime_configuration.embedder_config
 
-llm, embeddings = load_model()
+llm = load_llm()
+embeddings = load_embedder()
+
 embedding_model_safe_name = purify_name(embedder_config.model_name)
 
 
