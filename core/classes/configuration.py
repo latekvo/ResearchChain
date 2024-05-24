@@ -10,4 +10,4 @@ class RuntimeConfig:
     worker_type: Literal["embedder", "crawler", "summarizer", "scheduler"]
 
     llm_configuration: str | None
-    embed_configuration: str | None
+    embedder_configuration: str | None

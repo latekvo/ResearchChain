@@ -1,7 +1,8 @@
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
+
+from arguments import get_runtime_config
 from core.tools.utils import purify_name
-from core.models.configurations import load_llm_config
 
 from core.chainables.web import (
     web_docs_lookup,
@@ -18,8 +19,12 @@ from core.tools.model_loader import load_model
 output_parser = StrOutputParser()
 
 llm, embeddings = load_model()
-llm_config, embed_config = load_llm_config()
-embedding_model_safe_name = purify_name(embed_config.model_name)
+
+runtime_configuration = get_runtime_config()
+llm_config = runtime_configuration.llm_config
+embedder_config = runtime_configuration.embedder_config
+
+embedding_model_safe_name = purify_name(embedder_config.model_name)
 
 # this general db will be used to save AI responses,
 # might become useful as the responses are better than the input
