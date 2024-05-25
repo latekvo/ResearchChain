@@ -75,9 +75,15 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+runtime_config = None
+
 
 def get_runtime_config():
-    # todo: introduce caching, calculate once, distribute everywhere
+    global runtime_config
+
+    if runtime_config:
+        return runtime_config
+
     llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
     embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
 
@@ -87,7 +93,8 @@ def get_runtime_config():
     worker_config_path = "configs/{}.json".format(args.worker_type)
 
     # todo: load one of the standard configs based on worker_type, and overlay flags atop
-    return RuntimeConfiguration(
+
+    runtime_config = RuntimeConfiguration(
         worker_type=args.worker_type,
         worker_config_path=worker_config_path,
         llm_config_name=args.llm_choice,
@@ -95,3 +102,5 @@ def get_runtime_config():
         llm_config=llm_config,
         embedder_config=embedder_config,
     )
+
+    return runtime_config
