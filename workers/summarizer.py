@@ -116,14 +116,16 @@ previous_queued_tasks = None
 
 # todo: implement class-based task management system
 
-while True:
-    db = use_tinydb("completion_tasks")
-    db_query = Query()
-    queued_tasks = len(
-        db.search(db_query.completed == False and db_query.executing == False)
-    )
-    if queued_tasks != previous_queued_tasks:
-        print("Number of queued tasks: ", queued_tasks)
-    previous_queued_tasks = queued_tasks
 
-    summarize()
+def start_summarizer():
+    while True:
+        db = use_tinydb("completion_tasks")
+        db_query = Query()
+        queued_tasks = len(
+            db.search(db_query.completed == False and db_query.executing == False)
+        )
+        if queued_tasks != previous_queued_tasks:
+            print("Number of queued tasks: ", queued_tasks)
+        previous_queued_tasks = queued_tasks
+
+        summarize()

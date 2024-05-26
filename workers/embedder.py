@@ -42,12 +42,13 @@ def processing_iteration():
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
-while True:
-    db_query = Query()
-    db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
-    db_total = db_url_pool.db.all()
+def start_embedder():
+    while True:
+        db_query = Query()
+        db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
+        db_total = db_url_pool.db.all()
 
-    print("urls left to be embedded:", len(db_not_embedded))
-    print("url running total:", len(db_total))
+        print("urls left to be embedded:", len(db_not_embedded))
+        print("url running total:", len(db_total))
 
-    processing_iteration()
+        processing_iteration()
