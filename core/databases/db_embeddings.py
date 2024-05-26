@@ -7,7 +7,7 @@ runtime_configuration = get_runtime_config()
 llm_config = runtime_configuration.llm_config
 embedder_config = runtime_configuration.embedder_config
 
-vector_db, embedder = use_faiss("embeddings", embedder_config.model_name)
+vector_db, embedder = use_faiss("embeddings")
 
 text_splitter = RecursiveCharacterTextSplitter(
     separators=embedder_config.buffer_stops,
