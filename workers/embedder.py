@@ -4,15 +4,17 @@ from colorama import Fore
 from tinydb import Query
 from tinydb.table import Document
 
+from configurator import get_runtime_config
 from core.databases import db_url_pool, db_embeddings, db_crawl_tasks
-from core.models.configurations import load_llm_config
 from core.tools import utils
 
 rapid_queue_limit = 40
 rapid_queue: list[Document] = []
 
 # llm will be used - passed to an agentic preprocessor
-llm_config, embedder_config = load_llm_config()
+runtime_configuration = get_runtime_config()
+llm_config = runtime_configuration.llm_config
+embedder_config = runtime_configuration.embedder_config
 
 # important note to remember for later
 # we can avoid the ... issue if we just lock the db for every transaction,
@@ -40,12 +42,13 @@ def processing_iteration():
     print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
 
 
-while True:
-    db_query = Query()
-    db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
-    db_total = db_url_pool.db.all()
+def start_embedder():
+    while True:
+        db_query = Query()
+        db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
+        db_total = db_url_pool.db.all()
 
-    print("urls left to be embedded:", len(db_not_embedded))
-    print("url running total:", len(db_total))
+        print("urls left to be embedded:", len(db_not_embedded))
+        print("url running total:", len(db_total))
 
-    processing_iteration()
+        processing_iteration()

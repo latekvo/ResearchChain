@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import requests.exceptions
 import tiktoken
 from googlesearch import search
@@ -7,8 +9,9 @@ from langchain_community.vectorstores.faiss import FAISS
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
-from core.tools.model_loader import load_model
-from core.models.configurations import load_llm_config
+
+from configurator import get_runtime_config
+from core.tools.model_loader import load_embedder, load_llm
 from core.tools.utils import purify_name
 from core.tools.dbops import get_vec_db_by_name
 from core.classes.query import WebQuery
@@ -17,9 +20,15 @@ from core.tools.utils import is_text_junk, remove_characters
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
 
-llm, embeddings = load_model()
-llm_config, embed_config = load_llm_config()
-embedding_model_safe_name = purify_name(embed_config.model_name)
+runtime_configuration = get_runtime_config()
+
+llm_config = runtime_configuration.llm_config
+embedder_config = runtime_configuration.embedder_config
+
+llm = load_llm()
+embeddings = load_embedder()
+
+embedding_model_safe_name = purify_name(embedder_config.model_name)
 
 
 def docs_to_context(docs_and_scores: list[Document], token_limit: int) -> str:
@@ -44,7 +53,9 @@ def rag_query_lookup(prompt_text: str) -> str:
     pass
 
 
-def query_for_urls(query: WebQuery, url_amount=embed_config.article_limit) -> list[str]:
+def query_for_urls(
+    query: WebQuery, url_amount=embedder_config.article_limit
+) -> list[str]:
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", query.web_query)
 
     url_list = search(
@@ -76,9 +87,9 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
         document = download_article(url)
 
         text_splitter = RecursiveCharacterTextSplitter(
-            separators=embed_config.buffer_stops,
+            separators=embedder_config.buffer_stops,
             chunk_size=query.db_chunk_size,
-            chunk_overlap=embed_config.chunk_overlap,
+            chunk_overlap=embedder_config.chunk_overlap,
             keep_separator=False,
             strip_whitespace=True,
         )
@@ -107,7 +118,7 @@ def populate_db_with_google_search(database: FAISS, query: WebQuery):
 
 
 def web_query_google_lookup(
-    query: WebQuery, token_limit: int = embed_config.model_token_limit
+    query: WebQuery, token_limit: int = embedder_config.model_token_limit
 ):
     db_name = embedding_model_safe_name + query.db_save_file_extension
     db = get_vec_db_by_name(db_name, embeddings)

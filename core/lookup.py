@@ -1,7 +1,9 @@
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
+
+from configurator import get_runtime_config
+from core.tools.model_loader import load_llm, load_embedder
 from core.tools.utils import purify_name
-from core.models.configurations import load_llm_config
 
 from core.chainables.web import (
     web_docs_lookup,
@@ -12,14 +14,18 @@ from core.chainables.web import (
     web_wiki_lookup_prompt,
 )
 from core.tools.dbops import get_vec_db_by_name
-from core.tools.model_loader import load_model
 
 
 output_parser = StrOutputParser()
 
-llm, embeddings = load_model()
-llm_config, embed_config = load_llm_config()
-embedding_model_safe_name = purify_name(embed_config.model_name)
+llm = load_llm()
+embeddings = load_embedder()
+
+runtime_configuration = get_runtime_config()
+llm_config = runtime_configuration.llm_config
+embedder_config = runtime_configuration.embedder_config
+
+embedding_model_safe_name = purify_name(embedder_config.model_name)
 
 # this general db will be used to save AI responses,
 # might become useful as the responses are better than the input
@@ -55,11 +61,6 @@ def web_chain_function(prompt_dict: dict):
             return web_docs_lookup_prompt()
 
     web_interpret_prompt_mode = interpret_prompt_mode()
-    # NOTE: a detour has been performed here, more details:
-    #       web_chain_function will soon become just a tool playing a part of a larger mechanism.
-    #       prompt creation will be taken over by prompt sentiment extractor which will extract all researchable
-    #       queries from the user prompt, and start separate chains performing those steps in parallel
-    #       until a satisfactory response is created.
 
     chain = (
         {
