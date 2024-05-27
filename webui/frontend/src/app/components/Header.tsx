@@ -1,27 +1,33 @@
+'use client'
 import React from 'react';
-import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation'
 
 const Header = () => {
+  console.log(usePathname());
+  const pathName = usePathname()
+  
   return (
     <Navbar>
       <NavbarBrand>
         <h1 className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-purple-700 bg-clip-text">
-            Research Chain
+          Research Chain
         </h1>
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem isActive>
-          <Link href="#" aria-current="page" className='text-blue-500'>
+        <NavbarItem className='p-2' isActive={pathName === "/" ? true : false}>
+          <Link href="/" className={pathName === "/" ? "text-blue-500 font-normal" : ''}>
             Add task
           </Link>
         </NavbarItem>
-        <NavbarItem >
-          <Link color="foreground" href="#">
+        <NavbarItem isActive={pathName === "/crawl-history" ? true : false}>
+          <Link href="/crawl-history" className={pathName === "/crawl-history" ? "text-blue-500 font-normal" : ''} >
             Crawl history
           </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
+        </NavbarItem >
+        <NavbarItem isActive={pathName === "/summarize-history" ? true : false}>
+          <Link href="/summarize-history" className={pathName === "/summarize-history" ? "text-blue-500 font-normal" : ''}>
             Summarize history
           </Link>
         </NavbarItem>
