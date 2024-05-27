@@ -1,6 +1,5 @@
 import argparse
 from dataclasses import dataclass
-
 from core.classes.configuration import RuntimeConfiguration
 from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
