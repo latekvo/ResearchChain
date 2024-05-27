@@ -20,7 +20,7 @@ if runtime_config.worker_type == "embedder":
 if runtime_config.worker_type == "summarizer":
     start_summarizer()
 
-uvicorn.run("webui.main:app") #Workaround for launching backend service
+uvicorn.run("webui.main:app")  # Workaround for launching backend service
 
 try:
     try:

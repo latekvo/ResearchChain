@@ -22,12 +22,15 @@ from core.databases.db_url_pool import (
 )
 from pydantic import BaseModel
 
+
 class TaskCreator(BaseModel):
     prompt: str
     mode: str
 
+
 class CrawlCreator(BaseModel):
     prompt: str
+
 
 class CrawlTask(BaseModel):
     uuid: str
@@ -37,6 +40,8 @@ class CrawlTask(BaseModel):
     completion_date: float
     execution_date: float
     timestamp: float
+
+
 class UrlCreator(BaseModel):
     url: str
     prompt: str
@@ -52,6 +57,7 @@ class Downloaded(BaseModel):
     url_id: str
     text: str
 
+
 app = FastAPI()
 app.add_middleware = CORSMiddleware(
     CORSMiddleware,
@@ -60,6 +66,7 @@ app.add_middleware = CORSMiddleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/task")
 def get_tasks_by_page():
@@ -79,6 +86,8 @@ def add_completion_task(completion_task: TaskCreator):
     return {
         "task_uuid": uuid,
     }
+
+
 @app.get("/crawl")
 def get_crawl_task():
     crawl_task = db_get_crawl_task()
@@ -100,6 +109,7 @@ def set_crawl_completed(uuid):
 def get_inocmplete_completion_task():
     result = db_get_incomplete_completion_tasks()
     return {"task": result}
+
 
 @app.post("/url")
 def add_url(url: UrlCreator):
