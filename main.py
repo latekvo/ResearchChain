@@ -1,6 +1,6 @@
 import curses
 import requests
-
+import uvicorn
 from colorama import init as colorama_init, Fore, Style
 
 from configurator import get_runtime_config
@@ -20,6 +20,7 @@ if runtime_config.worker_type == "embedder":
 if runtime_config.worker_type == "summarizer":
     start_summarizer()
 
+uvicorn.run("webui.main:app") #Workaround for launching backend service
 
 try:
     try:
