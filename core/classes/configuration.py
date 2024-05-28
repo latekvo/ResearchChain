@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 from langchain_community.embeddings import OllamaEmbeddings
@@ -26,3 +27,19 @@ class RuntimeConfiguration:
     embedder_config: EmbedderConfiguration
     llm_object: Ollama | Llama = None
     embedder_object: OllamaEmbeddings | Llama = None
+
+    def constants_from_file(self, path: str):
+        with open(path) as f:
+            data = json.load(f)
+            self.worker_type = data["worker_type"]
+            self.worker_config_path = data["worker_config_path"]
+            self.llm_config_name = data["llm_config_name"]
+            self.embedder_config_name = data["embedder_config_name"]
+
+            # vvv - check if these save correctly, if not, remove
+            self.llm_config = data["llm_config"]
+            self.embedder_config = data["embedder_config"]
+
+            # todo: move logic regarding x_objects and x_configs here?
+
+        return self
