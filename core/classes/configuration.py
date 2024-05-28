@@ -28,18 +28,20 @@ class RuntimeConfiguration:
     llm_object: Ollama | Llama = None
     embedder_object: OllamaEmbeddings | Llama = None
 
-    def constants_from_file(self, path: str):
-        with open(path) as f:
-            data = json.load(f)
-            self.worker_type = data["worker_type"]
-            self.worker_config_path = data["worker_config_path"]
-            self.llm_config_name = data["llm_config_name"]
-            self.embedder_config_name = data["embedder_config_name"]
 
+def load_runtime_config_from_file(path: str):
+    with open(path) as f:
+        data = json.load(f)
+        config = RuntimeConfiguration(
+            worker_type=data["worker_type"],
+            worker_config_path=data["worker_config_path"],
+            llm_config_name=data["llm_config_name"],
+            embedder_config_name=data["embedder_config_name"],
             # vvv - check if these save correctly, if not, remove
-            self.llm_config = data["llm_config"]
-            self.embedder_config = data["embedder_config"]
+            llm_config=data["llm_config"],
+            embedder_config=data["embedder_config"],
+        )
 
-            # todo: move logic regarding x_objects and x_configs here?
+        # todo: move logic regarding x_objects and x_configs here?
 
-        return self
+    return config

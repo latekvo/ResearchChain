@@ -1,7 +1,10 @@
 import argparse
 from dataclasses import dataclass
 
-from core.classes.configuration import RuntimeConfiguration
+from core.classes.configuration import (
+    RuntimeConfiguration,
+    load_runtime_config_from_file,
+)
 from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
 )
@@ -74,35 +77,34 @@ runtime_config = None
 def get_runtime_config():
     global runtime_config
 
+    # fetch cache
     if runtime_config:
         return runtime_config
 
+    # default path
     worker_config_path = "configs/{}.json".format(args.worker_type)
 
     if args.worker_config_path != "none":
         worker_config_path = args.worker_config_path
         runtime_config.worker_config_path = worker_config_path
 
-    # fixme, check: getting some weird lints for 'self not provided' ???
-    runtime_config = RuntimeConfiguration.constants_from_file(worker_config_path)
+    runtime_config = load_runtime_config_from_file(worker_config_path)
 
     llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
     embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
 
     if args.worker_type != "none":
         runtime_config.worker_type = args.worker_type
-
     if args.llm_choice != "none":
         runtime_config.llm_config_name = args.llm_choice
-
     if args.llm_choice != "none":
         runtime_config.embedder_config_name = args.embed_choice
 
-    # todo: allow loading this conf directly from the very same file
-    llm_config = LlmConfiguration(llm_path)
-    embedder_config = EmbedderConfiguration(embed_path)
-
-    runtime_config.llm_config = llm_config
-    runtime_config.embedder_config = embedder_config
+    if runtime_config.llm_config is None:
+        llm_config = LlmConfiguration(llm_path)
+        runtime_config.llm_config = llm_config
+    if runtime_config.embedder_config is None:
+        embedder_config = EmbedderConfiguration(embed_path)
+        runtime_config.embedder_config = embedder_config
 
     return runtime_config
