@@ -45,12 +45,12 @@ parser.add_argument(
     dest="llm_choice",
     help="Select generative model configuration.\n"
     "Out of the box choices include:\n"
-    "- ollama_medium\n"
-    "- ollama_small\n"
-    "- ollama_large\n"
-    "- hugging_face_medium\n"
-    "- hugging_face_small\n"
-    "- hugging_face_large\n",
+    "ollama_medium, "
+    "ollama_small, "
+    "ollama_large, "
+    "hugging_face_medium, "
+    "hugging_face_small, "
+    "hugging_face_large, ",
     default="none",
 )
 parser.add_argument(
@@ -58,14 +58,14 @@ parser.add_argument(
     "--embedder-model",
     type=str,
     dest="embed_choice",
-    help="Select embedding model configuration.\n"
-    "Out of the box choices include:\n"
-    "- ollama_medium\n"
-    "- ollama_small\n"
-    "- ollama_large\n"
-    "- hugging_face_medium\n"
-    "- hugging_face_small\n"
-    "- hugging_face_large\n",
+    help="Select embedding model configuration. "
+    "Out of the box choices include: "
+    "ollama_medium, "
+    "ollama_small, "
+    "ollama_large, "
+    "hugging_face_medium, "
+    "hugging_face_small, "
+    "hugging_face_large, ",
     default="none",
 )
 
