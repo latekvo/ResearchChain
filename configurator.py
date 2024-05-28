@@ -1,6 +1,8 @@
 import argparse
 from dataclasses import dataclass
 
+from colorama import Fore, Style
+
 from core.classes.configuration import (
     RuntimeConfiguration,
     load_runtime_config_from_file,
@@ -88,7 +90,16 @@ def get_runtime_config():
         worker_config_path = args.worker_config_path
         runtime_config.worker_config_path = worker_config_path
 
-    runtime_config = load_runtime_config_from_file(worker_config_path)
+    try:
+        runtime_config = load_runtime_config_from_file(worker_config_path)
+    except FileNotFoundError:
+        # this error format deserves its own tiny library :3
+        print(
+            f"\n{Fore.RED}{Style.BRIGHT}No valid configuration was selected\n"
+            f"{Style.RESET_ALL}Try setting the {Fore.CYAN}-w{Fore.RESET} flag\n"
+            f"{Style.RESET_ALL}Run {Fore.CYAN}main.py -h{Fore.RESET} for more details"
+        )
+        exit(1)
 
     llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
     embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
