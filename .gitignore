@@ -5,3 +5,4 @@
 .pylintrc
 store/*
 __pycache__
+webui/frontend/package-lock.json
