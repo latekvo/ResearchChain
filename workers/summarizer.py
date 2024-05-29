@@ -1,5 +1,4 @@
 from core.databases.db_crawl_tasks import (
-    db_are_tasks_completed,
     db_are_crawl_tasks_fully_embedded,
 )
 from core.databases.db_embeddings import (
