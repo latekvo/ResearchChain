@@ -75,9 +75,9 @@ def load_hf_embedder():
 
 def load_llm():
     if llm_config is None:
-        errorlib.assert_error(
+        errorlib.pretty_error(
             title="Tried loading LLM without a valid configuration",
-            advice=f"Your worker configuration file is likely missing\n"
+            advice=f"Your worker configuration file is likely missing "
             f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
         )
 
@@ -89,9 +89,9 @@ def load_llm():
 
 def load_embedder():
     if embedder_config is None:
-        errorlib.assert_error(
+        errorlib.pretty_error(
             title="Tried loading EMBEDDER without a valid configuration",
-            advice=f"Your worker configuration file is likely missing \n"
+            advice=f"Your worker configuration file is likely missing "
             f"a valid {Fore.CYAN}embedder_config_name{Fore.RESET} variable",
         )
 

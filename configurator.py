@@ -95,7 +95,7 @@ def get_runtime_config():
         runtime_config = load_runtime_config_from_file(worker_config_path)
     except FileNotFoundError:
         # this error format deserves its own tiny library :3
-        errorlib.assert_error(
+        errorlib.pretty_error(
             title="No valid configuration was selected",
             advice=f"Try setting the {Fore.CYAN}-w{Fore.RESET} flag",
         )
@@ -111,12 +111,14 @@ def get_runtime_config():
     if args.embed_choice != "none":
         runtime_config.embedder_config_name = args.embed_choice
 
+    # check if x_configs are available
+    llm_config_available = runtime_config.llm_config_name != "none"
+    embedder_config_available = runtime_config.embedder_config_name != "none"
+
     # generate x_config
-    if runtime_config.llm_config is None:
-        llm_config = LlmConfiguration(llm_path)
-        runtime_config.llm_config = llm_config
-    if runtime_config.embedder_config is None:
-        embedder_config = EmbedderConfiguration(embed_path)
-        runtime_config.embedder_config = embedder_config
+    if runtime_config.llm_config is None and llm_config_available:
+        runtime_config.llm_config = LlmConfiguration(llm_path)
+    if runtime_config.embedder_config is None and embedder_config_available:
+        runtime_config.embedder_config = EmbedderConfiguration(embed_path)
 
     return runtime_config
