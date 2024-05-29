@@ -1,17 +1,41 @@
 "use client";
 import React, { Key, useState } from "react";
 import { Button, Tab, Tabs, Textarea } from "@nextui-org/react";
+import {
+  UseMutationOptions,
+  UseMutationResult,
+  useMutation,
+} from "react-query";
+import { z } from "zod";
 
-interface FormValues {
+type FormValuesCrawl = {
   prompt: string;
   mode: string;
-}
+};
+
+type FormValueSummarize = {
+  prompt: string;
+};
+
+type MutationResult = {
+  success: boolean;
+  message: string;
+};
 
 function PromptInput() {
   const [crawlActive, setCrawlActive] = useState(true);
-  const [formValues, setFormValues] = useState<FormValues>({
+  const [formValues, setFormValues] = useState<FormValuesCrawl>({
     prompt: "",
     mode: "",
+  });
+
+  const FormDataCrawl = z.object({
+    prompt: z.string().min(1),
+    mode: z.string(),
+  });
+
+  const FormDataSummarize = z.object({
+    prompt: z.string().min(1),
   });
 
   const onCrawlChange = (key: Key) => {
@@ -22,8 +46,58 @@ function PromptInput() {
     }
   };
 
-  const addCrawl = () => {};
-  const addSummarize = () => {};
+  const addCrawl: UseMutationResult<MutationResult, unknown, FormValuesCrawl> =
+    useMutation(
+      async (data: FormValuesCrawl) => {
+        const isValid = FormDataCrawl.safeParse(data);
+        if (!isValid.success) {
+          throw new Error(isValid.error.message);
+        }
+        const response = await fetch("https://api.example.com/data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        return result;
+      },
+      {
+        onSuccess: (result) => {},
+        onError: (error) => {},
+      } as UseMutationOptions<MutationResult, unknown, FormValuesCrawl>
+    );
+
+  const addSummarize: UseMutationResult<
+    MutationResult,
+    unknown,
+    FormValueSummarize
+  > = useMutation(
+    async (data: FormValueSummarize) => {
+      const isValid = FormDataSummarize.safeParse(data);
+        if (!isValid.success) {
+          throw new Error(isValid.error.message);
+        }
+      const response = await fetch("https://api.example.com/data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      return result;
+    },
+    {
+      onSuccess: (result) => {},
+      onError: (error) => {},
+    } as UseMutationOptions<MutationResult, unknown, FormValueSummarize>
+  );
 
   const onModeChange = (key: Key) => {
     setFormValues((prevValues) => ({
@@ -32,7 +106,7 @@ function PromptInput() {
     }));
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPromptChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -42,12 +116,12 @@ function PromptInput() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (key === "summarize") {
-      addSummarize();
+    if (crawlActive) {
+      addCrawl.mutate(formValues);
     } else {
-      addCrawl();
+      const data = { prompt: formValues.prompt };
+      addSummarize.mutate(data);
     }
-    console.log(formValues);
   };
 
   return (
@@ -73,7 +147,7 @@ function PromptInput() {
           color="default"
           size="lg"
           minRows={1}
-          onChange={handleChange}
+          onChange={onPromptChange}
           className="text-gray-300 px-3 text-large whitespace-normal"
         />
         <div className="w-full mt-4 flex justify-between">
