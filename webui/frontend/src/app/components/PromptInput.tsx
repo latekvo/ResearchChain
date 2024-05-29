@@ -2,23 +2,56 @@
 import React, { Key, useState } from "react";
 import { Button, Tab, Tabs, Textarea } from "@nextui-org/react";
 
+interface FormValues {
+  prompt: string;
+  mode: string;
+}
+
 function PromptInput() {
-  const [crawlActive, isCrawlActive] = useState(true);
+  const [crawlActive, setCrawlActive] = useState(true);
+  const [formValues, setFormValues] = useState<FormValues>({
+    prompt: "",
+    mode: "",
+  });
+
   const onCrawlChange = (key: Key) => {
     if (key === "summarize") {
-      isCrawlActive(false);
+      setCrawlActive(false);
     } else {
-      isCrawlActive(true);
+      setCrawlActive(true);
     }
   };
 
-  const [mode, setActiveMode] = useState("news");
+  const addCrawl = () => {};
+  const addSummarize = () => {};
+
   const onModeChange = (key: Key) => {
-    setActiveMode(String(key));
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      mode: String(key),
+    }));
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (key === "summarize") {
+      addSummarize();
+    } else {
+      addCrawl();
+    }
+    console.log(formValues);
   };
 
   return (
-    <form className="w-3/5 flex-col">
+    <form className="w-3/5 flex-col" onSubmit={handleSubmit}>
       <Tabs
         size="md"
         aria-label="Options"
@@ -34,11 +67,13 @@ function PromptInput() {
         <Textarea
           type="text"
           name="prompt"
+          value={formValues.prompt}
           variant="underlined"
           placeholder="Ask a question :)"
           color="default"
           size="lg"
           minRows={1}
+          onChange={handleChange}
           className="text-gray-300 px-3 text-large whitespace-normal"
         />
         <div className="w-full mt-4 flex justify-between">
