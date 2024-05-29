@@ -111,10 +111,10 @@ def get_runtime_config():
     if args.llm_choice != "none":
         runtime_config.embedder_config_name = args.embed_choice
 
-    if runtime_config.llm_config is None:
+    if runtime_config.llm_config is None and args.llm_choice != "none":
         llm_config = LlmConfiguration(llm_path)
         runtime_config.llm_config = llm_config
-    if runtime_config.embedder_config is None:
+    if runtime_config.embedder_config is None and args.embed_choice != "none":
         embedder_config = EmbedderConfiguration(embed_path)
         runtime_config.embedder_config = embedder_config
 

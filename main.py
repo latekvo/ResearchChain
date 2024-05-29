@@ -14,12 +14,18 @@ colorama_init()
 runtime_config = get_runtime_config()
 
 if runtime_config.worker_type == "crawler":
+    print("starting crawler")
     start_crawler()
 if runtime_config.worker_type == "embedder":
+    print("starting embedder")
+
     start_embedder()
 if runtime_config.worker_type == "summarizer":
+    print("starting summarizer")
+
     start_summarizer()
 
+print("going through")
 
 try:
     try:

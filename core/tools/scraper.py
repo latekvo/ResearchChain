@@ -25,7 +25,6 @@ runtime_configuration = get_runtime_config()
 llm_config = runtime_configuration.llm_config
 embedder_config = runtime_configuration.embedder_config
 
-llm = load_llm()
 embeddings = load_embedder()
 
 embedding_model_safe_name = purify_name(embedder_config.model_name)
