@@ -118,6 +118,8 @@ previous_queued_tasks = None
 
 
 def start_summarizer():
+    global previous_queued_tasks
+
     while True:
         db = use_tinydb("completion_tasks")
         db_query = Query()
