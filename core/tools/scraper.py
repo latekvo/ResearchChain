@@ -1,27 +1,16 @@
-import requests.exceptions
 import tiktoken
 from googlesearch import search
-from langchain_community.document_loaders import WebBaseLoader
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from colorama import Fore, Style
 
 from configurator import get_runtime_config
-from core.tools.model_loader import load_embedder
-from core.tools.utils import purify_name
 from core.classes.query import WebQuery
 
 encoder = tiktoken.get_encoding("cl100k_base")
 output_parser = StrOutputParser()
 
 runtime_configuration = get_runtime_config()
-
-llm_config = runtime_configuration.llm_config
-embedder_config = runtime_configuration.embedder_config
-
-embeddings = load_embedder()
-
-embedding_model_safe_name = purify_name(embedder_config.model_name)
 
 
 def docs_to_context(docs_and_scores: list[Document], token_limit: int) -> str:
@@ -42,9 +31,7 @@ def docs_to_context(docs_and_scores: list[Document], token_limit: int) -> str:
     return context_text
 
 
-def query_for_urls(
-    query: WebQuery, url_amount=embedder_config.article_limit
-) -> list[str]:
+def query_for_urls(query: WebQuery, url_amount=10) -> list[str]:
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", query.web_query)
 
     url_list = search(
@@ -57,13 +44,3 @@ def query_for_urls(
     )
     print(f"{Fore.CYAN}Web search completed.{Fore.RESET}")
     return url_list
-
-
-def download_article(url):
-    url_handle = WebBaseLoader(url)
-    try:
-        # fixme: certain sites load forever, soft-locking this loop (prompt example: car)
-        document = url_handle.load()
-    except requests.exceptions.ConnectionError:
-        return None
-    return document

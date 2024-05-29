@@ -79,7 +79,6 @@ def load_llm():
 
 
 def load_embedder():
-    print("runtime config", runtime_configuration)
     if embedder_config.supplier == "hugging_face":
         return load_hf_embedder()
     else:
