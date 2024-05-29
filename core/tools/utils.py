@@ -1,6 +1,4 @@
-import asyncio
 import datetime
-import multiprocessing
 import os
 import re
 import sys
@@ -55,7 +53,6 @@ def remove_characters(text: str, wordlist: list[str], replace_with: str = "") ->
 
 def purify_name(name):
     return remove_characters(name, ["_", "+", ":", "-"], "_")
-
 
 
 def extract_links(text: str):

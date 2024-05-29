@@ -42,7 +42,9 @@ def docs_to_context(docs_and_scores: list[Document], token_limit: int) -> str:
     return context_text
 
 
-def query_for_urls(query: WebQuery, url_amount=embedder_config.article_limit) -> list[str]:
+def query_for_urls(
+    query: WebQuery, url_amount=embedder_config.article_limit
+) -> list[str]:
     print(f"{Fore.CYAN}{Style.BRIGHT}Searching for:{Style.RESET_ALL}", query.web_query)
 
     url_list = search(
