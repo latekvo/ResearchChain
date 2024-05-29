@@ -103,17 +103,19 @@ def get_runtime_config():
     llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
     embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
 
+    # set x_config_name
     if args.worker_type != "none":
         runtime_config.worker_type = args.worker_type
     if args.llm_choice != "none":
         runtime_config.llm_config_name = args.llm_choice
-    if args.llm_choice != "none":
+    if args.embed_choice != "none":
         runtime_config.embedder_config_name = args.embed_choice
 
-    if runtime_config.llm_config is None and args.llm_choice != "none":
+    # generate x_config
+    if runtime_config.llm_config is None:
         llm_config = LlmConfiguration(llm_path)
         runtime_config.llm_config = llm_config
-    if runtime_config.embedder_config is None and args.embed_choice != "none":
+    if runtime_config.embedder_config is None:
         embedder_config = EmbedderConfiguration(embed_path)
         runtime_config.embedder_config = embedder_config
 
