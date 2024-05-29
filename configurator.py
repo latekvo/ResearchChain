@@ -100,16 +100,22 @@ def get_runtime_config():
             advice=f"Try setting the {Fore.CYAN}-w{Fore.RESET} flag",
         )
 
-    llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
-    embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
-
-    # set x_config_name
+    # override worker type
     if args.worker_type != "none":
         runtime_config.worker_type = args.worker_type
+
+    # override x_config_name
     if args.llm_choice != "none":
         runtime_config.llm_config_name = args.llm_choice
     if args.embed_choice != "none":
         runtime_config.embedder_config_name = args.embed_choice
+
+    llm_path = "core/models/configurations/llm/{}.json".format(
+        runtime_config.llm_config_name
+    )
+    embed_path = "core/models/configurations/embeder/{}.json".format(
+        runtime_config.embedder_config_name
+    )
 
     # check if x_configs are available
     llm_config_available = runtime_config.llm_config_name != "none"
