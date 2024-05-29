@@ -11,6 +11,7 @@ from core.models.configuration_objects.embedder_configuration import (
     EmbedderConfiguration,
 )
 from core.models.configuration_objects.llm_configuration import LlmConfiguration
+from core.tools import errorlib
 
 parser = argparse.ArgumentParser()
 
@@ -94,12 +95,10 @@ def get_runtime_config():
         runtime_config = load_runtime_config_from_file(worker_config_path)
     except FileNotFoundError:
         # this error format deserves its own tiny library :3
-        print(
-            f"\n{Fore.RED}{Style.BRIGHT}No valid configuration was selected\n"
-            f"{Style.RESET_ALL}Try setting the {Fore.CYAN}-w{Fore.RESET} flag\n"
-            f"{Style.RESET_ALL}Run {Fore.CYAN}main.py -h{Fore.RESET} for more details"
+        errorlib.assert_error(
+            title="No valid configuration was selected",
+            advice=f"Try setting the {Fore.CYAN}-w{Fore.RESET} flag",
         )
-        exit(1)
 
     llm_path = "core/models/configurations/llm/{}.json".format(args.llm_choice)
     embed_path = "core/models/configurations/embeder/{}.json".format(args.embed_choice)
