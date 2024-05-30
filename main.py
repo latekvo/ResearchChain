@@ -1,10 +1,9 @@
 import requests
 import uvicorn
 from colorama import init as colorama_init, Fore, Style
-
 from configurator import get_runtime_config
 from terminal_gui import user_input, select_input
-from core.lookup import web_lookup
+
 from workers.crawler import start_crawler
 from workers.embedder import start_embedder
 from workers.summarizer import start_summarizer
