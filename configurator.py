@@ -1,10 +1,8 @@
 import argparse
-from dataclasses import dataclass
 
-from colorama import Fore, Style
+from colorama import Fore
 
 from core.classes.configuration import (
-    RuntimeConfiguration,
     load_runtime_config_from_file,
 )
 from core.models.configuration_objects.embedder_configuration import (
@@ -80,6 +78,12 @@ runtime_config = None
 def get_runtime_config():
     global runtime_config
 
+    fallback_config_path = "configs/crawler.json"
+
+    if args.worker_type == "webui":
+        # fixme: this is a workaround, webui should be started from it's folder
+        return load_runtime_config_from_file(fallback_config_path)
+
     # fetch cache
     if runtime_config:
         return runtime_config
@@ -89,10 +93,10 @@ def get_runtime_config():
 
     if args.worker_config_path != "none":
         worker_config_path = args.worker_config_path
-        runtime_config.worker_config_path = worker_config_path
 
     try:
         runtime_config = load_runtime_config_from_file(worker_config_path)
+        runtime_config.worker_config_path = worker_config_path
     except FileNotFoundError:
         # this error format deserves its own tiny library :3
         errorlib.pretty_error(

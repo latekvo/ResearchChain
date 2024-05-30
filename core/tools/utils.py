@@ -2,6 +2,7 @@ import datetime
 import os
 import re
 import sys
+import time
 import uuid
 
 from tinydb import TinyDB
@@ -95,6 +96,11 @@ def use_faiss(db_name):
     db = get_vec_db_by_name(db_full_name, embedder)
 
     return db, embedder
+
+
+def sleep_forever():
+    while True:
+        time.sleep(60)
 
 
 class hide_prints:
