@@ -179,7 +179,11 @@ def processing_iteration():
     process_url(url_object)
 
 
+previous_db_not_downloaded = None
+
+
 def start_crawler():
+    global previous_db_not_downloaded
     while True:
         db_query = Query()
         db_not_downloaded = db_url_pool.db.search(
@@ -188,8 +192,10 @@ def start_crawler():
         db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
         db_total = db_url_pool.db.all()
 
-        print("urls left to be downloaded:", len(db_not_downloaded))
-        print("urls marked rubbish:", len(db_rubbish))
-        print("url running total:", len(db_total))
+        if db_not_downloaded != previous_db_not_downloaded:
+            print("urls left to be downloaded:", len(db_not_downloaded))
+            print("urls marked rubbish:", len(db_rubbish))
+            print("url running total:", len(db_total))
+            previous_db_not_downloaded = db_not_downloaded
 
         processing_iteration()

@@ -128,6 +128,6 @@ def start_summarizer():
         )
         if queued_tasks != previous_queued_tasks:
             print("Number of queued tasks: ", queued_tasks)
-        previous_queued_tasks = queued_tasks
+            previous_queued_tasks = queued_tasks
 
         summarize()
