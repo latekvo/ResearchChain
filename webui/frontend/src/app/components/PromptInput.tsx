@@ -8,13 +8,9 @@ import {
 } from "react-query";
 import { z } from "zod";
 
-type FormValuesCrawl = {
+type FormValues = {
   prompt: string;
   mode: string;
-};
-
-type FormValueSummarize = {
-  prompt: string;
 };
 
 type MutationResult = {
@@ -24,18 +20,14 @@ type MutationResult = {
 
 function PromptInput() {
   const [crawlActive, setCrawlActive] = useState(true);
-  const [formValues, setFormValues] = useState<FormValuesCrawl>({
+  const [formValues, setFormValues] = useState<FormValues>({
     prompt: "",
     mode: "",
   });
 
-  const FormDataCrawl = z.object({
+  const FormData = z.object({
     prompt: z.string().min(1),
     mode: z.string(),
-  });
-
-  const FormDataSummarize = z.object({
-    prompt: z.string().min(1),
   });
 
   const onCrawlChange = (key: Key) => {
@@ -46,10 +38,10 @@ function PromptInput() {
     }
   };
 
-  const addCrawl: UseMutationResult<MutationResult, unknown, FormValuesCrawl> =
+  const addCrawl: UseMutationResult<MutationResult, unknown, FormValues> =
     useMutation(
-      async (data: FormValuesCrawl) => {
-        const isValid = FormDataCrawl.safeParse(data);
+      async (data: FormValues) => {
+        const isValid = FormData.safeParse(data);
         if (!isValid.success) {
           throw new Error(isValid.error.message);
         }
@@ -68,16 +60,16 @@ function PromptInput() {
       {
         onSuccess: (result) => {},
         onError: (error) => {},
-      } as UseMutationOptions<MutationResult, unknown, FormValuesCrawl>
+      } as UseMutationOptions<MutationResult, unknown, FormValues>
     );
 
   const addSummarize: UseMutationResult<
     MutationResult,
     unknown,
-    FormValueSummarize
+    FormValues
   > = useMutation(
-    async (data: FormValueSummarize) => {
-      const isValid = FormDataSummarize.safeParse(data);
+    async (data: FormValues) => {
+      const isValid = FormData.safeParse(data);
         if (!isValid.success) {
           throw new Error(isValid.error.message);
         }
@@ -96,7 +88,7 @@ function PromptInput() {
     {
       onSuccess: (result) => {},
       onError: (error) => {},
-    } as UseMutationOptions<MutationResult, unknown, FormValueSummarize>
+    } as UseMutationOptions<MutationResult, unknown, FormValues>
   );
 
   const onModeChange = (key: Key) => {
@@ -119,8 +111,7 @@ function PromptInput() {
     if (crawlActive) {
       addCrawl.mutate(formValues);
     } else {
-      const data = { prompt: formValues.prompt };
-      addSummarize.mutate(data);
+      addSummarize.mutate(formValues);
     }
   };
 
@@ -156,7 +147,6 @@ function PromptInput() {
             aria-label="Options"
             variant="underlined"
             color="default"
-            isDisabled={!crawlActive}
             onSelectionChange={onModeChange}
           >
             <Tab key="news" title="News" />
