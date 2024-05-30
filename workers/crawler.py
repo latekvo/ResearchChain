@@ -179,16 +179,17 @@ def processing_iteration():
     process_url(url_object)
 
 
-while True:
-    db_query = Query()
-    db_not_downloaded = db_url_pool.db.search(
-        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
-    )
-    db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
-    db_total = db_url_pool.db.all()
+def start_crawler():
+    while True:
+        db_query = Query()
+        db_not_downloaded = db_url_pool.db.search(
+            db_query.fragment({"is_downloaded": False, "is_rubbish": False})
+        )
+        db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
+        db_total = db_url_pool.db.all()
 
-    print("urls left to be downloaded:", len(db_not_downloaded))
-    print("urls marked rubbish:", len(db_rubbish))
-    print("url running total:", len(db_total))
+        print("urls left to be downloaded:", len(db_not_downloaded))
+        print("urls marked rubbish:", len(db_rubbish))
+        print("url running total:", len(db_total))
 
-    processing_iteration()
+        processing_iteration()

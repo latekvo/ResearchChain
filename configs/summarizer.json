@@ -1,0 +1,5 @@
+{
+  "worker_type": "summarizer",
+  "llm_config_name": "ollama_medium",
+  "embedder_config_name": "ollama_medium"
+}

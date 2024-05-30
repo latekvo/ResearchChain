@@ -17,7 +17,7 @@ from core.chainables.web import (
     web_news_lookup_prompt,
     web_wiki_lookup_prompt,
 )
-from core.tools.model_loader import load_model
+from core.tools.model_loader import load_llm, load_embedder
 from langchain_core.output_parsers import StrOutputParser
 
 from tinydb import Query
@@ -26,7 +26,8 @@ from colorama import Fore
 
 output_parser = StrOutputParser()
 
-llm, embeddings = load_model()
+llm = load_llm()
+embeddings = load_embedder()
 
 
 # even though a single task takes a long time to complete,
@@ -107,22 +108,23 @@ def summarize():
 
 previous_queued_tasks = None
 
-# todo: 1. get a list of available tasks, in the backend they'll be automatically set as executing
-#       2. parse through all of them, until one that has all it's dependencies resolved appears
-#       3. once one is found to be ready, release all the other tasks (reset 'executing')
-#       4. proceed with normal execution
+# 1. get a list of available tasks, in the backend they'll be automatically set as executing
+# 2. parse through all of them, until one that has all it's dependencies resolved appears
+# 3. once one is found to be ready, release all the other tasks (reset 'executing')
+# 4. proceed with normal execution
 
 # todo: implement class-based task management system
 
 
-while True:
-    db = use_tinydb("completion_tasks")
-    db_query = Query()
-    queued_tasks = len(
-        db.search(db_query.completed == False and db_query.executing == False)
-    )
-    if queued_tasks != previous_queued_tasks:
-        print("Number of queued tasks: ", queued_tasks)
-    previous_queued_tasks = queued_tasks
+def start_summarizer():
+    while True:
+        db = use_tinydb("completion_tasks")
+        db_query = Query()
+        queued_tasks = len(
+            db.search(db_query.completed == False and db_query.executing == False)
+        )
+        if queued_tasks != previous_queued_tasks:
+            print("Number of queued tasks: ", queued_tasks)
+        previous_queued_tasks = queued_tasks
 
-    summarize()
+        summarize()
