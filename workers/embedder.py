@@ -39,8 +39,6 @@ def processing_iteration():
             task_uuid, embed_model_name
         )
 
-    print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
-
 
 previous_not_embedded = None
 
