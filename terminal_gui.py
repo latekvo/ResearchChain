@@ -1,4 +1,3 @@
-import argparse
 import curses
 
 HIGHLIGHTED_COLOR_ID = 1
