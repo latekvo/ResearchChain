@@ -31,8 +31,6 @@ google_traffic_manager = TrafficManager()
 def rq_refill(seed_task, use_google: bool = True):
     global url_rapid_queue
 
-    print("loaded task:", seed_task)
-
     # adapt crawl_task to web_query
     seed_query = None
 
