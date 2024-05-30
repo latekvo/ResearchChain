@@ -31,8 +31,6 @@ google_traffic_manager = TrafficManager()
 def rq_refill(seed_task, use_google: bool = True):
     global url_rapid_queue
 
-    print("loaded task:", seed_task)
-
     # adapt crawl_task to web_query
     seed_query = None
 
@@ -179,16 +177,23 @@ def processing_iteration():
     process_url(url_object)
 
 
-while True:
-    db_query = Query()
-    db_not_downloaded = db_url_pool.db.search(
-        db_query.fragment({"is_downloaded": False, "is_rubbish": False})
-    )
-    db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
-    db_total = db_url_pool.db.all()
+previous_db_not_downloaded = None
 
-    print("urls left to be downloaded:", len(db_not_downloaded))
-    print("urls marked rubbish:", len(db_rubbish))
-    print("url running total:", len(db_total))
 
-    processing_iteration()
+def start_crawler():
+    global previous_db_not_downloaded
+    while True:
+        db_query = Query()
+        db_not_downloaded = db_url_pool.db.search(
+            db_query.fragment({"is_downloaded": False, "is_rubbish": False})
+        )
+        db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
+        db_total = db_url_pool.db.all()
+
+        if db_not_downloaded != previous_db_not_downloaded:
+            print("urls left to be downloaded:", len(db_not_downloaded))
+            print("urls marked rubbish:", len(db_rubbish))
+            print("url running total:", len(db_total))
+            previous_db_not_downloaded = db_not_downloaded
+
+        processing_iteration()

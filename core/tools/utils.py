@@ -1,20 +1,16 @@
-import asyncio
 import datetime
-import multiprocessing
 import os
 import re
 import sys
+import time
 import uuid
 
 from tinydb import TinyDB
 
+from configurator import get_runtime_config
 from core.databases import defaults
 from core.tools.dbops import get_vec_db_by_name
-from core.tools.model_loader import load_model
-
-
-def purify_name(name):
-    return "_".join("_".join(name.split(":")).split("-"))
+from core.tools.model_loader import load_embedder
 
 
 def is_text_junk(text: str):
@@ -50,39 +46,14 @@ def reduce(text: str, goal: str, match: str):
     return goal.join(text.split(match))
 
 
-def remove_characters(text: str, wordlist: list[str]):
+def remove_characters(text: str, wordlist: list[str], replace_with: str = "") -> str:
     for word in wordlist:
-        text = "".join(text.split(word))
+        text = "{}".format(replace_with).join(text.split(word))
     return text
 
 
-def timeout_function(task, timeout=2.0):
-    # FIXME: THIS FUNCTION MAY BE BROKEN, TEST THIS
-
-    ctx = multiprocessing.get_context("spawn")
-    q = ctx.Queue()
-
-    def wrapper(q):
-        task_result = task()
-        q.put(task_result)
-
-    thread_loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(thread_loop)
-
-    thread = ctx.Process(target=wrapper, args=(q,))
-
-    thread.start()
-    thread.join(timeout)  # close thread if work is finished
-    if thread.is_alive():
-        thread.kill()
-        return None
-
-    result = q.get()
-
-    thread_loop.run_until_complete(asyncio.sleep(0))
-    thread_loop.close()
-
-    return result
+def purify_name(name):
+    return remove_characters(name, ["_", "+", ":", "-"], "_")
 
 
 def extract_links(text: str):
@@ -112,17 +83,24 @@ def gen_vec_db_full_name(db_name, model_name):
     return db_name + "_" + model_name
 
 
-def use_faiss(db_name, model_name):
+def use_faiss(db_name):
     data_path = defaults.DATA_PATH
+    config = get_runtime_config()
     if not os.path.exists(data_path):
         os.makedirs(data_path)
 
-    _, embedder = load_model()
+    embedder = load_embedder()
+    model_name = config.embedder_config.model_name
 
     db_full_name = gen_vec_db_full_name(db_name, model_name)
     db = get_vec_db_by_name(db_full_name, embedder)
 
-    return db
+    return db, embedder
+
+
+def sleep_forever():
+    while True:
+        time.sleep(60)
 
 
 class hide_prints:

@@ -1,21 +1,31 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from core.models.configurations import load_llm_config
-from core.tools.model_loader import load_model
-from core.tools.utils import use_faiss, is_text_junk, remove_characters
+from configurator import get_runtime_config
+from core.tools.utils import use_faiss, is_text_junk
 
-llm_config, embedder_config = load_llm_config()
-_, embedder = load_model()
+runtime_configuration = get_runtime_config()
+llm_config = runtime_configuration.llm_config
+embedder_config = runtime_configuration.embedder_config
 
-vector_db = use_faiss("embeddings", embedder_config.model_name)
+# fixme: these cause linter errors, i don't like this code overall,
+#        but i had to quickly find a solution to file-scope execution
+vector_db, embedder = None, None
+text_splitter = None
 
-text_splitter = RecursiveCharacterTextSplitter(
-    separators=embedder_config.buffer_stops,
-    chunk_size=embedder_config.model_token_limit,
-    chunk_overlap=embedder_config.chunk_overlap,
-    keep_separator=False,
-    strip_whitespace=True,
-)
+
+def first_use_init():
+    global vector_db, embedder, text_splitter
+    if vector_db is None:
+        vector_db, embedder = use_faiss("embeddings")
+
+    if text_splitter is None:
+        text_splitter = RecursiveCharacterTextSplitter(
+            separators=embedder_config.buffer_stops,
+            chunk_size=embedder_config.model_token_limit,
+            chunk_overlap=embedder_config.chunk_overlap,
+            keep_separator=False,
+            strip_whitespace=True,
+        )
 
 
 def db_get_currently_used_vector_model():
@@ -23,6 +33,8 @@ def db_get_currently_used_vector_model():
 
 
 def db_add_text_batch(text: str, db_full_name: str):
+    first_use_init()
+
     # automatically splits text before embedding it
     chunks = text_splitter.split_text(text)
 
@@ -40,5 +52,7 @@ def db_add_text_batch(text: str, db_full_name: str):
 
 
 def db_search_for_similar_queries(query):
+    first_use_init()
+
     docs = vector_db.similarity_search(query)
     return docs

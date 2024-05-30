@@ -1,0 +1,5 @@
+{
+  "worker_type": "embedder",
+  "llm_config_name": "none",
+  "embedder_config_name": "ollama_medium"
+}
