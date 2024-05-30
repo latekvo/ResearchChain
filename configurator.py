@@ -25,7 +25,7 @@ parser.add_argument(
     type=str,
     dest="worker_type",
     choices=[
-        "none",  # legacy runner / custom worker path
+        "webui",
         "crawler",
         "embedder",
         "summarizer",

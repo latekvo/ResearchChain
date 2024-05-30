@@ -1,4 +1,5 @@
 import requests
+import uvicorn
 
 from colorama import init as colorama_init, Fore
 
@@ -11,7 +12,16 @@ from workers.summarizer import start_summarizer
 colorama_init()
 runtime_config = get_runtime_config()
 
+if runtime_config.worker_type == "none":
+    errorlib.pretty_error(
+        title=f"No flags were provided",
+        advice=f"---",
+    )
+
 try:
+    if runtime_config.worker_type == "webui":
+        # this is a workaround :P
+        uvicorn.run("webui.main:app")
     if runtime_config.worker_type == "crawler":
         start_crawler()
     if runtime_config.worker_type == "embedder":
