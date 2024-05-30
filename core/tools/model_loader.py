@@ -1,9 +1,11 @@
+from colorama import Fore
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
 from configurator import get_runtime_config
+from core.tools import errorlib
 
 runtime_configuration = get_runtime_config()
 llm_config = runtime_configuration.llm_config
@@ -72,6 +74,13 @@ def load_hf_embedder():
 
 
 def load_llm():
+    if llm_config is None:
+        errorlib.pretty_error(
+            title="Tried loading LLM without a valid configuration",
+            advice=f"Your worker configuration file is likely missing "
+            f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
+        )
+
     if llm_config.supplier == "hugging_face":
         return load_hf_llm()
     else:
@@ -79,6 +88,13 @@ def load_llm():
 
 
 def load_embedder():
+    if embedder_config is None:
+        errorlib.pretty_error(
+            title="Tried loading EMBEDDER without a valid configuration",
+            advice=f"Your worker configuration file is likely missing "
+            f"a valid {Fore.CYAN}embedder_config_name{Fore.RESET} variable",
+        )
+
     if embedder_config.supplier == "hugging_face":
         return load_hf_embedder()
     else:

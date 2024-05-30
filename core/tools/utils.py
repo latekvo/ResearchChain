@@ -1,11 +1,8 @@
-from __future__ import annotations
-
-import asyncio
 import datetime
-import multiprocessing
 import os
 import re
 import sys
+import time
 import uuid
 
 from tinydb import TinyDB
@@ -59,35 +56,6 @@ def purify_name(name):
     return remove_characters(name, ["_", "+", ":", "-"], "_")
 
 
-def timeout_function(task, timeout=2.0):
-    # FIXME: THIS FUNCTION MAY BE BROKEN, TEST THIS
-
-    ctx = multiprocessing.get_context("spawn")
-    q = ctx.Queue()
-
-    def wrapper(q):
-        task_result = task()
-        q.put(task_result)
-
-    thread_loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(thread_loop)
-
-    thread = ctx.Process(target=wrapper, args=(q,))
-
-    thread.start()
-    thread.join(timeout)  # close thread if work is finished
-    if thread.is_alive():
-        thread.kill()
-        return None
-
-    result = q.get()
-
-    thread_loop.run_until_complete(asyncio.sleep(0))
-    thread_loop.close()
-
-    return result
-
-
 def extract_links(text: str):
     return re.findall(r"(https?://\S+\.\S+/)", text)
 
@@ -128,6 +96,11 @@ def use_faiss(db_name):
     db = get_vec_db_by_name(db_full_name, embedder)
 
     return db, embedder
+
+
+def sleep_forever():
+    while True:
+        time.sleep(60)
 
 
 class hide_prints:

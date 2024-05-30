@@ -45,7 +45,7 @@ class CrawlTask(BaseModel):
 class UrlCreator(BaseModel):
     url: str
     prompt: str
-    parent_uuid: str | None = None
+    parent_uuid: str = None
 
 
 class Embedded(BaseModel):
@@ -124,13 +124,13 @@ def get_not_downloaded():
 
 
 @app.get("/url/embedded")
-def get_not_embedded(model: str | None = None):
+def get_not_embedded(model: str = None):
     result = db_get_not_embedded(model)
     return {"result": result}
 
 
 @app.get("/url/present")
-def get_present_urls(url: str | None = None):
+def get_present_urls(url: str = None):
     result = db_is_url_present(url)
     return {"url": result}
 

@@ -26,9 +26,7 @@ from colorama import Fore
 
 output_parser = StrOutputParser()
 
-llm = load_llm()
-embeddings = load_embedder()
-
+llm = None
 
 # even though a single task takes a long time to complete,
 # as soon as one task is started, all elements of the queue are released
@@ -41,7 +39,10 @@ def extract_uuid(task):
 
 
 def summarize():
-    global task_queue
+    global task_queue, llm
+
+    if llm is None:
+        llm = load_llm()
 
     queue_space = task_queue_limit - len(task_queue)
     task_queue += db_get_incomplete_completion_tasks(queue_space)
@@ -117,6 +118,8 @@ previous_queued_tasks = None
 
 
 def start_summarizer():
+    global previous_queued_tasks
+
     while True:
         db = use_tinydb("completion_tasks")
         db_query = Query()
@@ -125,6 +128,6 @@ def start_summarizer():
         )
         if queued_tasks != previous_queued_tasks:
             print("Number of queued tasks: ", queued_tasks)
-        previous_queued_tasks = queued_tasks
+            previous_queued_tasks = queued_tasks
 
         summarize()

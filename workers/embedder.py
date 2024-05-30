@@ -27,7 +27,6 @@ def processing_iteration():
     embedding_queue = db_url_pool.db_get_not_embedded(embed_model_name)
 
     for url_object in embedding_queue:
-        print("embedding document:", url_object)
         document = url_object["text"]
         task_uuid = url_object["task_uuid"]
 
@@ -39,16 +38,19 @@ def processing_iteration():
             task_uuid, embed_model_name
         )
 
-    print(f"{Fore.CYAN}Document vectorization completed.{Fore.RESET}")
+
+previous_not_embedded = None
 
 
 def start_embedder():
+    global previous_not_embedded
     while True:
-        db_query = Query()
         db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
         db_total = db_url_pool.db.all()
 
-        print("urls left to be embedded:", len(db_not_embedded))
-        print("url running total:", len(db_total))
+        if len(db_not_embedded) != previous_not_embedded:
+            print("urls left to be embedded:", len(db_not_embedded))
+            print("url running total:", len(db_total))
+            previous_not_embedded = len(db_not_embedded)
 
         processing_iteration()
