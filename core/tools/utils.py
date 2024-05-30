@@ -55,7 +55,6 @@ def remove_characters(text: str, wordlist: list[str], replace_with: str = "") ->
     return text
 
 
-<<<<<<< HEAD
 def purify_name(name):
     return remove_characters(name, ["_", "+", ":", "-"], "_")
 
@@ -89,8 +88,6 @@ def timeout_function(task, timeout=2.0):
     return result
 
 
-=======
->>>>>>> main
 def extract_links(text: str):
     return re.findall(r"(https?://\S+\.\S+/)", text)
 
