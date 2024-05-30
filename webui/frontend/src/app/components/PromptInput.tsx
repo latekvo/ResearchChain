@@ -126,18 +126,7 @@ function PromptInput() {
 
   return (
     <form className="w-3/5 flex-col" onSubmit={handleSubmit}>
-      <Tabs
-        size="md"
-        aria-label="Options"
-        color="default"
-        variant="light"
-        onSelectionChange={onCrawlChange}
-        className="mb-3 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between"
-      >
-        <Tab key="crawl" title="Crawl" />
-        <Tab key="summarize" title="Summarize" />
-      </Tabs>
-      <div className="w-full p-5 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between">
+      <div className="w-full p-6 shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between">
         <Textarea
           type="text"
           name="prompt"
@@ -150,6 +139,17 @@ function PromptInput() {
           onChange={onPromptChange}
           className="text-gray-300 px-3 text-large whitespace-normal"
         />
+      <Tabs
+        size="md"
+        aria-label="Options"
+        color="primary"
+        variant="light"
+        onSelectionChange={onCrawlChange}
+        className="mt-4 mb-2 shadow-xl  rounded-xl  bg-black bg-opacity-15 z-10 flex flex-col justify-between"
+      >
+        <Tab key="crawl" title="Crawl" />
+        <Tab key="summarize" title="Summarize" />
+      </Tabs>
         <div className="w-full mt-4 flex justify-between">
           <Tabs
             size="lg"
