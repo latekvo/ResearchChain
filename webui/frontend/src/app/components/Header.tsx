@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
 import { FaGithub } from "react-icons/fa";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'

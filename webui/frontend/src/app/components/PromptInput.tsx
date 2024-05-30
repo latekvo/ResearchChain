@@ -53,7 +53,7 @@ function PromptInput() {
         if (!isValid.success) {
           throw new Error(isValid.error.message);
         }
-        const response = await fetch("https://api.example.com/data", {
+        const response = await fetch("http://127.0.0.1:8000/crawl", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ function PromptInput() {
         if (!isValid.success) {
           throw new Error(isValid.error.message);
         }
-      const response = await fetch("https://api.example.com/data", {
+      const response = await fetch("http://127.0.0.1:8000/task", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
