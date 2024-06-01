@@ -88,7 +88,7 @@ def add_completion_task(completion_task: TaskCreator):
     while result is None or result["completion_result"] is None:
         result = db_get_completion_tasks_by_uuid(uuid)
     return {
-        "task": result["completion_result"]
+        "summary": result["completion_result"]
     }
 
 
