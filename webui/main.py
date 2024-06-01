@@ -5,6 +5,7 @@ from core.databases.db_completion_tasks import (
     db_add_completion_task,
     db_get_completion_tasks_by_page,
     db_get_incomplete_completion_tasks,
+    db_get_completion_tasks_by_uuid
 )
 from core.databases.db_crawl_tasks import (
     db_add_crawl_task,
@@ -83,9 +84,13 @@ def get_incomplete_task():
 @app.post("/task")
 def add_completion_task(completion_task: TaskCreator):
     uuid = db_add_completion_task(completion_task.prompt, completion_task.mode)
+    result = db_get_completion_tasks_by_uuid(uuid)
+    while result is None or result["completion_result"] is None:
+        result = db_get_completion_tasks_by_uuid(uuid)
     return {
-        "task_uuid": uuid,
+        "task": result["completion_result"]
     }
+
 
 
 @app.get("/crawl")

@@ -1,4 +1,5 @@
 from tinydb import Query
+import asyncio
 
 from core.databases import defaults
 from core.tools import utils
@@ -35,6 +36,12 @@ def db_get_completion_tasks_by_page(page: int, per_page: int = defaults.ITEMS_PE
     results = db.all()
 
     return results
+
+
+def db_get_completion_tasks_by_uuid(uuid: int):
+    fields = Query()
+    result = db.get(fields.uuid == uuid)
+    return result
 
 
 def db_set_completion_task_executing(uuid: str):
