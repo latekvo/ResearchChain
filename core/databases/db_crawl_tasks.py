@@ -16,17 +16,19 @@ class CrawlTask(DeclarativeBase):
     __tablename__ = "crawl_tasks"
 
     uuid: Mapped[str] = mapped_column(primary_key=True)
-    prompt: Mapped[str] = mapped_column(String(300))
-    type: Mapped[str] = mapped_column(String(12))
-    completed: Mapped[bool] = mapped_column(Boolean())
-    executing: Mapped[bool] = mapped_column(Boolean())
-    completion_date: Mapped[int] = mapped_column(Integer())  # time completed
-    execution_date: Mapped[int] = mapped_column(Integer())  # time started completion
+    prompt: Mapped[str] = mapped_column(String())
+    mode: Mapped[str] = mapped_column(String(12))
     timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
-    base_amount_scheduled: Mapped[int] = mapped_column(Integer())
+
+    executing: Mapped[bool] = mapped_column(Boolean())
+    execution_date: Mapped[int] = mapped_column(Integer())  # time started completion
+
+    completed: Mapped[bool] = mapped_column(Boolean())
+    completion_date: Mapped[int] = mapped_column(Integer())  # time completed
 
     # fixme: sqlalchemy likely wants us to use a relationship here
     embedding_progression: Mapped[dict] = mapped_column()  # {model_name: count}
+    base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
 
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
@@ -38,7 +40,7 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
         {
             "uuid": new_uuid,
             "prompt": prompt,
-            "type": mode,
+            "mode": mode,
             "completed": False,
             "executing": False,
             "completion_date": 0,  # time completed
