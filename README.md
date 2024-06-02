@@ -2,6 +2,12 @@
 
 #### Langchain project aiming at achieving perpetual research with the help of a chain of ai researching agents.
 
+### Dockerized running 
+This method deploys all 4 workers including webui web server at the same time using docker compose.<br>
+> sudo docker-compose -f docker/docker-compose.yml up
+
+### Bare metal running
+
 - Install and launch Ollama: `ollama serve`
 - Create new environment: `conda env create -n ResearchChain -f environment.yml`
 - Activate the new environment: `conda activate ResearchChain`
