@@ -37,7 +37,7 @@ def db_get_completion_tasks_by_page(page: int, per_page: int = defaults.ITEMS_PE
     return results
 
 
-def db_get_completion_tasks_by_uuid(uuid: int):
+def db_get_completion_task_by_uuid(uuid: int):
     fields = Query()
     result = db.get(fields.uuid == uuid)
     return result
