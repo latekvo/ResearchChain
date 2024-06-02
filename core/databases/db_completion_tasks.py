@@ -1,3 +1,5 @@
+from sqlalchemy import String, Integer, Boolean
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from tinydb import Query
 
 from core.databases import defaults
@@ -5,6 +7,24 @@ from core.tools import utils
 from core.tools.utils import use_tinydb, gen_unix_time
 
 db = use_tinydb("completion_tasks")
+
+
+class CompletionTask(DeclarativeBase):
+    __tablename__ = "completion_tasks"
+
+    uuid: Mapped[str] = mapped_column(primary_key=True)
+    prompt: Mapped[str] = mapped_column(String())  # make sure postgres uses "TEXT" here
+    mode: Mapped[str] = mapped_column(String(12))
+    timestamp: Mapped[int] = mapped_column(Integer())  # time added
+
+    executing: Mapped[bool] = mapped_column(Boolean())
+    execution_date: Mapped[int] = mapped_column(Integer())  # time started completion
+
+    completed: Mapped[bool] = mapped_column(Boolean())
+    completion_date: Mapped[int] = mapped_column(Integer())  # time completed
+
+    # fixme: sqlalchemy likely wants us to use a relationship here
+    required_crawl_tasks: Mapped[list[str]] = mapped_column()  # {model_name: count}
 
 
 def db_add_completion_task(prompt, mode):
