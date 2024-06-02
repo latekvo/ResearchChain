@@ -1,0 +1,13 @@
+services:
+  crawler:
+    build: ./crawler
+    image: crawler
+  embedder:
+    build: ./embedder
+    image: embedder
+  summarizer:
+    build: ./summarizer
+    image: summarizer
+  webui:
+    build: ./webui
+    image: webui
