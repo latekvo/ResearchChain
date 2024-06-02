@@ -16,8 +16,12 @@ This method deploys all 4 workers including webui backend web server at the same
 - Run: `python3 main.py`
 
 ### Running webui frontend
+
 Frontend is launched separately to back end, run the following command to start it.
-> npm run dev
+- install dependencies: `npm install`
+- start react project: `npm run dev`
+- open `http://localhost:3000/` in your browser
+
 #### Other notes
 
 - The default models can be seen in the `core/models/configurations` folder.<br>
