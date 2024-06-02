@@ -33,6 +33,10 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
     return new_uuid
 
 
+def db_get_all_crawl_tasks():
+    tasks = db.all()
+    return tasks
+
 def db_set_crawl_executing(uuid: str):
     fields = Query()
     db.update(
