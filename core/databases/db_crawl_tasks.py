@@ -1,5 +1,7 @@
 from typing import Literal
 
+from sqlalchemy import String, Boolean, Integer
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from tinydb import Query
 
 from core.tools import utils
@@ -8,6 +10,23 @@ from core.tools.utils import use_tinydb, gen_unix_time
 db = use_tinydb("crawl_tasks")
 
 # we have to heartbeat our workers once we run out of tasks, websocks should suffice
+
+
+class CrawlTask(DeclarativeBase):
+    __tablename__ = "crawl_tasks"
+
+    uuid: Mapped[str] = mapped_column(primary_key=True)
+    prompt: Mapped[str] = mapped_column(String(300))
+    type: Mapped[str] = mapped_column(String(12))
+    completed: Mapped[bool] = mapped_column(Boolean())
+    executing: Mapped[bool] = mapped_column(Boolean())
+    completion_date: Mapped[int] = mapped_column(Integer())  # time completed
+    execution_date: Mapped[int] = mapped_column(Integer())  # time started completion
+    timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
+    base_amount_scheduled: Mapped[int] = mapped_column(Integer())
+
+    # fixme: sqlalchemy likely wants us to use a relationship here
+    embedding_progression: Mapped[dict] = mapped_column()  # {model_name: count}
 
 
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
