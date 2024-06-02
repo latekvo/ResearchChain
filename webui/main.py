@@ -111,7 +111,7 @@ def set_crawl_completed(uuid):
 
 
 @app.get("/crawl/incomplete")
-def get_inocmplete_completion_task():
+def get_incomplete_completion_task():
     result = db_get_incomplete_completion_tasks()
     return {"task": result}
 

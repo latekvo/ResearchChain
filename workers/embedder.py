@@ -1,7 +1,5 @@
 # embedding worker
 # url_db -> THIS -> THIS.vector_db
-from colorama import Fore
-from tinydb import Query
 from tinydb.table import Document
 
 from configurator import get_runtime_config
