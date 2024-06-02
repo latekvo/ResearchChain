@@ -1,3 +1,5 @@
+from sqlalchemy import String, Boolean, Integer
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from tinydb import Query
 from tinydb.table import Document
 
@@ -11,6 +13,28 @@ db = use_tinydb("url_pool")
 # i believe this db should remain local permanently
 # instead, we should have a separate global file db for embedder to use,
 # and a tiny global kv cache just to prevent duplicate urls
+
+
+class UrlObject(DeclarativeBase):
+    __tablename__ = "url_pool"
+
+    # base data
+    uuid: Mapped[str] = mapped_column(primary_key=True)
+    url: Mapped[str] = mapped_column(String())
+    text: Mapped[str] = mapped_column(String())
+
+    # tracking data
+    parent_uuid: Mapped[str] = mapped_column(String())
+    task_uuid: Mapped[str] = mapped_column(String())
+    prompt: Mapped[str] = mapped_column(String())
+
+    timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
+
+    is_downloaded: Mapped[bool] = mapped_column(Boolean())
+    is_rubbish: Mapped[bool] = mapped_column(Boolean())
+
+    # fixme: sqlalchemy likely wants us to use a relationship here
+    embedded_by: Mapped[list[str]] = mapped_column()  # {model_name: count}
 
 
 def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = None):
