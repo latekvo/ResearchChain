@@ -13,7 +13,7 @@ colorama_init()
 
 if args.worker_type == "webui":
     # fixme: this is a workaround, webui should be started from it's folder
-    uvicorn.run("webui.main:app")
+    uvicorn.run("webui.main:app", host="0.0.0.0", port=8000)
 
 if args.worker_type == "webui":
     errorlib.pretty_error(

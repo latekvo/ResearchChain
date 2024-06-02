@@ -19,3 +19,5 @@ services:
       context: ../.
       dockerfile: ./docker/webui/Dockerfile
     image: webui
+    ports:
+      - 8000:8000
