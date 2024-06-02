@@ -1,13 +1,21 @@
 services:
   crawler:
-    build: ./crawler
+    build:
+     context: ../.
+     dockerfile: ./docker/crawler/Dockerfile
     image: crawler
   embedder:
-    build: ./embedder
+    build:
+      context: ../.
+      dockerfile: ./docker/embedder/Dockerfile
     image: embedder
   summarizer:
-    build: ./summarizer
+    build:
+      context: ../.
+      dockerfile: ./docker/summarizer/Dockerfile
     image: summarizer
   webui:
-    build: ./webui
+    build:
+      context: ../.
+      dockerfile: ./docker/webui/Dockerfile
     image: webui
