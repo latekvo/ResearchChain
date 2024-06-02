@@ -3,7 +3,7 @@
 #### Langchain project aiming at achieving perpetual research with the help of a chain of ai researching agents.
 
 ### Dockerized running 
-This method deploys all 4 workers including webui web server at the same time using docker compose.<br>
+This method deploys all 4 workers including webui backend web server at the same time using docker compose.<br>
 > sudo docker-compose -f docker/docker-compose.yml up
 
 ### Bare metal running
@@ -15,6 +15,9 @@ This method deploys all 4 workers including webui web server at the same time us
 - Pull an embedding model: `ollama pull nomic-embed-text` (default)
 - Run: `python3 main.py`
 
+### Running webui frontend
+Frontend is launched separately to back end, run the following command to start it.
+> npm run dev
 #### Other notes
 
 - The default models can be seen in the `core/models/configurations` folder.<br>
