@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
     clang \
     && rm -rf /var/lib/apt/lists/*
 
-RUN conda env create -n ResearchChain -f environment.yml
+RUN conda env create -f environment.yml
 
 SHELL ["conda", "run", "-n", "ResearchChain", "/bin/bash", "-c"]
 
-CMD ["conda", "run", "-n", "ResearchChain", "python3", "main.py", "-w", "crawler"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ResearchChain", "python3", "main.py", "-w", "crawler"]
