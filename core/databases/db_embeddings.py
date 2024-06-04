@@ -12,6 +12,8 @@ embedder_config = runtime_configuration.embedder_config
 vector_db, embedder = None, None
 text_splitter = None
 
+# todo: we've changed every other db to Postgres, but here, we'll have to use 'FAISS server'
+
 
 def first_use_init():
     global vector_db, embedder, text_splitter

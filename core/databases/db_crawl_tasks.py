@@ -1,15 +1,13 @@
 from typing import Literal
 
-from sqlalchemy import String, Boolean, Integer
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from tinydb import Query
+from sqlalchemy import String, Boolean, Integer, create_engine, update, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 from core.tools import utils
-from core.tools.utils import use_tinydb, gen_unix_time
-
-db = use_tinydb("crawl_tasks")
+from core.tools.utils import gen_unix_time
 
 # we have to heartbeat our workers once we run out of tasks, websocks should suffice
+engine = create_engine("sqlite://", echo=True)
 
 
 class CrawlTask(DeclarativeBase):
@@ -26,8 +24,9 @@ class CrawlTask(DeclarativeBase):
     completed: Mapped[bool] = mapped_column(Boolean())
     completion_date: Mapped[int] = mapped_column(Integer())  # time completed
 
-    # fixme: sqlalchemy likely wants us to use a relationship here
+    # fixme! figure out embedding_progression (n to 1)
     embedding_progression: Mapped[dict] = mapped_column()  # {model_name: count}
+    # todo: replace with dynamically adjusted value
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
 
@@ -36,41 +35,56 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
 
-    db.insert(
-        {
-            "uuid": new_uuid,
-            "prompt": prompt,
-            "mode": mode,
-            "completed": False,
-            "executing": False,
-            "completion_date": 0,  # time completed
-            "execution_date": 0,  # time started completion
-            "timestamp": timestamp,  # time added
-            "base_amount_scheduled": 100,  # todo: replace with dynamically adjusted value
-            "embedding_progression": {},  # {model_name: count} | progress tracking
-        }
-    )
+    with Session(engine) as session:
+        crawl_task = CrawlTask(
+            uuid=new_uuid,
+            prompt=prompt,
+            mode=mode,
+            timestamp=timestamp,
+            executing=False,
+            execution_date=0,
+            completed=False,
+            completion_date=0,
+            base_amount_scheduled=100,
+            embedding_progression={},
+        )
+
+        session.add(crawl_task)
+        session.commit()
 
     return new_uuid
 
 
 def db_set_crawl_executing(uuid: str):
-    fields = Query()
-    db.update(
-        {"executing": True, "execution_date": gen_unix_time()}, fields.uuid == uuid
+    session = Session(engine)
+
+    session.execute(
+        update(CrawlTask)
+        .where(CrawlTask.uuid.is_(uuid))
+        .values(executing=True, execution_date=gen_unix_time())
     )
+
+    session.commit()
 
 
 def db_set_crawl_completed(uuid: str):
-    fields = Query()
-    db.update(
-        {"completed": True, "completion_date": gen_unix_time()}, fields.uuid == uuid
+    session = Session(engine)
+
+    session.execute(
+        update(CrawlTask)
+        .where(CrawlTask.uuid.is_(uuid))
+        .values(completed=True, completion_date=gen_unix_time())
     )
 
+    session.commit()
 
+
+# fixme: this function should return a list of all tasks for management purposes (see below)
 def db_get_crawl_task():
-    fields = Query()
-    crawl_task = db.get(fields.completed == False)
+    session = Session(engine)
+
+    query = select(CrawlTask).where(CrawlTask.completed.is_(False))
+    crawl_task = session.scalars(query).one()
 
     if crawl_task is not None:
         db_set_crawl_executing(crawl_task.uuid)
@@ -78,19 +92,30 @@ def db_get_crawl_task():
     return crawl_task
 
 
+# fixme cont. and this function should only return n of inComp and nonExec tasks, for workers
 def db_get_incomplete_crawl_task():
-    fields = Query()
-    task = db.get(fields.completed == False and fields.executing == False)
-    db.update({"executing": True}, fields.uuid == task.uuid)
+    session = Session(engine)
 
-    return task
+    query = select(CrawlTask).where(
+        CrawlTask.completed.is_(False) and CrawlTask.executing.is_(False)
+    )
+
+    # fixme: potential exception here
+    crawl_task = session.scalars(query).one()
+
+    if crawl_task is not None:
+        db_set_crawl_executing(crawl_task.uuid)
+
+    return crawl_task
 
 
 def db_is_task_completed(uuid: str):
-    fields = Query()
-    task = db.get(fields.uuid == uuid)
+    session = Session(engine)
 
-    return task.completed
+    query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
+    crawl_task = session.scalars(query).one()
+
+    return crawl_task.completed
 
 
 def db_are_tasks_completed(uuid_list: list[str]):
@@ -101,17 +126,21 @@ def db_are_tasks_completed(uuid_list: list[str]):
 
     for uuid in uuid_list:
         task_completeness = db_is_task_completed(uuid)
-        total_completeness *= task_completeness
+        if task_completeness is False:
+            total_completeness = False
+            break
 
-    pass
+    return total_completeness
 
 
 def db_is_crawl_task_fully_embedded(uuid: str, model_name: str):
-    fields = Query()
-    task = db.get(fields.uuid == uuid)
+    session = Session(engine)
 
-    baseline_count = task.base_amount_scheduled
-    current_count = task.embedding_progression[model_name]
+    query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
+    crawl_task = session.scalars(query).one()
+
+    baseline_count = crawl_task.base_amount_scheduled
+    current_count = crawl_task.embedding_progression[model_name]
 
     return current_count >= baseline_count
 
@@ -126,10 +155,12 @@ def db_are_crawl_tasks_fully_embedded(uuid_list: str, model_name: str):
 
 
 def db_increment_task_embedding_progression(uuid: str, model_name: str):
-    fields = Query()
-    task = db.get(fields.uuid == uuid)
+    session = Session(engine)
 
-    current_progression = task.embedding_progression
+    query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
+    crawl_task = session.scalars(query).one()
+
+    current_progression = crawl_task.embedding_progression
     current_count = current_progression[model_name]
 
     if current_count is not None:
@@ -139,4 +170,10 @@ def db_increment_task_embedding_progression(uuid: str, model_name: str):
 
     current_progression[model_name] = current_count
 
-    db.update({"embedding_progression": current_progression}, fields.uuid == task.uuid)
+    session.execute(
+        update(CrawlTask)
+        .where(CrawlTask.uuid.is_(crawl_task.uuid))
+        .values(embedding_progression=current_progression)
+    )
+
+    session.commit()

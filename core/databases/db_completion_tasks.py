@@ -42,6 +42,7 @@ def db_add_completion_task(prompt, mode) -> str:
             completed=False,
             completion_date=0,
             # fixme! figure out required crawl tasks (n to 1)
+            required_crawl_tasks=[],
         )
 
         session.add(completion_task)
