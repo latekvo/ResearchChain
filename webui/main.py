@@ -112,8 +112,8 @@ def get_incomplete_completion_task():
 
 @app.post("/url")
 def add_url(url: UrlCreator):
-    result = db_add_url(url.url, url.prompt, url.parent_uuid)
-    return {"url_object": result}
+    uuid, result = db_add_url(url.url, url.prompt, url.parent_uuid)
+    return {"uuid": uuid, "url_object": result}
 
 
 @app.get("/url/downloaded")

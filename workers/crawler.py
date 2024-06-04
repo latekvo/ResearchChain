@@ -66,7 +66,7 @@ def rq_refill(seed_task, use_google: bool = True):
                         continue
 
                     prompt = seed_query.web_query
-                    new_url_object = db_url_pool.db_add_url(
+                    _, new_url_object = db_url_pool.db_add_url(
                         url=url,
                         prompt=prompt,
                         parent_uuid=None,
