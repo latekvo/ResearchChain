@@ -1,13 +1,33 @@
 from typing import Literal
 
-from sqlalchemy import String, Boolean, Integer, create_engine, update, select
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
+from sqlalchemy import (
+    String,
+    Boolean,
+    Integer,
+    create_engine,
+    update,
+    select,
+    ForeignKey,
+)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
 
 from core.tools import utils
 from core.tools.utils import gen_unix_time
 
 # we have to heartbeat our workers once we run out of tasks, websocks should suffice
 engine = create_engine("sqlite://", echo=True)
+
+
+class EmbeddingProgression(DeclarativeBase):
+    __tablename__ = "embedding_progressions"
+
+    uuid: Mapped[str] = mapped_column(primary_key=True)
+
+    crawl_uuid: Mapped[str] = mapped_column(ForeignKey("crawl_tasks.uuid"))
+
+    embedder_name: Mapped[str] = mapped_column(String())
+    embedding_amount: Mapped[int] = mapped_column(Integer(), default=0)
+    timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
 
 
 class CrawlTask(DeclarativeBase):
@@ -24,9 +44,7 @@ class CrawlTask(DeclarativeBase):
     completed: Mapped[bool] = mapped_column(Boolean())
     completion_date: Mapped[int] = mapped_column(Integer())  # time completed
 
-    # fixme! figure out embedding_progression (n to 1)
-    embedding_progression: Mapped[dict] = mapped_column()  # {model_name: count}
-    # todo: replace with dynamically adjusted value
+    embedding_progression: Mapped[list["EmbeddingProgression"]] = relationship()
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
 

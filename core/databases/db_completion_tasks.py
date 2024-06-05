@@ -7,6 +7,9 @@ from core.tools.utils import gen_unix_time, page_to_range
 
 engine = create_engine("sqlite://", echo=True)
 
+# here we will actually have to reference the real CrawlTask table somewhere along the way,
+# so might as well do it straight away in the ORM, even though this will reduce independence
+
 
 class CompletionTask(DeclarativeBase):
     __tablename__ = "completion_tasks"

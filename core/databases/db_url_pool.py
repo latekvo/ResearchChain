@@ -1,13 +1,28 @@
-from sqlalchemy import String, Boolean, Integer, create_engine, select, update
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
-from tinydb import Query
-from tinydb.table import Document
+from sqlalchemy import (
+    String,
+    Boolean,
+    Integer,
+    create_engine,
+    select,
+    update,
+    ForeignKey,
+)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
 
-from core.databases import defaults
 from core.tools import utils
-from core.tools.errorlib import pretty_error
 
 engine = create_engine("sqlite://", echo=True)
+
+
+class UrlEmbedding(DeclarativeBase):
+    __tablename__ = "url_embeddings"
+
+    uuid: Mapped[str] = mapped_column(primary_key=True)
+
+    document_uuid: Mapped[str] = mapped_column(ForeignKey("url_pool.uuid"))
+
+    embedder_name: Mapped[str] = mapped_column(String())
+    timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
 
 
 class UrlObject(DeclarativeBase):
@@ -28,8 +43,8 @@ class UrlObject(DeclarativeBase):
     is_downloaded: Mapped[bool] = mapped_column(Boolean())
     is_rubbish: Mapped[bool] = mapped_column(Boolean())
 
-    # fixme: sqlalchemy likely wants us to use a relationship here
-    embedded_by: Mapped[list[str]] = mapped_column()  # {model_name: count}
+    # todo: using this type of list may cause issues, test this!
+    embedded_by: Mapped[list["UrlEmbedding"]] = relationship()
 
 
 def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = None):
@@ -68,7 +83,7 @@ def db_get_not_downloaded() -> list:
     return results
 
 
-def db_get_not_embedded(model: str) -> list[Document]:
+def db_get_not_embedded(model: str) -> list[UrlObject]:
     session = Session(engine)
 
     # fixme: this requires embedded_by to be a relation, not a list
