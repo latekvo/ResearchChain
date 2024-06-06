@@ -43,7 +43,6 @@ class UrlObject(DeclarativeBase):
     is_downloaded: Mapped[bool] = mapped_column(Boolean())
     is_rubbish: Mapped[bool] = mapped_column(Boolean())
 
-    # todo: using this type of list may cause issues, test this!
     embedded_by: Mapped[list["UrlEmbedding"]] = relationship()
 
 

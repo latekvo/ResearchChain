@@ -47,6 +47,8 @@ class CrawlTask(DeclarativeBase):
     embedding_progression: Mapped[list["EmbeddingProgression"]] = relationship()
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
+    required_by_uuid: Mapped[str] = mapped_column(ForeignKey("completion_tasks.uuid"))
+
 
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
     # todo: replace arguments with a single WebQuery
