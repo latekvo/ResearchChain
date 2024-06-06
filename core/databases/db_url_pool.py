@@ -82,28 +82,43 @@ def db_get_not_downloaded() -> list:
     return results
 
 
-def db_get_not_embedded(model: str) -> list[UrlObject]:
+def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
     session = Session(engine)
 
-    # fixme: this requires embedded_by to be a relation, not a list
+    exclusion_query = select(UrlObject).where(
+        UrlEmbedding.document_uuid.is_(UrlObject.uuid)
+        and UrlEmbedding.embedder_name.is_(model)
+    )
 
-    # query = select(UrlObject).where(UrlObject.embedded_by.has())
-    # results = list(session.scalars(query).all())
+    query = select(UrlObject).where(
+        UrlObject.is_downloaded.is_(True) and UrlObject.is_rubbish.is_(False)
+    )
 
-    return []
+    # todo: this particular function requires rigorous testing,
+    #       as this is not common usage
+    query.except_(exclusion_query)
+
+    results = list(session.scalars(query).all())
+
+    return results
 
 
 def db_set_url_embedded(url_id: str, embedding_model: str):
-    session = Session(engine)
+    new_uuid = utils.gen_uuid()
+    timestamp = utils.gen_unix_time()
 
-    query = select(UrlObject).where(UrlObject.uuid.is_(url_id))
-    result = session.scalar(query)
+    with Session(engine) as session:
+        completion_task = UrlEmbedding(
+            uuid=new_uuid,
+            document_uuid=url_id,
+            embedder_name=embedding_model,
+            timestamp=timestamp,
+        )
 
-    embedded_by = result.embedded_by
-    embedded_by.append(embedding_model)
+        session.add(completion_task)
+        session.commit()
 
-    # fixme: embedded_by...
-    # db.update({"embedded_by": embedded_by}, query.uuid == url_id)
+    return True
 
 
 def db_set_url_downloaded(url_id: str, text: str):
