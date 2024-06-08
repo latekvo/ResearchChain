@@ -14,7 +14,11 @@ from core.tools import utils
 engine = create_engine("sqlite://", echo=True)
 
 
-class UrlEmbedding(DeclarativeBase):
+class Base(DeclarativeBase):
+    pass
+
+
+class UrlEmbedding(Base):
     __tablename__ = "url_embeddings"
 
     uuid: Mapped[str] = mapped_column(primary_key=True)
@@ -25,7 +29,7 @@ class UrlEmbedding(DeclarativeBase):
     timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
 
 
-class UrlObject(DeclarativeBase):
+class UrlObject(Base):
     __tablename__ = "url_pool"
 
     # base data

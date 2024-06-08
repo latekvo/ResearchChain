@@ -9,7 +9,11 @@ from webui.main import CrawlTask
 engine = create_engine("sqlite://", echo=True)
 
 
-class CompletionTask(DeclarativeBase):
+class Base(DeclarativeBase):
+    pass
+
+
+class CompletionTask(Base):
     __tablename__ = "completion_tasks"
 
     uuid: Mapped[str] = mapped_column(primary_key=True)

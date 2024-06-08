@@ -18,7 +18,11 @@ from core.tools.utils import gen_unix_time
 engine = create_engine("sqlite://", echo=True)
 
 
-class EmbeddingProgression(DeclarativeBase):
+class Base(DeclarativeBase):
+    pass
+
+
+class EmbeddingProgression(Base):
     __tablename__ = "embedding_progressions"
 
     uuid: Mapped[str] = mapped_column(primary_key=True)
@@ -30,7 +34,7 @@ class EmbeddingProgression(DeclarativeBase):
     timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
 
 
-class CrawlTask(DeclarativeBase):
+class CrawlTask(Base):
     __tablename__ = "crawl_tasks"
 
     uuid: Mapped[str] = mapped_column(primary_key=True)
