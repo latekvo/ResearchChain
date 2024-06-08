@@ -5,7 +5,6 @@ from core.databases.db_completion_tasks import (
     db_add_completion_task,
     db_get_completion_tasks_by_page,
     db_get_incomplete_completion_tasks,
-    db_get_completion_task_by_uuid,
 )
 from core.databases.db_crawl_tasks import (
     db_add_crawl_task,

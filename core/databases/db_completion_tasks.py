@@ -2,9 +2,9 @@ from sqlalchemy import String, Integer, Boolean, create_engine, select, update
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
 
 from core.databases import defaults
+from core.databases.db_crawl_tasks import CrawlTask
 from core.tools import utils
 from core.tools.utils import gen_unix_time, page_to_range
-from webui.main import CrawlTask
 
 engine = create_engine("sqlite://", echo=True)
 
