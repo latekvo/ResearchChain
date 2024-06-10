@@ -37,6 +37,7 @@ def db_get_all_crawl_tasks():
     tasks = db.all()
     return tasks
 
+
 def db_set_crawl_executing(uuid: str):
     fields = Query()
     db.update(
