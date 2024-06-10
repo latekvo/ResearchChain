@@ -4,22 +4,15 @@ from sqlalchemy import (
     String,
     Boolean,
     Integer,
-    create_engine,
     update,
     select,
     ForeignKey,
 )
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
+from core.databases.db_base import Base, engine
 from core.tools import utils
 from core.tools.utils import gen_unix_time
-
-# we have to heartbeat our workers once we run out of tasks, websocks should suffice
-engine = create_engine("sqlite://", echo=True)
-
-
-class Base(DeclarativeBase):
-    pass
 
 
 class EmbeddingProgression(Base):
@@ -52,10 +45,6 @@ class CrawlTask(Base):
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
     required_by_uuid: Mapped[str] = mapped_column(ForeignKey("completion_tasks.uuid"))
-
-
-def db_init_table():
-    Base.metadata.create_all(engine)
 
 
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):

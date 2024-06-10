@@ -2,20 +2,14 @@ from sqlalchemy import (
     String,
     Boolean,
     Integer,
-    create_engine,
     select,
     update,
     ForeignKey,
 )
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
+from core.databases.db_base import Base, engine
 from core.tools import utils
-
-engine = create_engine("sqlite://", echo=True)
-
-
-class Base(DeclarativeBase):
-    pass
 
 
 class UrlEmbedding(Base):
@@ -48,10 +42,6 @@ class UrlObject(Base):
     is_rubbish: Mapped[bool] = mapped_column(Boolean())
 
     embedded_by: Mapped[list["UrlEmbedding"]] = relationship()
-
-
-def db_init_table():
-    Base.metadata.create_all(engine)
 
 
 def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = None):

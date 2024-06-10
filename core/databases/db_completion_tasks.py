@@ -1,16 +1,11 @@
-from sqlalchemy import String, Integer, Boolean, create_engine, select, update
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session, relationship
+from sqlalchemy import String, Integer, Boolean, select, update
+from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
 from core.databases import defaults
+from core.databases.db_base import Base, engine
 from core.databases.db_crawl_tasks import CrawlTask
 from core.tools import utils
 from core.tools.utils import gen_unix_time, page_to_range
-
-engine = create_engine("sqlite://", echo=True)
-
-
-class Base(DeclarativeBase):
-    pass
 
 
 class CompletionTask(Base):
@@ -29,10 +24,6 @@ class CompletionTask(Base):
     completion_date: Mapped[int] = mapped_column(Integer())  # time completed
 
     required_crawl_tasks: Mapped[list["CrawlTask"]] = relationship()
-
-
-def db_init_table():
-    Base.metadata.create_all(engine)
 
 
 def db_add_completion_task(prompt, mode) -> str:
