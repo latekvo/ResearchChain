@@ -71,8 +71,10 @@ def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = 
 def db_get_not_downloaded() -> list:
     session = Session(engine)
 
-    query = select(UrlObject).where(
-        UrlObject.is_downloaded.is_(False) and UrlObject.is_rubbish.is_(False)
+    query = (
+        select(UrlObject)
+        .where(UrlObject.is_downloaded.is_(False))
+        .where(UrlObject.is_rubbish.is_(False))
     )
 
     results = list(session.scalars(query).all())
@@ -83,17 +85,21 @@ def db_get_not_downloaded() -> list:
 def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
     session = Session(engine)
 
-    exclusion_query = select(UrlObject).where(
-        UrlEmbedding.document_uuid.is_(UrlObject.uuid)
-        and UrlEmbedding.embedder_name.is_(model)
+    exclusion_query = (
+        select(UrlObject)
+        .where(UrlEmbedding.document_uuid.is_(UrlObject.uuid))
+        .where(UrlEmbedding.embedder_name.is_(model))
+        .limit(amount)
     )
 
-    query = select(UrlObject).where(
-        UrlObject.is_downloaded.is_(True) and UrlObject.is_rubbish.is_(False)
+    query = (
+        select(UrlObject)
+        .where(UrlObject.is_downloaded.is_(True))
+        .where(UrlObject.is_rubbish.is_(False))
     )
 
     # todo: this particular function requires rigorous testing,
-    #       as this is not common usage
+    #       as this is not a well documented use case
     query.except_(exclusion_query)
 
     results = list(session.scalars(query).all())

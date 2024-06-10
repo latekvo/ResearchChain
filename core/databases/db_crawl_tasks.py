@@ -113,8 +113,10 @@ def db_get_crawl_task():
 def db_get_incomplete_crawl_task():
     session = Session(engine)
 
-    query = select(CrawlTask).where(
-        CrawlTask.completed.is_(False) and CrawlTask.executing.is_(False)
+    query = (
+        select(CrawlTask)
+        .where(CrawlTask.completed.is_(False))
+        .where(CrawlTask.executing.is_(False))
     )
 
     crawl_task = session.scalars(query).one_or_none()
