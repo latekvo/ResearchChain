@@ -54,6 +54,10 @@ class CrawlTask(Base):
     required_by_uuid: Mapped[str] = mapped_column(ForeignKey("completion_tasks.uuid"))
 
 
+def db_init_table():
+    Base.metadata.create_all(engine)
+
+
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
     # todo: replace arguments with a single WebQuery
     new_uuid = utils.gen_uuid()
@@ -108,7 +112,7 @@ def db_get_crawl_task():
     session = Session(engine)
 
     query = select(CrawlTask).where(CrawlTask.completed.is_(False))
-    crawl_task = session.scalars(query).one()
+    crawl_task = session.scalars(query).one_or_none()
 
     if crawl_task is not None:
         db_set_crawl_executing(crawl_task.uuid)
@@ -124,8 +128,7 @@ def db_get_incomplete_crawl_task():
         CrawlTask.completed.is_(False) and CrawlTask.executing.is_(False)
     )
 
-    # fixme: potential exception here
-    crawl_task = session.scalars(query).one()
+    crawl_task = session.scalars(query).one_or_none()
 
     if crawl_task is not None:
         db_set_crawl_executing(crawl_task.uuid)
@@ -137,7 +140,7 @@ def db_is_task_completed(uuid: str):
     session = Session(engine)
 
     query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
-    crawl_task = session.scalars(query).one()
+    crawl_task = session.scalars(query).one_or_none()
 
     return crawl_task.completed
 

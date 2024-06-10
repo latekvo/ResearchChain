@@ -50,6 +50,10 @@ class UrlObject(Base):
     embedded_by: Mapped[list["UrlEmbedding"]] = relationship()
 
 
+def db_init_table():
+    Base.metadata.create_all(engine)
+
+
 def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = None):
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()

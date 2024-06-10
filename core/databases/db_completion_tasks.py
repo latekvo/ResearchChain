@@ -31,6 +31,10 @@ class CompletionTask(Base):
     required_crawl_tasks: Mapped[list["CrawlTask"]] = relationship()
 
 
+def db_init_table():
+    Base.metadata.create_all(engine)
+
+
 def db_add_completion_task(prompt, mode) -> str:
     new_uuid = utils.gen_uuid()
     timestamp = utils.gen_unix_time()
