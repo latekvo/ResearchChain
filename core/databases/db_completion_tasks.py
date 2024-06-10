@@ -99,7 +99,7 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
         select(CompletionTask).where(CompletionTask.completed.is_(False)).limit(amount)
     )
 
-    results = list(session.scalars(query))
+    results = list(session.scalars(query).all())
 
     for task in results:
         db_set_completion_task_executing(task.uuid)
