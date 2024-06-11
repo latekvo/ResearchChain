@@ -25,13 +25,13 @@ def processing_iteration():
     embedding_queue = db_url_pool.db_get_not_embedded(embed_model_name)
 
     for url_object in embedding_queue:
-        document = url_object["text"]
-        task_uuid = url_object["task_uuid"]
+        document = url_object.text
+        task_uuid = url_object.task_uuid
 
         db_full_name = utils.gen_vec_db_full_name("embeddings", embed_model_name)
 
         db_embeddings.db_add_text_batch(document, db_full_name)
-        db_url_pool.db_set_url_embedded(url_object["uuid"], embed_model_name)
+        db_url_pool.db_set_url_embedded(url_object.uuid, embed_model_name)
         db_crawl_tasks.db_increment_task_embedding_progression(
             task_uuid, embed_model_name
         )

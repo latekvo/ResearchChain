@@ -23,7 +23,7 @@ requested_crawl_tasks = []
 # url order:
 # 0. use short memory urls
 # 1. refill with non-researched db urls
-# 2. refill with google search
+# 2. refill with Google search
 
 google_traffic_manager = TrafficManager()
 
@@ -46,7 +46,7 @@ def rq_refill(seed_task, use_google: bool = True):
     db_url_objects = db_url_pool.db_get_not_downloaded()
     url_space_left = url_space_left - len(db_url_objects)
 
-    # 2. get from google
+    # 2. get from Google
     google_url_objects = []
     if use_google and seed_query is not None:
         quit_unexpectedly = False

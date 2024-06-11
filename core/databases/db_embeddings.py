@@ -1,4 +1,11 @@
+from __future__ import annotations
+
+from typing import Union
+
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from llama_cpp import Llama
 
 from configurator import get_runtime_config
 from core.tools.utils import use_faiss, is_text_junk
@@ -9,8 +16,9 @@ embedder_config = runtime_configuration.embedder_config
 
 # fixme: these cause linter errors, i don't like this code overall,
 #        but i had to quickly find a solution to file-scope execution
-vector_db, embedder = None, None
-text_splitter = None
+vector_db: FAISS | None = None
+embedder: Union[OllamaEmbeddings, Llama] | None = None
+text_splitter: RecursiveCharacterTextSplitter | None = None
 
 # todo: we've changed every other db to Postgres, but here, we'll have to use 'FAISS server'
 
