@@ -4,12 +4,14 @@ import uvicorn
 from colorama import init as colorama_init, Fore
 
 from configurator import get_runtime_config, args
+from core.databases import db_base
 from core.tools import errorlib
 from workers.crawler import start_crawler
 from workers.embedder import start_embedder
 from workers.summarizer import start_summarizer
 
 colorama_init()
+db_base.db_init()
 
 if args.worker_type == "webui":
     # fixme: this is a workaround, webui should be started from it's folder

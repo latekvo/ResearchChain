@@ -1,7 +1,7 @@
 from urllib.error import HTTPError
 
+from colorama import Fore, Style
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
-from tinydb import Query
 
 from core.classes.traffic_manager import TrafficManager
 from core.databases import db_url_pool, db_crawl_tasks
@@ -23,7 +23,7 @@ requested_crawl_tasks = []
 # url order:
 # 0. use short memory urls
 # 1. refill with non-researched db urls
-# 2. refill with google search
+# 2. refill with Google search
 
 google_traffic_manager = TrafficManager()
 
@@ -46,7 +46,7 @@ def rq_refill(seed_task, use_google: bool = True):
     db_url_objects = db_url_pool.db_get_not_downloaded()
     url_space_left = url_space_left - len(db_url_objects)
 
-    # 2. get from google
+    # 2. get from Google
     google_url_objects = []
     if use_google and seed_query is not None:
         quit_unexpectedly = False
@@ -66,7 +66,7 @@ def rq_refill(seed_task, use_google: bool = True):
                         continue
 
                     prompt = seed_query.web_query
-                    new_url_object = db_url_pool.db_add_url(
+                    _, new_url_object = db_url_pool.db_add_url(
                         url=url,
                         prompt=prompt,
                         parent_uuid=None,
@@ -177,23 +177,19 @@ def processing_iteration():
     process_url(url_object)
 
 
-previous_db_not_downloaded = None
+previous_tasks_queued = 0
 
 
 def start_crawler():
-    global previous_db_not_downloaded
+    global previous_tasks_queued
     while True:
-        db_query = Query()
-        db_not_downloaded = db_url_pool.db.search(
-            db_query.fragment({"is_downloaded": False, "is_rubbish": False})
-        )
-        db_rubbish = db_url_pool.db.search(db_query.fragment({"is_rubbish": True}))
-        db_total = db_url_pool.db.all()
+        queue_length = len(url_rapid_queue)
+        if queue_length > previous_tasks_queued:
+            print(f"{Fore.CYAN}{Style.BRIGHT}RECEIVED NEW TASKS")
+            print(f"currently executing:", url_rapid_queue[0])
 
-        if db_not_downloaded != previous_db_not_downloaded:
-            print("urls left to be downloaded:", len(db_not_downloaded))
-            print("urls marked rubbish:", len(db_rubbish))
-            print("url running total:", len(db_total))
-            previous_db_not_downloaded = db_not_downloaded
+        if queue_length != previous_tasks_queued:
+            print(f"{Fore.CYAN}tasks left:", queue_length)
+            previous_tasks_queued = queue_length
 
         processing_iteration()

@@ -79,6 +79,13 @@ def use_tinydb(db_name):
     return db
 
 
+def page_to_range(page: int, per_page: int) -> (int, int):
+    start = page * per_page
+    stop = start + per_page
+
+    return start, stop
+
+
 def gen_vec_db_full_name(db_name, model_name):
     return db_name + "_" + model_name
 
