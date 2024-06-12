@@ -21,3 +21,15 @@ services:
     image: webui
     ports:
       - 8000:8000
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+        - 8080:8080
+volumes:
+  pgdata:
+    driver: local
