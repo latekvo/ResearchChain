@@ -21,7 +21,7 @@ services:
     image: webui
     ports:
       - 8000:8000
-  db:
+  postgres:
     image: postgres
     restart: always
     environment:
