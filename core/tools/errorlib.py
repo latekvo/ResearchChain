@@ -8,14 +8,14 @@ debug = os.environ.get("DEBUG")
 
 
 def pretty_error(title: str, advice: str):
+    global debug
     err_content = (
         f"\n{Fore.RED}{Style.BRIGHT}{title}{Style.RESET_ALL}\n"
         f"{advice}{Style.RESET_ALL}\n"
         f"Run {Fore.CYAN}main.py -h{Fore.RESET} for more details\n"
     )
 
-    debug = 1
-    if debug == 1:
+    if debug == 1 or debug is True:
         raise ValueError(err_content)
 
     print(err_content)
