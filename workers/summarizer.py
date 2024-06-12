@@ -21,7 +21,7 @@ from core.tools.model_loader import load_llm
 from langchain_core.output_parsers import StrOutputParser
 
 from tinydb import Query
-from core.tools.utils import use_tinydb
+from core.tools.utils import use_tinydb, sleep_noisy
 from colorama import Fore
 
 output_parser = StrOutputParser()
@@ -131,3 +131,4 @@ def start_summarizer():
             previous_queued_tasks = queued_tasks
 
         summarize()
+        sleep_noisy(1)

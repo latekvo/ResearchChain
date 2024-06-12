@@ -5,6 +5,7 @@ from tinydb.table import Document
 from configurator import get_runtime_config
 from core.databases import db_url_pool, db_embeddings, db_crawl_tasks
 from core.tools import utils
+from core.tools.utils import sleep_noisy
 
 rapid_queue_limit = 40
 rapid_queue: list[Document] = []
@@ -45,3 +46,5 @@ def start_embedder():
     while True:
         # todo: improve verbosity
         processing_iteration()
+
+        sleep_noisy(1)

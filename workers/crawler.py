@@ -8,7 +8,7 @@ from core.databases import db_url_pool, db_crawl_tasks
 from core.tools import utils
 from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
-from core.tools.utils import hide_prints
+from core.tools.utils import hide_prints, sleep_noisy
 
 # 100 links max, then put new ones in db
 # this does not increase access speed,
@@ -193,3 +193,5 @@ def start_crawler():
             previous_tasks_queued = queue_length
 
         processing_iteration()
+
+        sleep_noisy(1)

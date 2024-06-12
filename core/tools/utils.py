@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 import re
 import sys
 import time
@@ -108,6 +109,15 @@ def use_faiss(db_name):
 def sleep_forever():
     while True:
         time.sleep(60)
+
+
+# deviation [0.0 -> 1.0]
+def sleep_noisy(duration: int, deviation=0.05):
+    rng = random.Random
+    from_duration = duration - duration * deviation
+    to_duration = duration + duration * deviation
+    random_coefficient = rng.randrange(start=from_duration, stop=to_duration, step=0.01)
+    time.sleep(duration * random_coefficient)
 
 
 class hide_prints:
