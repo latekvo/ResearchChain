@@ -7,6 +7,7 @@ import { CrawlTask } from "../types/TaskType";
 
 type TaskCardProps = {
   item: CrawlTask;
+  onClick?: (item: any) => void;
 };
 
 const HistoryCard: React.FC<TaskCardProps> = ({ item }) => {

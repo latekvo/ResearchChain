@@ -1,12 +1,26 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import { useQuery } from "react-query";
 import HistoryCard from "../components/HistoryCard"
-import { data } from "./summarizeHistoryMock";
+import { data } from "./SummarizeHistoryMock";
+import SummarizeHistoryModal from "./SummarizeHistoryModal"
+import { SummaryTask } from "../types/TaskType";
 
 
 const SummarizeHistory = () => {
+
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState<number | null>(null);
+
+  const handleCardClick = (index: number) => {
+    setSelectedTaskIndex(index);
+  };
+
+  const closeModal = () => {
+    setSelectedTaskIndex(null);
+  };
+  console.log(selectedTaskIndex);
+
   // const { data, isLoading, isError } = useQuery<CrawlHistoryItem[], Error>(
   //   "crawlHistory",
   //   async () => {
@@ -48,16 +62,27 @@ const SummarizeHistory = () => {
     );
   }
 
+
   return (
     <div className="h-screen w-screen flex-col">
-      <Header></Header>
+      <Header />
       <div className="h-4/5 w-full flex-col items-center justify-center">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 p-4">
-          {data.task.map((item) => (
-            <HistoryCard key={item.uuid} item={item}></HistoryCard>
+          {data.task.map((item, index) => (
+            <div key={item.uuid}  onClick={() => handleCardClick(index)}>
+              <HistoryCard item={item}></HistoryCard>
+            </div>
           ))}
         </div>
       </div>
+
+      {selectedTaskIndex && (
+        <SummarizeHistoryModal
+          isOpen={true}
+          onClose={closeModal}
+          summaryTask={data.task[selectedTaskIndex]}
+        />
+      )}
     </div>
   );
 };
