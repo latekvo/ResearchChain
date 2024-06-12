@@ -43,14 +43,5 @@ previous_not_embedded = None
 def start_embedder():
     global previous_not_embedded
     while True:
-        """
-        db_not_embedded = db_url_pool.db_get_not_embedded(embedder_config.model_name)
-        db_total = db_url_pool.db.all()
-
-        if len(db_not_embedded) != previous_not_embedded:
-            print("urls left to be embedded:", len(db_not_embedded))
-            print("url running total:", len(db_total))
-            previous_not_embedded = len(db_not_embedded)
-        """
-
+        # todo: improve verbosity
         processing_iteration()
