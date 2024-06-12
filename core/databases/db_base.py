@@ -1,7 +1,12 @@
+import logging
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase
 
-engine = create_engine("sqlite://", echo=True)
+engine = create_engine("sqlite://")
+
+logging.basicConfig()
+logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
 
 
 class Base(DeclarativeBase):
