@@ -17,7 +17,7 @@ from core.chainables.web import (
     web_news_lookup_prompt,
     web_wiki_lookup_prompt,
 )
-from core.tools.model_loader import load_llm, load_embedder
+from core.tools.model_loader import load_llm
 from langchain_core.output_parsers import StrOutputParser
 
 from tinydb import Query

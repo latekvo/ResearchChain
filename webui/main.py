@@ -2,10 +2,10 @@ from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from core.databases.db_crawl_tasks import db_add_crawl_task, db_get_all_crawl_tasks
-from core.databases.db_completion_tasks import (
-    db_add_completion_task,
-    db_get_completion_tasks_by_uuid,
+from core.databases.db_crawl_tasks import (
+    db_add_crawl_task
 )
+
 from pydantic import BaseModel
 from typing import Literal
 
@@ -30,7 +30,6 @@ def add_crawl_task(req_body: RequestBody):
     if new_uuid is None:
         raise HTTPException(status_code=500, detail="Something went wrong")
     return {"uuid": new_uuid}
-
 
 @app.get("/crawl")
 def get_crawl_tasks():
