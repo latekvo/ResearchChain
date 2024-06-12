@@ -3,16 +3,16 @@ import { PiQueueDuotone } from "react-icons/pi";
 import { MdDone } from "react-icons/md";
 import { GrInProgress } from "react-icons/gr";
 import { calculateElapsedTime } from "../hooks/calculateElapsedTime";
-import { Task } from "./page";
+import { CrawlTask } from "../types/TaskType";
 
 type TaskCardProps = {
-  item: Task;
+  item: CrawlTask;
 };
 
-const CrawlHistoryCard: React.FC<TaskCardProps> = ({ item }) => {
+const HistoryCard: React.FC<TaskCardProps> = ({ item }) => {
     let status:string = "status"
 
-  function getIconComponent(item: Task) {
+  function getIconComponent(item: CrawlTask) {
     if (item.executing) {
         status = "Executing"
         return <GrInProgress color="#006fee" className="text-3xl my-auto mr-6" />;
@@ -48,4 +48,4 @@ const CrawlHistoryCard: React.FC<TaskCardProps> = ({ item }) => {
   );
 };
 
-export default CrawlHistoryCard;
+export default HistoryCard;
