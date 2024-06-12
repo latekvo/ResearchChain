@@ -1,5 +1,5 @@
 from __future__ import annotations
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from core.databases.db_completion_tasks import (
     db_add_completion_task,
@@ -153,3 +153,23 @@ def set_downloaded_url(body: Downloaded):
 @app.put("/url/rubbish/{url_id}")
 def set_url_rubbish(url_id: str):
     db_set_url_rubbish(url_id)
+
+
+active_connections = {}
+
+
+@app.websocket("/ws")
+async def connection(websocket: WebSocket):
+    await websocket.accept()
+    active_connections[websocket] = []
+    print(active_connections)
+    while True:
+        data = await websocket.receive_text()
+        active_connections[websocket].append(data)
+        print(active_connections)
+
+
+async def send_status(uuid: str, status: str):
+    for websocket, uuid_list in active_connections.items():
+        if uuid in uuid_list:
+            websocket.send.send_text("current status: " + status)
