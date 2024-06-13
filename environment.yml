@@ -72,6 +72,7 @@ dependencies:
       - multidict==6.0.5
       - numpy==1.26.4
       - orjson==3.10.1
+      - psycopg2==2.9.9
       - pydantic==2.7.0
       - pydantic-core==2.18.1
       - pyyaml==6.0.1
