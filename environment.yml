@@ -40,7 +40,7 @@ dependencies:
       - colorama==0.4.6
       - dataclasses-json==0.6.4
       - diskcache==5.6.3
-      - faiss-gpu==1.7.2
+      - faiss-cpu==1.7.2
       - filelock==3.13.4
       - frozenlist==1.4.1
       - fsspec==2024.3.1

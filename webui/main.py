@@ -22,6 +22,7 @@ from core.databases.db_url_pool import (
     db_set_url_rubbish,
 )
 from pydantic import BaseModel
+import pika
 
 
 class TaskCreator(BaseModel):
@@ -155,6 +156,14 @@ def set_url_rubbish(url_id: str):
     db_set_url_rubbish(url_id)
 
 
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='crawler_update')
+channel.queue_declare(queue='embeder_update')
+channel.queue_declare(queue='summarizer_update')
+
+
 active_connections = {}
 
 
@@ -169,7 +178,25 @@ async def connection(websocket: WebSocket):
         print(active_connections)
 
 
-async def send_status(uuid: str, status: str):
+def callback(ch, method, properties, body):
+    print("getting data from: ", body)
+    uuid = body.uuid
+    status = body.status
     for websocket, uuid_list in active_connections.items():
         if uuid in uuid_list:
             websocket.send.send_text("current status: " + status)
+
+
+channel.basic_consume(queue='crawler_update',
+                      on_message_callback=callback,
+                      auto_ack=True)
+
+channel.basic_consume(queue='embeder_update',
+                      on_message_callback=callback,
+                      auto_ack=True)
+
+channel.basic_consume(queue='summarizer_update',
+                      on_message_callback=callback,
+                      auto_ack=True)
+
+channel.start_consuming()
