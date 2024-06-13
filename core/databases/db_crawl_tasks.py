@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from sqlalchemy import (
     String,
@@ -44,7 +44,9 @@ class CrawlTask(Base):
     embedding_progression: Mapped[list["EmbeddingProgression"]] = relationship()
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
-    required_by_uuid: Mapped[str] = mapped_column(ForeignKey("completion_tasks.uuid"))
+    required_by_uuid: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("completion_tasks.uuid")
+    )
 
 
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
@@ -63,7 +65,6 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
             completed=False,
             completion_date=0,
             base_amount_scheduled=100,
-            embedding_progression={},
         )
 
         session.add(crawl_task)
