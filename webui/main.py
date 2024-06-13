@@ -5,7 +5,6 @@ from core.databases.db_completion_tasks import (
     db_add_completion_task,
     db_get_completion_tasks_by_page,
     db_get_incomplete_completion_tasks,
-    db_get_completion_tasks_by_uuid
 )
 from core.databases.db_crawl_tasks import (
     db_add_crawl_task,
@@ -85,13 +84,7 @@ def get_incomplete_task():
 @app.post("/task")
 def add_completion_task(completion_task: TaskCreator):
     uuid = db_add_completion_task(completion_task.prompt, completion_task.mode)
-    result = db_get_completion_tasks_by_uuid(uuid)
-    while result is None or result["completion_result"] is None:
-        result = db_get_completion_tasks_by_uuid(uuid)
-    return {
-        "summary": result["completion_result"]
-    }
-
+    return {"uuid": uuid}
 
 
 @app.get("/crawl")
@@ -112,15 +105,15 @@ def set_crawl_completed(uuid):
 
 
 @app.get("/crawl/incomplete")
-def get_inocmplete_completion_task():
+def get_incomplete_completion_task():
     result = db_get_incomplete_completion_tasks()
     return {"task": result}
 
 
 @app.post("/url")
 def add_url(url: UrlCreator):
-    result = db_add_url(url.url, url.prompt, url.parent_uuid)
-    return {"url_object": result}
+    uuid, result = db_add_url(url.url, url.prompt, url.parent_uuid)
+    return {"uuid": uuid, "url_object": result}
 
 
 @app.get("/url/downloaded")
