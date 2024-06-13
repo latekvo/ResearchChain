@@ -25,6 +25,7 @@ dependencies:
   - pathspec=0.10.3
   - pip=23.3.1
   - platformdirs=3.10.0
+  - psycopg2==2.9.9
   - python=3.9.19
   - readline=8.2
   - setuptools=68.2.2
@@ -72,7 +73,6 @@ dependencies:
       - multidict==6.0.5
       - numpy==1.26.4
       - orjson==3.10.1
-      - psycopg2==2.9.9
       - pydantic==2.7.0
       - pydantic-core==2.18.1
       - pyyaml==6.0.1
