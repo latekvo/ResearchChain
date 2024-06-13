@@ -113,10 +113,10 @@ def sleep_forever():
 
 # deviation [0.0 -> 1.0]
 def sleep_noisy(duration: int, deviation=0.05):
-    rng = random.Random
+    rng = random.Random()
     from_duration = duration - duration * deviation
     to_duration = duration + duration * deviation
-    random_coefficient = rng.randrange(start=from_duration, stop=to_duration, step=0.01)
+    random_coefficient = rng.uniform(from_duration, to_duration)
     time.sleep(duration * random_coefficient)
 
 
