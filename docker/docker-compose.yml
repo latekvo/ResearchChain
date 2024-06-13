@@ -1,34 +1,4 @@
 services:
-  crawler:
-    build:
-     context: ../.
-     dockerfile: ./docker/crawler/Dockerfile
-    image: crawler
-    networks:
-      - app-network
-  embedder:
-    build:
-      context: ../.
-      dockerfile: ./docker/embedder/Dockerfile
-    image: embedder
-    networks:
-      - app-network
-  summarizer:
-    build:
-      context: ../.
-      dockerfile: ./docker/summarizer/Dockerfile
-    image: summarizer
-    networks:
-      - app-network
-  webui:
-    build:
-      context: ../.
-      dockerfile: ./docker/webui/Dockerfile
-    image: webui
-    ports:
-      - 8000:8000
-    networks:
-      - app-network
   postgres:
     image: postgres
     restart: always
@@ -45,6 +15,42 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - 8081:80
+    networks:
+      - app-network
+  crawler:
+    depends_on:
+      - postgres
+    build:
+     context: ../.
+     dockerfile: ./docker/crawler/Dockerfile
+    image: crawler
+    networks:
+      - app-network
+  embedder:
+    depends_on:
+      - postgres
+    build:
+      context: ../.
+      dockerfile: ./docker/embedder/Dockerfile
+    image: embedder
+    networks:
+      - app-network
+  summarizer:
+    depends_on:
+      - postgres
+    build:
+      context: ../.
+      dockerfile: ./docker/summarizer/Dockerfile
+    image: summarizer
+    networks:
+      - app-network
+  webui:
+    build:
+      context: ../.
+      dockerfile: ./docker/webui/Dockerfile
+    image: webui
+    ports:
+      - 8000:8000
     networks:
       - app-network
 volumes:
