@@ -4,16 +4,22 @@ services:
      context: ../.
      dockerfile: ./docker/crawler/Dockerfile
     image: crawler
+    networks:
+      - app-network
   embedder:
     build:
       context: ../.
       dockerfile: ./docker/embedder/Dockerfile
     image: embedder
+    networks:
+      - app-network
   summarizer:
     build:
       context: ../.
       dockerfile: ./docker/summarizer/Dockerfile
     image: summarizer
+    networks:
+      - app-network
   webui:
     build:
       context: ../.
@@ -21,6 +27,8 @@ services:
     image: webui
     ports:
       - 8000:8000
+    networks:
+      - app-network
   postgres:
     image: postgres
     restart: always
@@ -28,8 +36,20 @@ services:
       POSTGRES_PASSWORD: pass
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-        - 8080:8080
+      - 8081:80
+    networks:
+      - app-network
 volumes:
   pgdata:
     driver: local
+networks:
+  app-network:
+    driver: bridge
