@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { Modal, ModalContent, ModalHeader, Button } from "@nextui-org/react";
 import { SummaryTask } from '../types/TaskType'; // Import SummaryTask
+import { PiQueueDuotone } from "react-icons/pi";
+import { MdDone } from "react-icons/md";
+import { GrInProgress } from "react-icons/gr";
+import {calculateElapsedTime} from "../hooks/calculateElapsedTime"
 
 interface ExampleModalProps {
   isOpen: boolean;
@@ -10,6 +14,22 @@ interface ExampleModalProps {
 
 const ExampleModal: React.FC<ExampleModalProps> = ({ isOpen, onClose, summaryTask }) => {
   const scrollableTargetRef = useRef<HTMLDivElement>(null);
+
+  let status:string = "status"
+
+  function getIconComponent(summaryTask: SummaryTask) {
+    if (summaryTask.executing) {
+        status = "Executing"
+        return <GrInProgress color="#006fee" className="text-3xl my-auto mr-6" />;
+    } else if (!summaryTask.executing && !summaryTask.completed) {
+        status = "Queued"
+        return <PiQueueDuotone color="#ffff44bd" className="text-3xl my-auto mr-6 rounded-full" />;
+    } else if (summaryTask.completed) {
+        status ="Done"
+        return <MdDone color="#00f400a6" className="text-3xl my-auto mr-6 rounded-full" />;
+    }
+    return null;
+  }
 
   useEffect(() => {
     if (isOpen && scrollableTargetRef.current) {
@@ -34,24 +54,30 @@ const ExampleModal: React.FC<ExampleModalProps> = ({ isOpen, onClose, summaryTas
       }}
     >
       <ModalContent>
+        <ModalHeader>
+        <div className="flex justify-between items-center w-full p-4">
+        {getIconComponent(summaryTask)}
+          <div className="flex flex-col">
+            <p className="text-md text-center">Mode: {summaryTask.mode}</p>
+            <p className="text-small text-default-500">Status: {status}</p>
+          </div>
+          <div>
+            <p className="text-sm whitespace-pre-line text-center">{calculateElapsedTime(summaryTask.timestamp)}</p>
+          </div>
+        </div>
+        </ModalHeader>
         <div className="display:contents">
-          <ModalHeader className="flex flex-col gap-1">
-            <div className="flex w-full items-center justify-between gap-2">
-              <Button variant="light" isIconOnly onPress={onClose}>
-                Close
-              </Button>
-            </div>
-          </ModalHeader>
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 py-2" ref={scrollableTargetRef}>
+          <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6" ref={scrollableTargetRef}>
+            <div className="flex justify-between items-center w-full">
             <p>uuid: {summaryTask?.uuid}</p>
-            <p>prompt: {summaryTask?.prompt}</p>
-            <p>mode: {summaryTask?.mode}</p>
-            <p>timestamp: {summaryTask?.timestamp}</p>
-            <p>executing: {summaryTask?.executing.toString()}</p>
             <p>execution_date: {summaryTask?.execution_date}</p>
-            <p>completed: {summaryTask?.completed.toString()}</p>
             <p>completion_date: {summaryTask?.completion_date}</p>
-            <p>completion_result: {summaryTask?.completion_result}</p>
+            </div>
+            <div className='pb-8'>
+            <p className='pt-3 text-xl text-primary'>Prompt</p> <p>{summaryTask?.prompt}</p>
+            <p className='pt-3 text-xl text-primary'>Completion result</p>
+            <p>{summaryTask?.completion_result}</p>
+            </div>
           </div>
         </div>
       </ModalContent>

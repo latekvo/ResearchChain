@@ -20,6 +20,7 @@ const SummarizeHistory = () => {
     setSelectedTaskIndex(null);
   };
   console.log(selectedTaskIndex);
+  console.log(data.task[0])
 
   // const { data, isLoading, isError } = useQuery<CrawlHistoryItem[], Error>(
   //   "crawlHistory",
@@ -69,14 +70,14 @@ const SummarizeHistory = () => {
       <div className="h-4/5 w-full flex-col items-center justify-center">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 p-4">
           {data.task.map((item, index) => (
-            <div key={item.uuid}  onClick={() => handleCardClick(index)}>
+            <div key={item.uuid} className="cursor-pointer"  onClick={() => handleCardClick(index)}>
               <HistoryCard item={item}></HistoryCard>
             </div>
           ))}
         </div>
       </div>
 
-      {selectedTaskIndex && (
+      {(selectedTaskIndex || selectedTaskIndex == 0)&& (
         <SummarizeHistoryModal
           isOpen={true}
           onClose={closeModal}

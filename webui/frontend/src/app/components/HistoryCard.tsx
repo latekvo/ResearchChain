@@ -28,7 +28,7 @@ const HistoryCard: React.FC<TaskCardProps> = ({ item }) => {
   }
 
   return (
-    <Card isBlurred={false} key={item.uuid} className="p-2 m-2 cursor-pointer w-full h-5/6 mx-auto shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-25">
+    <Card isBlurred={false} key={item.uuid} className="p-2 m-2 w-full h-5/6 mx-auto shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-25">
       <CardHeader className="p-1">
         <div className="flex justify-between items-center w-full">
         {getIconComponent(item)}
@@ -43,7 +43,7 @@ const HistoryCard: React.FC<TaskCardProps> = ({ item }) => {
       </CardHeader>
       <Divider />
       <CardBody className="h-14 p-2">
-        <p className="text-sm">{item.prompt}</p>
+        <p className="text-sm text-default-600">{item.prompt}</p>
       </CardBody>
     </Card>
   );

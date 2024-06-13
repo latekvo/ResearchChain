@@ -11,7 +11,7 @@ export const data: { task: SummaryTask[] } = {
       execution_date: 0,
       completed: false,
       completion_date: 0,
-      completion_result: "Summary result for task 11",
+      completion_result: "Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11",
     },
     {
       uuid: "12",
