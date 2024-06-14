@@ -22,6 +22,8 @@ from core.databases.db_url_pool import (
 )
 from pydantic import BaseModel
 import pika
+import threading
+import json
 
 
 class TaskCreator(BaseModel):
@@ -149,25 +151,20 @@ def set_url_rubbish(url_id: str):
     db_set_url_rubbish(url_id)
 
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
-
-channel.queue_declare(queue='crawler_update')
-channel.queue_declare(queue='embeder_update')
-channel.queue_declare(queue='summarizer_update')
 
 
 active_connections = {}
 
 
 @app.websocket("/ws")
-async def connection(websocket: WebSocket):
+async def on_connection(websocket: WebSocket):
     await websocket.accept()
     active_connections[websocket] = []
     print(active_connections)
     while True:
         data = await websocket.receive_text()
-        active_connections[websocket].append(data)
+        data_dict = json.loads(data)
+        active_connections[websocket].append(data_dict["message"])
         print(active_connections)
 
 
@@ -180,16 +177,27 @@ def callback(ch, method, properties, body):
             websocket.send.send_text("current status: " + status)
 
 
-channel.basic_consume(queue='crawler_update',
-                      on_message_callback=callback,
-                      auto_ack=True)
+def consumer():
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
 
-channel.basic_consume(queue='embeder_update',
-                      on_message_callback=callback,
-                      auto_ack=True)
+    channel.exchange_declare(exchange='status', exchange_type='direct')
 
-channel.basic_consume(queue='summarizer_update',
-                      on_message_callback=callback,
-                      auto_ack=True)
+    # channel.queue_declare(queue='crawler_update')
+    # channel.queue_declare(queue='embeder_update')
+    channel.queue_declare(queue='update_status', durable=True)
 
-channel.start_consuming()
+    channel.queue_bind(
+        exchange='status',
+        queue='update_status',
+        routing_key='update_status'
+    )
+
+    channel.basic_consume(queue='update_status',
+                          on_message_callback=callback)
+
+    channel.start_consuming()
+
+
+consumer_thread = threading.Thread(target=consumer)
+consumer_thread.start()

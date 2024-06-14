@@ -19,6 +19,7 @@ from core.chainables.web import (
 )
 from core.tools.model_loader import load_llm
 from langchain_core.output_parsers import StrOutputParser
+from core.tools import utils
 
 from tinydb import Query
 from core.tools.utils import use_tinydb
@@ -105,6 +106,7 @@ def summarize():
     db_update_completion_task_after_summarizing(summary, current_task["uuid"])
 
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task["uuid"])
+    utils.send_update_to_api(current_task["uuid"], "summary completed", "update_status")
 
 
 previous_queued_tasks = None

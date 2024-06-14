@@ -12,6 +12,9 @@ from core.databases import defaults
 from core.tools.dbops import get_vec_db_by_name
 from core.tools.model_loader import load_embedder
 
+import pika
+import json
+
 
 def is_text_junk(text: str):
     # checks if text contains any of junky keywords eg: privacy policy, subscribe, cookies etc.
@@ -108,6 +111,18 @@ def use_faiss(db_name):
 def sleep_forever():
     while True:
         time.sleep(60)
+
+
+def send_update_to_api(task_uuid: str, status: str, routing_key: str):
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    channel.exchange_declare(exchange='status', exchange_type='direct')
+    message = json.dumps({'task_uuid': task_uuid, 'status': status})
+    channel.basic_publish(exchange='',
+                          routing_key=routing_key,
+                          body=message)
+    print("status sent")
 
 
 class hide_prints:

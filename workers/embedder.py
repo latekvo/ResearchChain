@@ -35,6 +35,7 @@ def processing_iteration():
         db_crawl_tasks.db_increment_task_embedding_progression(
             task_uuid, embed_model_name
         )
+        utils.send_update_to_api(task_uuid, "embedding completed", "update_status")
 
 
 previous_not_embedded = None

@@ -10,6 +10,9 @@ from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
 from core.tools.utils import hide_prints
 
+import pika
+import json
+
 # 100 links max, then put new ones in db
 # this does not increase access speed,
 # it only encourages a better mix of broadness and deepness of links
@@ -153,6 +156,8 @@ def process_url(url_object):
     # 2. save all links
     for link in url_list:
         url_save(url=link, parent_uuid=url_uuid, task_uuid=url_task_uuid)
+    utils.send_update_to_api(url_task_uuid, "crawl completed", "update_status")
+
 
 
 def processing_iteration():
