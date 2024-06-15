@@ -29,7 +29,7 @@ class UrlObject(Base):
     # base data
     uuid: Mapped[str] = mapped_column(primary_key=True)
     url: Mapped[str] = mapped_column(String())
-    text: Mapped[str] = mapped_column(String())
+    text: Mapped[str] = mapped_column(String(), nullable=True)
 
     # tracking data
     parent_uuid: Mapped[str] = mapped_column(String())
@@ -85,8 +85,8 @@ def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
     with Session(engine) as session:
         exclusion_query = (
             select(UrlObject)
-            .where(UrlEmbedding.document_uuid.is_(UrlObject.uuid))
-            .where(UrlEmbedding.embedder_name.is_(model))
+            .where(UrlEmbedding.document_uuid == UrlObject.uuid)
+            .where(UrlEmbedding.embedder_name == model)
             .limit(amount)
         )
 
@@ -127,7 +127,7 @@ def db_set_url_downloaded(url_id: str, text: str):
     with Session(engine) as session:
         session.execute(
             update(UrlObject)
-            .where(UrlObject.uuid.is_(url_id))
+            .where(UrlObject.uuid == url_id)
             .values(is_downloaded=True, text=text)
         )
 
@@ -137,7 +137,7 @@ def db_set_url_downloaded(url_id: str, text: str):
 def db_set_url_rubbish(url_id: str):
     with Session(engine) as session:
         session.execute(
-            update(UrlObject).where(UrlObject.uuid.is_(url_id)).values(is_rubbish=True)
+            update(UrlObject).where(UrlObject.uuid == url_id).values(is_rubbish=True)
         )
 
         session.commit()
@@ -145,7 +145,7 @@ def db_set_url_rubbish(url_id: str):
 
 def db_is_url_present(url: str):
     with Session(engine) as session:
-        query = select(UrlObject).where(UrlObject.url.is_(url))
+        query = select(UrlObject).where(UrlObject.url == url)
         result = session.scalar(query)
 
         if result is None:

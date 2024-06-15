@@ -35,7 +35,7 @@ def rq_refill(seed_task, use_google: bool = True):
     seed_query = None
 
     if seed_task is not None:
-        seed_query = WebQuery(query_type=seed_task.type, prompt_core=seed_task.prompt)
+        seed_query = WebQuery(query_type=seed_task.mode, prompt_core=seed_task.prompt)
 
     # 0. check for space
     url_space_left = url_queue_limit - len(url_rapid_queue)

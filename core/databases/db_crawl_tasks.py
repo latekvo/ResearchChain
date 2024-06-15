@@ -45,7 +45,7 @@ class CrawlTask(Base):
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
 
     required_by_uuid: Mapped[Optional[str]] = mapped_column(
-        ForeignKey("completion_tasks.uuid")
+        ForeignKey("completion_tasks.uuid"), nullable=True
     )
 
 
@@ -77,7 +77,7 @@ def db_set_crawl_executing(uuid: str):
     with Session(engine) as session:
         session.execute(
             update(CrawlTask)
-            .where(CrawlTask.uuid.is_(uuid))
+            .where(CrawlTask.uuid == uuid)
             .values(executing=True, execution_date=gen_unix_time())
         )
 
@@ -88,7 +88,7 @@ def db_set_crawl_completed(uuid: str):
     with Session(engine) as session:
         session.execute(
             update(CrawlTask)
-            .where(CrawlTask.uuid.is_(uuid))
+            .where(CrawlTask.uuid == uuid)
             .values(completed=True, completion_date=gen_unix_time())
         )
 
@@ -127,7 +127,7 @@ def db_get_incomplete_crawl_task():
 
 def db_is_task_completed(uuid: str):
     with Session(engine) as session:
-        query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
         crawl_task = session.scalars(query).one()
 
         return crawl_task.completed
@@ -150,7 +150,7 @@ def db_are_tasks_completed(uuid_list: list[str]):
 
 def db_is_crawl_task_fully_embedded(uuid: str, model_name: str):
     with Session(engine) as session:
-        query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
         crawl_task = session.scalars(query).one()
 
         baseline_count = crawl_task.base_amount_scheduled
@@ -170,7 +170,7 @@ def db_are_crawl_tasks_fully_embedded(uuid_list: str, model_name: str):
 
 def db_increment_task_embedding_progression(uuid: str, model_name: str):
     with Session(engine) as session:
-        query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
         crawl_task = session.scalars(query).one()
 
         current_progression = crawl_task.embedding_progression
@@ -185,7 +185,7 @@ def db_increment_task_embedding_progression(uuid: str, model_name: str):
 
         session.execute(
             update(CrawlTask)
-            .where(CrawlTask.uuid.is_(crawl_task.uuid))
+            .where(CrawlTask.uuid == crawl_task.uuid)
             .values(embedding_progression=current_progression)
         )
 

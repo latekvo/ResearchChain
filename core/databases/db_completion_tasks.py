@@ -61,7 +61,7 @@ def db_get_completion_tasks_by_page(
 
 def db_get_completion_task_by_uuid(uuid: int) -> CompletionTask:
     with Session(engine) as session:
-        query = select(CompletionTask).where(CompletionTask.uuid.is_(uuid))
+        query = select(CompletionTask).where(CompletionTask.uuid == uuid)
         result = session.scalars(query).one()
         return result
 
@@ -70,7 +70,7 @@ def db_set_completion_task_executing(uuid: str):
     with Session(engine) as session:
         session.execute(
             update(CompletionTask)
-            .where(CompletionTask.uuid.is_(uuid))
+            .where(CompletionTask.uuid == uuid)
             .values(executing=True, execution_date=gen_unix_time())
         )
 
@@ -108,7 +108,7 @@ def db_update_completion_task_after_summarizing(summary: str, uuid: str):
     with Session(engine) as session:
         session.execute(
             update(CompletionTask)
-            .where(CompletionTask.uuid.is_(uuid))
+            .where(CompletionTask.uuid == uuid)
             .values(
                 completed=True,
                 completion_result=summary,
