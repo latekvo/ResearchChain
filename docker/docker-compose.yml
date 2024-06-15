@@ -10,8 +10,11 @@ services:
       - 5432:5432
     networks:
       - app-network
+
   pgadmin:
     image: dpage/pgadmin4
+    depends_on:
+      - postgres
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -19,45 +22,53 @@ services:
       - 8081:80
     networks:
       - app-network
+
   crawler:
+    image: crawler
     depends_on:
       - postgres
     build:
      context: ../.
      dockerfile: ./docker/crawler/Dockerfile
-    image: crawler
     networks:
       - app-network
+
   embedder:
+    image: embedder
     depends_on:
       - postgres
     build:
       context: ../.
       dockerfile: ./docker/embedder/Dockerfile
-    image: embedder
     networks:
       - app-network
+
   summarizer:
+    image: summarizer
     depends_on:
       - postgres
     build:
       context: ../.
       dockerfile: ./docker/summarizer/Dockerfile
-    image: summarizer
     networks:
       - app-network
+
   webui:
+    image: webui
+    depends_on:
+      - postgres
     build:
       context: ../.
       dockerfile: ./docker/webui/Dockerfile
-    image: webui
     ports:
       - 8000:8000
     networks:
       - app-network
+
 volumes:
   pgdata:
     driver: local
+
 networks:
   app-network:
     driver: bridge
