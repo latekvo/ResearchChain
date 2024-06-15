@@ -20,25 +20,16 @@ const ExampleModal: React.FC<ExampleModalProps> = ({ isOpen, onClose, summaryTas
   function getIconComponent(summaryTask: SummaryTask) {
     if (summaryTask.executing) {
         status = "Executing"
-        return <GrInProgress color="#006fee" className="text-3xl my-auto mr-6" />;
+        return <GrInProgress color="#006fee" className="text-3xl my-auto " />;
     } else if (!summaryTask.executing && !summaryTask.completed) {
         status = "Queued"
-        return <PiQueueDuotone color="#ffff44bd" className="text-3xl my-auto mr-6 rounded-full" />;
+        return <PiQueueDuotone color="#ffff44bd" className="text-3xl my-auto  rounded-full" />;
     } else if (summaryTask.completed) {
         status ="Done"
-        return <MdDone color="#00f400a6" className="text-3xl my-auto mr-6 rounded-full" />;
+        return <MdDone color="#00f400a6" className="text-3xl my-auto  rounded-full" />;
     }
     return null;
   }
-
-  useEffect(() => {
-    if (isOpen && scrollableTargetRef.current) {
-      // Tutaj możesz umieścić dowolną logikę obsługi otwarcia modala, np. blokowanie scrolla
-      return () => {
-        // Tutaj możesz umieścić logikę czyszczenia, np. odblokowanie scrolla
-      };
-    }
-  }, [isOpen]);
 
   return (
     <Modal
@@ -53,34 +44,49 @@ const ExampleModal: React.FC<ExampleModalProps> = ({ isOpen, onClose, summaryTas
         backdrop: 'top-0 left-0',
       }}
     >
-      <ModalContent>
-        <ModalHeader>
-        <div className="flex justify-between items-center w-full p-4">
+<ModalContent>
+  <ModalHeader className='border-b-1 border-indigo-800 '>
+    <div className="grid grid-cols-3 gap-40 items-center w-full py-2">
+      <div className="flex justify-center">
         {getIconComponent(summaryTask)}
-          <div className="flex flex-col">
-            <p className="text-md text-center">Mode: {summaryTask.mode}</p>
-            <p className="text-small text-default-500">Status: {status}</p>
-          </div>
-          <div>
-            <p className="text-sm whitespace-pre-line text-center">{calculateElapsedTime(summaryTask.timestamp)}</p>
-          </div>
+      </div>
+      <div className="flex flex-col items-center">
+        <p className="text-md text-center">Mode: {summaryTask.mode}</p>
+        <p className="text-small text-default-500">Status: {status}</p>
+      </div>
+      <div className="flex flex-col items-center">
+        <p className="text-md whitespace-pre-line text-center">{calculateElapsedTime(summaryTask.timestamp)}</p>
+      </div>
+    </div>
+  </ModalHeader>
+  <div className="display:contents">
+    <div className="flex-1 overflow-y-auto px-6" ref={scrollableTargetRef}>
+      <div className="grid grid-cols-3 py-4 gap-40 w-full">
+        <div className="text-md text-center">
+          <span className='text-xl'>uuid</span><span className="block">{summaryTask?.uuid}</span>
         </div>
-        </ModalHeader>
-        <div className="display:contents">
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-6" ref={scrollableTargetRef}>
-            <div className="flex justify-between items-center w-full">
-            <p>uuid: {summaryTask?.uuid}</p>
-            <p>execution_date: {summaryTask?.execution_date}</p>
-            <p>completion_date: {summaryTask?.completion_date}</p>
-            </div>
-            <div className='pb-8'>
-            <p className='pt-3 text-xl text-primary'>Prompt</p> <p>{summaryTask?.prompt}</p>
-            <p className='pt-3 text-xl text-primary'>Completion result</p>
-            <p>{summaryTask?.completion_result}</p>
-            </div>
-          </div>
+        <div className="text-md text-center">
+          Execution date<span className="block">{calculateElapsedTime(summaryTask?.execution_date)}</span>
         </div>
-      </ModalContent>
+        <div className="text-md text-center">
+          Completion date<span className="block">{calculateElapsedTime(summaryTask?.completion_date)}</span>
+        </div>
+      </div>
+      <div className="pb-8">
+        <div className=''>
+          <p className="pt-3 text-xl text-primary">Prompt</p>
+          <p className="text-lg">{summaryTask?.prompt}</p>
+        </div>
+        <div className=''>
+          <p className="pt-3 text-xl text-primary">Completion result</p>
+          <p className="text-lg">{summaryTask?.completion_result}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</ModalContent>
+
+
     </Modal>
   );
 };

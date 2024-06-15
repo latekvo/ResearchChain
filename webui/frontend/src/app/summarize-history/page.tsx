@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import { useQuery } from "react-query";
 import HistoryCard from "../components/HistoryCard"
-import { data } from "./SummarizeHistoryMock";
+import { data } from "./summarizeHistoryMock";
 import SummarizeHistoryModal from "./SummarizeHistoryModal"
 import { SummaryTask } from "../types/TaskType";
 
