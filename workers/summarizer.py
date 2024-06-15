@@ -20,8 +20,7 @@ from core.chainables.web import (
 from core.tools.model_loader import load_llm
 from langchain_core.output_parsers import StrOutputParser
 
-from tinydb import Query
-from core.tools.utils import use_tinydb, sleep_noisy
+from core.tools.utils import sleep_noisy
 from colorama import Fore
 
 output_parser = StrOutputParser()
@@ -121,14 +120,14 @@ def start_summarizer():
     global previous_queued_tasks
 
     while True:
-        db = use_tinydb("completion_tasks")
-        db_query = Query()
-        queued_tasks = len(
-            db.search(db_query.completed == False and db_query.executing == False)
-        )
-        if queued_tasks != previous_queued_tasks:
-            print("Number of queued tasks: ", queued_tasks)
-            previous_queued_tasks = queued_tasks
+        # db = use_tinydb("completion_tasks")
+        # db_query = Query()
+        # queued_tasks = len(
+        #     db.search(db_query.completed == False and db_query.executing == False)
+        # )
+        # if queued_tasks != previous_queued_tasks:
+        #     print("Number of queued tasks: ", queued_tasks)
+        #     previous_queued_tasks = queued_tasks
 
         summarize()
         sleep_noisy(1)

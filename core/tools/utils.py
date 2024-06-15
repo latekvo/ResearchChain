@@ -6,8 +6,6 @@ import sys
 import time
 import uuid
 
-from tinydb import TinyDB
-
 from configurator import get_runtime_config
 from core.databases import defaults
 from core.tools.dbops import get_vec_db_by_name
@@ -67,17 +65,6 @@ def gen_uuid() -> str:
 
 def gen_unix_time() -> float:
     return datetime.datetime.utcnow().timestamp()
-
-
-def use_tinydb(db_name):
-    data_path = defaults.DATA_PATH
-    if not os.path.exists(data_path):
-        os.makedirs(data_path)
-
-    db_path = data_path + "/{}.json".format(db_name)
-    db = TinyDB(db_path)
-
-    return db
 
 
 def page_to_range(page: int, per_page: int) -> (int, int):
