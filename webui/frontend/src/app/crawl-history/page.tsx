@@ -5,7 +5,6 @@ import { useQuery } from "react-query";
 import HistoryCard from "../components/HistoryCard"
 import { data } from "./crawlHistoryMock";
 
-
 const CrawlHistory = () => {
   // const { data, isLoading, isError } = useQuery<CrawlHistoryItem[], Error>(
   //   "crawlHistory",
@@ -55,6 +54,7 @@ const CrawlHistory = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 p-4">
           {data.task.map((item) => (
             <HistoryCard key={item.uuid} item={item}></HistoryCard>
+
           ))}
         </div>
       </div>
