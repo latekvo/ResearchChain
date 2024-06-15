@@ -90,6 +90,7 @@ def rq_refill(seed_task, use_google: bool = True):
         if idx == 0 and not quit_unexpectedly:
             requested_crawl_tasks.remove(seed_task)
             db_crawl_tasks.db_set_crawl_completed(seed_task.uuid)
+            utils.send_update_to_api(seed_task.uuid, "crawl completed", "update_status")
             print("removed exhausted query:", seed_query.web_query)
 
     # 3. fill from db + google
@@ -156,8 +157,6 @@ def process_url(url_object):
     # 2. save all links
     for link in url_list:
         url_save(url=link, parent_uuid=url_uuid, task_uuid=url_task_uuid)
-    utils.send_update_to_api(url_task_uuid, "crawl completed", "update_status")
-
 
 
 def processing_iteration():

@@ -24,6 +24,8 @@ from pydantic import BaseModel
 import pika
 import threading
 import json
+import asyncio
+import functools
 
 
 class TaskCreator(BaseModel):
@@ -168,13 +170,24 @@ async def on_connection(websocket: WebSocket):
         print(active_connections)
 
 
-def callback(ch, method, properties, body):
-    print("getting data from: ", body)
-    uuid = body.uuid
-    status = body.status
+def sync(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(f(*args, **kwargs))
+    return wrapper
+
+
+@sync
+async def callback(ch, method, properties, body):
+    data = json.loads(body)
+    print("getting data from: ", data)
+    uuid = data['task_uuid']
+    status = data['status']
     for websocket, uuid_list in active_connections.items():
         if uuid in uuid_list:
-            websocket.send.send_text("current status: " + status)
+            await websocket.send_text("current status: " + status)
 
 
 def consumer():
@@ -183,8 +196,6 @@ def consumer():
 
     channel.exchange_declare(exchange='status', exchange_type='direct')
 
-    # channel.queue_declare(queue='crawler_update')
-    # channel.queue_declare(queue='embeder_update')
     channel.queue_declare(queue='update_status', durable=True)
 
     channel.queue_bind(
@@ -194,7 +205,8 @@ def consumer():
     )
 
     channel.basic_consume(queue='update_status',
-                          on_message_callback=callback)
+                          on_message_callback=callback,
+                          auto_ack=True)
 
     channel.start_consuming()
 

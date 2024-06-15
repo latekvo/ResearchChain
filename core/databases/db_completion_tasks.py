@@ -36,6 +36,7 @@ def db_add_completion_task(prompt, mode) -> str:
             prompt=prompt,
             mode=mode,
             timestamp=timestamp,
+            completion_result="",
             executing=False,
             execution_date=0,
             completed=False,
@@ -76,7 +77,7 @@ def db_set_completion_task_executing(uuid: str):
 
     session.execute(
         update(CompletionTask)
-        .where(CompletionTask.uuid.is_(uuid))
+        .where(CompletionTask.uuid == uuid)
         .values(executing=True, execution_date=gen_unix_time())
     )
 

@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase
 
-engine = create_engine("sqlite://")
+engine = create_engine("postgresql://postgres:pass@localhost:5432/postgres")
 
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
