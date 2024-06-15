@@ -63,8 +63,8 @@ def gen_uuid() -> str:
     return uuid.uuid4().hex
 
 
-def gen_unix_time() -> float:
-    return datetime.datetime.utcnow().timestamp()
+def gen_unix_time() -> int:
+    return int(datetime.datetime.utcnow().timestamp() * 1000)
 
 
 def page_to_range(page: int, per_page: int) -> (int, int):
