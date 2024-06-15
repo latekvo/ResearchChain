@@ -114,14 +114,11 @@ def sleep_forever():
 
 
 def send_update_to_api(task_uuid: str, status: str, routing_key: str):
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
     channel = connection.channel()
-    channel.exchange_declare(exchange='status', exchange_type='direct')
-    message = json.dumps({'task_uuid': task_uuid, 'status': status})
-    channel.basic_publish(exchange='',
-                          routing_key=routing_key,
-                          body=message)
+    channel.exchange_declare(exchange="status", exchange_type="direct")
+    message = json.dumps({"task_uuid": task_uuid, "status": status})
+    channel.basic_publish(exchange="", routing_key=routing_key, body=message)
     print("status sent")
 
 

@@ -35,7 +35,10 @@ def get_vec_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
     except Exception:
         # linux & mac
         db_connection = FAISS.load_local(
-            folder_path=folder_path, embeddings=embeddings, index_name=db_name, allow_dangerous_deserialization=True
+            folder_path=folder_path,
+            embeddings=embeddings,
+            index_name=db_name,
+            allow_dangerous_deserialization=True,
         )
 
     return db_connection

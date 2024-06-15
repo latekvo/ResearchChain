@@ -153,8 +153,6 @@ def set_url_rubbish(url_id: str):
     db_set_url_rubbish(url_id)
 
 
-
-
 active_connections = {}
 
 
@@ -176,6 +174,7 @@ def sync(f):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         return loop.run_until_complete(f(*args, **kwargs))
+
     return wrapper
 
 
@@ -183,30 +182,28 @@ def sync(f):
 async def callback(ch, method, properties, body):
     data = json.loads(body)
     print("getting data from: ", data)
-    uuid = data['task_uuid']
-    status = data['status']
+    uuid = data["task_uuid"]
+    status = data["status"]
     for websocket, uuid_list in active_connections.items():
         if uuid in uuid_list:
             await websocket.send_text("current status: " + status)
 
 
 def consumer():
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
 
-    channel.exchange_declare(exchange='status', exchange_type='direct')
+    channel.exchange_declare(exchange="status", exchange_type="direct")
 
-    channel.queue_declare(queue='update_status', durable=True)
+    channel.queue_declare(queue="update_status", durable=True)
 
     channel.queue_bind(
-        exchange='status',
-        queue='update_status',
-        routing_key='update_status'
+        exchange="status", queue="update_status", routing_key="update_status"
     )
 
-    channel.basic_consume(queue='update_status',
-                          on_message_callback=callback,
-                          auto_ack=True)
+    channel.basic_consume(
+        queue="update_status", on_message_callback=callback, auto_ack=True
+    )
 
     channel.start_consuming()
 
