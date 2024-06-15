@@ -2,12 +2,25 @@
 
 #### Langchain project aiming at achieving perpetual research with the help of a chain of ai researching agents.
 
+### Dockerized running 
+This method deploys all 4 workers including webui backend web server at the same time using docker compose.<br>
+> sudo docker-compose -f docker/docker-compose.yml up
+
+### Bare metal running
+
 - Install and launch Ollama: `ollama serve`
 - Create new environment: `conda env create -n ResearchChain -f environment.yml`
 - Activate the new environment: `conda activate ResearchChain`
 - Pull the model you intend to use: `ollama pull zephyr:7b-beta-q5_K_M` (default)
 - Pull an embedding model: `ollama pull nomic-embed-text` (default)
 - Run: `python3 main.py`
+
+### Running webui frontend
+
+Frontend is launched separately to back end, run the following command to start it.
+- install dependencies: `npm install`
+- start react project: `npm run dev`
+- open `http://localhost:3000/` in your browser
 
 #### Other notes
 

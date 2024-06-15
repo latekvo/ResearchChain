@@ -1,0 +1,23 @@
+services:
+  crawler:
+    build:
+     context: ../.
+     dockerfile: ./docker/crawler/Dockerfile
+    image: crawler
+  embedder:
+    build:
+      context: ../.
+      dockerfile: ./docker/embedder/Dockerfile
+    image: embedder
+  summarizer:
+    build:
+      context: ../.
+      dockerfile: ./docker/summarizer/Dockerfile
+    image: summarizer
+  webui:
+    build:
+      context: ../.
+      dockerfile: ./docker/webui/Dockerfile
+    image: webui
+    ports:
+      - 8000:8000
