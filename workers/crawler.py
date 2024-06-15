@@ -185,7 +185,8 @@ def start_crawler():
     while True:
         queue_length = len(url_rapid_queue)
         if queue_length > previous_tasks_queued:
-            print(f"{Fore.CYAN}{Style.BRIGHT}RECEIVED NEW TASKS")
+            print(f"{Fore.CYAN}{Style.BRIGHT}--- CRAWLER ---")
+            print(f"RECEIVED NEW TASKS")
             print(f"currently executing:", url_rapid_queue[0])
 
         if queue_length != previous_tasks_queued:
@@ -194,4 +195,4 @@ def start_crawler():
 
         processing_iteration()
 
-        sleep_noisy(1)
+        sleep_noisy(4)

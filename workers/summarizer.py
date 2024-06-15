@@ -21,7 +21,7 @@ from core.tools.model_loader import load_llm
 from langchain_core.output_parsers import StrOutputParser
 
 from core.tools.utils import sleep_noisy
-from colorama import Fore
+from colorama import Fore, Style
 
 output_parser = StrOutputParser()
 
@@ -106,7 +106,7 @@ def summarize():
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
 
 
-previous_queued_tasks = None
+previous_queued_tasks = 0
 
 # 1. get a list of available tasks, in the backend they'll be automatically set as executing
 # 2. parse through all of them, until one that has all it's dependencies resolved appears
@@ -120,14 +120,15 @@ def start_summarizer():
     global previous_queued_tasks
 
     while True:
-        # db = use_tinydb("completion_tasks")
-        # db_query = Query()
-        # queued_tasks = len(
-        #     db.search(db_query.completed == False and db_query.executing == False)
-        # )
-        # if queued_tasks != previous_queued_tasks:
-        #     print("Number of queued tasks: ", queued_tasks)
-        #     previous_queued_tasks = queued_tasks
+        queue_length = len(task_queue)
+        if queue_length > previous_queued_tasks:
+            print(f"{Fore.CYAN}{Style.BRIGHT}--- SUMMARIZER ---")
+            print(f"RECEIVED NEW TASKS")
+            print(f"currently executing:", task_queue[0])
+
+        if queue_length != previous_queued_tasks:
+            print(f"{Fore.CYAN}tasks left:", queue_length, f"{Style.RESET_ALL}")
+            previous_tasks_queued = queue_length
 
         summarize()
-        sleep_noisy(1)
+        sleep_noisy(5)
