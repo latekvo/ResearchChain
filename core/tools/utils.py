@@ -1,4 +1,5 @@
 import datetime
+import math
 import os
 import random
 import re
@@ -64,7 +65,7 @@ def gen_uuid() -> str:
 
 
 def gen_unix_time() -> int:
-    return int(datetime.datetime.utcnow().timestamp() * 1000)
+    return math.floor(datetime.datetime.utcnow().timestamp())
 
 
 def page_to_range(page: int, per_page: int) -> (int, int):
@@ -99,7 +100,7 @@ def sleep_forever():
 
 
 # deviation [0.0 -> 1.0]
-def sleep_noisy(duration: int, deviation=0.05):
+def sleep_noisy(duration: int, deviation=0.10):
     rng = random.Random()
     from_duration = duration - duration * deviation
     to_duration = duration + duration * deviation
