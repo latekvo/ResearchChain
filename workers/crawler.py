@@ -123,8 +123,8 @@ def url_download_text(url: str):
 
 
 def url_download(url_object):
-    url_uuid = url_object["uuid"]
-    url_addr = url_object["url"]
+    url_uuid = url_object.uuid
+    url_addr = url_object.url
     document = url_download_text(url_addr)
     if document is None:
         db_url_pool.db_set_url_rubbish(url_uuid)
@@ -137,8 +137,8 @@ def url_download(url_object):
 
 
 def process_url(url_object):
-    url_uuid = url_object["uuid"]
-    url_task_uuid = url_object["task_uuid"]
+    url_uuid = url_object.uuid
+    url_task_uuid = url_object.task_uuid
 
     # 0. download article
     document_text = url_download(url_object)

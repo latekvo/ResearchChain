@@ -34,7 +34,7 @@ task_queue_limit = 10
 
 
 def extract_uuid(task):
-    return task["uuid"]
+    return task.uuid
 
 
 def summarize():
@@ -53,7 +53,7 @@ def summarize():
     # find the first task ready for execution, dismiss the others
     for task in task_queue:
         # check all dependencies for completeness
-        dep_list = task["required_crawl_tasks"]
+        dep_list = task.required_crawl_tasks
 
         if db_are_crawl_tasks_fully_embedded(dep_list, current_vec_db_model):
             current_task = task
@@ -65,7 +65,7 @@ def summarize():
         return
 
     task_query = WebQuery(
-        prompt_core=current_task["prompt"], query_type=current_task["mode"].lower()
+        prompt_core=current_task.prompt, query_type=current_task.mode.lower()
     )
 
     context = db_search_for_similar_queries(task_query)
@@ -74,22 +74,22 @@ def summarize():
         return
 
     def interpret_prompt_mode():
-        if current_task["mode"] == "News":
+        if current_task.mode == "News":
             return web_news_lookup_prompt()
-        elif current_task["mode"] == "Docs":
+        elif current_task.mode == "Docs":
             return web_docs_lookup_prompt()
-        elif current_task["mode"] == "Wiki":
+        elif current_task.mode == "Wiki":
             return web_wiki_lookup_prompt()
 
     def get_user_prompt(_: dict):
-        return current_task["prompt"]
+        return current_task.prompt
 
     def get_context(_: dict):
         return context[0].page_content
 
     web_interpret_prompt_mode = interpret_prompt_mode()
 
-    print("Summarizing task with uuid: ", current_task["uuid"])
+    print("Summarizing task with uuid: ", current_task.uuid)
     chain = (
         {
             "search_data": RunnableLambda(get_context),
@@ -101,9 +101,9 @@ def summarize():
         | output_parser
     )
     summary = chain.invoke(current_task)
-    db_update_completion_task_after_summarizing(summary, current_task["uuid"])
+    db_update_completion_task_after_summarizing(summary, current_task.uuid)
 
-    print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task["uuid"])
+    print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
 
 
 previous_queued_tasks = None
