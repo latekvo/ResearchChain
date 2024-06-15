@@ -69,42 +69,40 @@ def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = 
 
 
 def db_get_not_downloaded() -> list:
-    session = Session(engine)
+    with Session(engine) as session:
+        query = (
+            select(UrlObject)
+            .where(UrlObject.is_downloaded.is_(False))
+            .where(UrlObject.is_rubbish.is_(False))
+        )
 
-    query = (
-        select(UrlObject)
-        .where(UrlObject.is_downloaded.is_(False))
-        .where(UrlObject.is_rubbish.is_(False))
-    )
+        results = list(session.scalars(query).all())
 
-    results = list(session.scalars(query).all())
-
-    return results
+        return results
 
 
 def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
-    session = Session(engine)
+    with Session(engine) as session:
+        exclusion_query = (
+            select(UrlObject)
+            .where(UrlEmbedding.document_uuid.is_(UrlObject.uuid))
+            .where(UrlEmbedding.embedder_name.is_(model))
+            .limit(amount)
+        )
 
-    exclusion_query = (
-        select(UrlObject)
-        .where(UrlEmbedding.document_uuid.is_(UrlObject.uuid))
-        .where(UrlEmbedding.embedder_name.is_(model))
-        .limit(amount)
-    )
+        query = (
+            select(UrlObject)
+            .where(UrlObject.is_downloaded.is_(True))
+            .where(UrlObject.is_rubbish.is_(False))
+        )
 
-    query = (
-        select(UrlObject)
-        .where(UrlObject.is_downloaded.is_(True))
-        .where(UrlObject.is_rubbish.is_(False))
-    )
+        # todo: this particular function requires rigorous testing,
+        #       as this is not a well documented use case
+        query.except_(exclusion_query)
 
-    # todo: this particular function requires rigorous testing,
-    #       as this is not a well documented use case
-    query.except_(exclusion_query)
+        results = list(session.scalars(query).all())
 
-    results = list(session.scalars(query).all())
-
-    return results
+        return results
 
 
 def db_set_url_embedded(url_id: str, embedding_model: str):
@@ -126,34 +124,31 @@ def db_set_url_embedded(url_id: str, embedding_model: str):
 
 
 def db_set_url_downloaded(url_id: str, text: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.execute(
+            update(UrlObject)
+            .where(UrlObject.uuid.is_(url_id))
+            .values(is_downloaded=True, text=text)
+        )
 
-    session.execute(
-        update(UrlObject)
-        .where(UrlObject.uuid.is_(url_id))
-        .values(is_downloaded=True, text=text)
-    )
-
-    session.commit()
+        session.commit()
 
 
 def db_set_url_rubbish(url_id: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.execute(
+            update(UrlObject).where(UrlObject.uuid.is_(url_id)).values(is_rubbish=True)
+        )
 
-    session.execute(
-        update(UrlObject).where(UrlObject.uuid.is_(url_id)).values(is_rubbish=True)
-    )
-
-    session.commit()
+        session.commit()
 
 
 def db_is_url_present(url: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        query = select(UrlObject).where(UrlObject.url.is_(url))
+        result = session.scalar(query)
 
-    query = select(UrlObject).where(UrlObject.url.is_(url))
-    result = session.scalar(query)
+        if result is None:
+            return False
 
-    if result is None:
-        return False
-
-    return True
+        return True
