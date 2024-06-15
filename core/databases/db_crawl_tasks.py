@@ -98,7 +98,7 @@ def db_set_crawl_completed(uuid: str):
 # fixme: this function should return a list of all tasks for management purposes (see below)
 def db_get_crawl_task():
     with Session(engine) as session:
-        query = select(CrawlTask).where(CrawlTask.completed.is_(False))
+        query = select(CrawlTask).where(CrawlTask.completed.is_(False)).limit(1)
         crawl_task = session.scalars(query).one_or_none()
 
         if crawl_task is not None:
@@ -114,6 +114,7 @@ def db_get_incomplete_crawl_task():
             select(CrawlTask)
             .where(CrawlTask.completed.is_(False))
             .where(CrawlTask.executing.is_(False))
+            .limit(1)
         )
 
         crawl_task = session.scalars(query).one_or_none()
@@ -127,7 +128,7 @@ def db_get_incomplete_crawl_task():
 def db_is_task_completed(uuid: str):
     with Session(engine) as session:
         query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
-        crawl_task = session.scalars(query).one_or_none()
+        crawl_task = session.scalars(query).one()
 
         return crawl_task.completed
 
