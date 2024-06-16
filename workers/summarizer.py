@@ -75,11 +75,11 @@ def summarize():
         return
 
     def interpret_prompt_mode():
-        if current_task.mode == "News":
+        if current_task.mode == "news":
             return web_news_lookup_prompt()
-        elif current_task.mode == "Docs":
+        elif current_task.mode == "docs":
             return web_docs_lookup_prompt()
-        elif current_task.mode == "Wiki":
+        elif current_task.mode == "wiki":
             return web_wiki_lookup_prompt()
 
     def get_user_prompt(_: dict):
