@@ -59,6 +59,8 @@ def db_get_completion_tasks_by_page(
         start, stop = page_to_range(page, per_page)
         query = select(CompletionTask).slice(start, stop)
         results = list(session.scalars(query))
+        session.expunge_all()
+
         return results
 
 
@@ -68,6 +70,7 @@ def db_get_completion_task_by_uuid(uuid: int) -> CompletionTask:
 
         query = select(CompletionTask).where(CompletionTask.uuid == uuid)
         result = session.scalars(query).one()
+        session.expunge_all()
         return result
 
 
@@ -98,6 +101,8 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
 
         for task in results:
             db_set_completion_task_executing(task.uuid)
+
+        session.expunge_all()
 
         return results
 

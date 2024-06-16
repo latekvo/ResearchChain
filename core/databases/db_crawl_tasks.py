@@ -149,8 +149,9 @@ def db_is_task_completed(uuid: str):
     with Session(engine) as session:
         query = select(CrawlTask).where(CrawlTask.uuid == uuid)
         crawl_task = session.scalars(query).one()
+        crawl_state = crawl_task.completed
 
-        return crawl_task.completed
+        return crawl_state
 
 
 def db_are_tasks_completed(uuid_list: list[str]):
