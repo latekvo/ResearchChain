@@ -1,10 +1,12 @@
 # embedding worker
 # url_db -> THIS -> THIS.vector_db
+from colorama import Fore, Style
 from tinydb.table import Document
 
 from configurator import get_runtime_config
 from core.databases import db_url_pool, db_embeddings, db_crawl_tasks
 from core.tools import utils
+from core.tools.utils import sleep_noisy
 
 rapid_queue_limit = 40
 rapid_queue: list[Document] = []
@@ -37,11 +39,22 @@ def processing_iteration():
         )
 
 
-previous_not_embedded = None
+previous_tasks_queued = 0
 
 
 def start_embedder():
-    global previous_not_embedded
+    global previous_tasks_queued
     while True:
-        # todo: improve verbosity
+        queue_length = len(rapid_queue)
+        if queue_length > previous_tasks_queued:
+            print(f"{Fore.CYAN}{Style.BRIGHT}--- EMBEDDER ---")
+            print(f"RECEIVED NEW TASKS")
+            print(f"currently executing:", rapid_queue[0])
+
+        if queue_length != previous_tasks_queued:
+            print(f"{Fore.CYAN}tasks left:", queue_length)
+            previous_tasks_queued = queue_length
+
         processing_iteration()
+
+        sleep_noisy(6)

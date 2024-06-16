@@ -63,33 +63,30 @@ function PromptInput() {
       } as UseMutationOptions<MutationResult, unknown, FormValues>
     );
 
-  const addSummarize: UseMutationResult<
-    MutationResult,
-    unknown,
-    FormValues
-  > = useMutation(
-    async (data: FormValues) => {
-      const isValid = FormData.safeParse(data);
+  const addSummarize: UseMutationResult<MutationResult, unknown, FormValues> =
+    useMutation(
+      async (data: FormValues) => {
+        const isValid = FormData.safeParse(data);
         if (!isValid.success) {
           throw new Error(isValid.error.message);
         }
-      const response = await fetch("http://127.0.0.1:8000/task", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+        const response = await fetch("http://127.0.0.1:8000/completion", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      return result;
-    },
-    {
-      onSuccess: (result) => {},
-      onError: (error) => {},
-    } as UseMutationOptions<MutationResult, unknown, FormValues>
-  );
+        return result;
+      },
+      {
+        onSuccess: (result) => {},
+        onError: (error) => {},
+      } as UseMutationOptions<MutationResult, unknown, FormValues>
+    );
 
   const onModeChange = (key: Key) => {
     setFormValues((prevValues) => ({
@@ -130,17 +127,17 @@ function PromptInput() {
           onChange={onPromptChange}
           className="text-gray-300 px-3 text-large whitespace-normal"
         />
-      <Tabs
-        size="md"
-        aria-label="Options"
-        color="primary"
-        variant="light"
-        onSelectionChange={onCrawlChange}
-        className="mt-4 mb-2 shadow-xl  rounded-xl  bg-black bg-opacity-15 z-10 flex flex-col justify-between"
-      >
-        <Tab key="crawl" title="Crawl" />
-        <Tab key="summarize" title="Summarize" />
-      </Tabs>
+        <Tabs
+          size="md"
+          aria-label="Options"
+          color="primary"
+          variant="light"
+          onSelectionChange={onCrawlChange}
+          className="mt-4 mb-2 shadow-xl  rounded-xl  bg-black bg-opacity-15 z-10 flex flex-col justify-between"
+        >
+          <Tab key="crawl" title="Crawl" />
+          <Tab key="summarize" title="Summarize" />
+        </Tabs>
         <div className="w-full mt-4 flex justify-between">
           <Tabs
             size="lg"

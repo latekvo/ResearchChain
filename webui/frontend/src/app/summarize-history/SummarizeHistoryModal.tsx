@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Modal, ModalContent, ModalHeader, Button } from "@nextui-org/react";
 import type { SummaryTask } from "../types/TaskType"; // Import SummaryTask
 import { PiQueueDuotone } from "react-icons/pi";

@@ -2,12 +2,31 @@
 
 #### Langchain project aiming at achieving perpetual research with the help of a chain of ai researching agents.
 
-- Install and launch Ollama: `ollama serve`
-- Create new environment: `conda env create -n ResearchChain -f environment.yml`
-- Activate the new environment: `conda activate ResearchChain`
-- Pull the model you intend to use: `ollama pull zephyr:7b-beta-q5_K_M` (default)
-- Pull an embedding model: `ollama pull nomic-embed-text` (default)
-- Run: `python3 main.py`
+### Running ResearchChain
+Deploy every single worker, database and utility simultaneously
+> sudo docker-compose -f docker/docker-compose.yml up
+
+Please note, that webui frontend has to be launched separately. `see below`
+
+### Running webui front-end `user interaction`
+
+Frontend is launched separately to back end, run the following command to start it.
+- go to frontend directory: `cd webui/frontend/`
+- install dependencies: `npm install`
+- start react project: `npm run dev`
+- open `http://localhost:3000/` in your browser
+
+### Accessing postgres database
+- postgres can be accessed via `pgAdmin`, which is already included in the docker compose,
+  so there is no need for any additional packages
+- go to `localhost:8081/browser/`
+- click `add new server`
+- in `name`, write `postgres`
+- go to `connection` tab
+- in `hostname/address` write `postgres`
+- in `username` write `admin` and in `password` write `pass`
+- click `save`, the database should be immediately available
+- there, you'll see connection statistics as well as the entire schema
 
 #### Other notes
 
@@ -35,8 +54,11 @@
 > to supply constant 24/7 knowledge and news analysis,
 > and to expand its knowledge base by scheduling crawls based on the provided areas of interest.
 
-### Flow of operations with WebUI app.
+### Flow of operations with WebUI app
 ![Flow chart explaining flow of research chain when WebUI is used as the scheduling app.](./assets/rc_flow.png "Research chain flow chart.")
+
+### Database schema
+![Database schema](./assets/db_schema.png "Database schema.")
 
 ---
 ### Contributing

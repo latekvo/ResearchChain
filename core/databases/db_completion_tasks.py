@@ -39,7 +39,7 @@ def db_add_completion_task(prompt, mode) -> str:
             executing=False,
             execution_date=0,
             completed=False,
-            completion_result="",  # providing default value
+            completion_result="N/A",
             completion_date=0,
             required_crawl_tasks=[],
         )
@@ -53,75 +53,76 @@ def db_add_completion_task(prompt, mode) -> str:
 def db_get_completion_tasks_by_page(
     page: int, per_page: int = defaults.ITEMS_PER_PAGE
 ) -> list[CompletionTask]:
-    session = Session(engine)
+    with Session(engine) as session:
+        session.expire_on_commit = False
 
-    start, stop = page_to_range(page, per_page)
-
-    query = select(CompletionTask).slice(start, stop)
-
-    results = list(session.scalars(query))
-    return results
+        start, stop = page_to_range(page, per_page)
+        query = select(CompletionTask).slice(start, stop)
+        results = list(session.scalars(query))
+        return results
 
 
 def db_get_completion_task_by_uuid(uuid: int) -> CompletionTask:
-    session = Session(engine)
+    with Session(engine) as session:
+        session.expire_on_commit = False
 
-    query = select(CompletionTask).where(CompletionTask.uuid.is_(uuid))
-
-    result = session.scalars(query).one()
-    return result
+        query = select(CompletionTask).where(CompletionTask.uuid == uuid)
+        result = session.scalars(query).one()
+        return result
 
 
 def db_set_completion_task_executing(uuid: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.execute(
+            update(CompletionTask)
+            .where(CompletionTask.uuid == uuid)
+            .values(executing=True, execution_date=gen_unix_time())
+        )
 
-    session.execute(
-        update(CompletionTask)
-        .where(
-            CompletionTask.uuid == uuid
-        )  # new  operator could be replaced with (__eq__) method s
-        .values(executing=True, execution_date=gen_unix_time())
-    )
-
-    session.commit()
+        session.commit()
 
 
 def db_get_incomplete_completion_tasks(amount: int = 1):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.expire_on_commit = False
 
-    query = (
-        select(CompletionTask).where(CompletionTask.completed.is_(False)).limit(amount)
-    )
+        query = (
+            select(CompletionTask)
+            # point of notice! is_ may need to be replaced with ==
+            .where(CompletionTask.completed.is_(False))
+            .where(CompletionTask.executing.is_(False))
+            .limit(amount)
+        )
 
-    results = list(session.scalars(query).all())
+        results = list(session.scalars(query).all())
 
-    for task in results:
-        db_set_completion_task_executing(task.uuid)
+        for task in results:
+            db_set_completion_task_executing(task.uuid)
 
-    return results
+        return results
 
 
 def db_release_executing_tasks(uuid_list: list[str]):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.execute(
+            update(CompletionTask)
+            .where(CompletionTask.uuid.in_(uuid_list))
+            .values(executing=False, execution_date=0)
+        )
 
-    session.execute(
-        update(CompletionTask)
-        .where(CompletionTask.uuid.in_(uuid_list))
-        .values(executing=False, execution_date=0)
-    )
-
-    session.commit()
+        session.commit()
 
 
 def db_update_completion_task_after_summarizing(summary: str, uuid: str):
-    session = Session(engine)
-
-    session.execute(
-        update(CompletionTask)
-        .where(CompletionTask.uuid.is_(uuid))
-        .values(
-            completed=True, completion_result=summary, completion_date=gen_unix_time()
+    with Session(engine) as session:
+        session.execute(
+            update(CompletionTask)
+            .where(CompletionTask.uuid == uuid)
+            .values(
+                completed=True,
+                completion_result=summary,
+                completion_date=gen_unix_time(),
+            )
         )
-    )
 
-    session.commit()
+        session.commit()

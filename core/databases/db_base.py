@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase
 
 engine = create_engine(
-    "postgresql://postgres:zaq12wsx@localhost:5432/postgres"
-)  # this string needs to be replaced
+    "postgresql://postgres:pass@postgres:5432/postgres", pool_size=20, max_overflow=0
+)
 
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.CRITICAL)
