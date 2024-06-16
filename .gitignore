@@ -6,3 +6,4 @@
 store/*
 __pycache__
 webui/frontend/package-lock.json
+**/.DS-Store

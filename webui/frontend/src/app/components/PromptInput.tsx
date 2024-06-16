@@ -117,7 +117,7 @@ function PromptInput() {
 
   return (
     <form className="w-3/5 flex-col" onSubmit={handleSubmit}>
-      <div className="w-full p-6 shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between">
+      <div className="w-full p-6 py-8 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between">
         <Textarea
           type="text"
           name="prompt"

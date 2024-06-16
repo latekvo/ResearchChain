@@ -12,7 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
 from core.databases.db_base import Base, engine
 from core.tools import utils
-from core.tools.utils import gen_unix_time
+from core.tools.utils import gen_unix_time,
 
 
 class EmbeddingProgression(Base):
@@ -43,7 +43,6 @@ class CrawlTask(Base):
 
     embedding_progression: Mapped[list["EmbeddingProgression"]] = relationship()
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
-
     required_by_uuid: Mapped[Optional[str]] = mapped_column(
         ForeignKey("completion_tasks.uuid"), nullable=True
     )
@@ -65,6 +64,8 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
             completed=False,
             completion_date=0,
             base_amount_scheduled=100,
+            required_by_uuid=None,
+            embedding_progression=[],
         )
 
         session.add(crawl_task)
