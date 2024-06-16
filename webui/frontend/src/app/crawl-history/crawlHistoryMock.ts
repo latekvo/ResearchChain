@@ -44,7 +44,8 @@ export const data: { task: CrawlTask[] } = {
     },
     {
       uuid: "5",
-      prompt: "This is a very detailed prompt meant for extensive testing of the system's capabilities and performance under stress",
+      prompt:
+        "This is a very detailed prompt meant for extensive testing of the system's capabilities and performance under stress",
       mode: "Wiki",
       timestamp: 1717499916.700594,
       executing: true,
@@ -104,4 +105,3 @@ export const data: { task: CrawlTask[] } = {
     },
   ],
 };
-

@@ -11,7 +11,8 @@ export const data: { task: SummaryTask[] } = {
       execution_date: 1718304716.700594,
       completed: false,
       completion_date: 1718354716.700594,
-      completion_result: "Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11",
+      completion_result:
+        "Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11Summary result for task 11",
     },
     {
       uuid: "1231239812391823",

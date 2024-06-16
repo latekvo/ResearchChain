@@ -3,7 +3,7 @@ import { PiQueueDuotone } from "react-icons/pi";
 import { MdDone } from "react-icons/md";
 import { GrInProgress } from "react-icons/gr";
 import { calculateElapsedTime } from "../hooks/calculateElapsedTime";
-import { CrawlTask } from "../types/TaskType";
+import type { CrawlTask } from "../types/TaskType";
 
 type TaskCardProps = {
   item: CrawlTask;
