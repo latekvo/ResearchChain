@@ -1,5 +1,5 @@
 from __future__ import annotations
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from core.databases.db_completion_tasks import (
     db_add_completion_task,
@@ -161,14 +161,21 @@ async def on_connection(websocket: WebSocket):
     await websocket.accept()
     active_connections[websocket] = []
     print(active_connections)
-    while True:
-        data = await websocket.receive_text()
-        data_dict = json.loads(data)
-        if isinstance(data_dict["message"], list):
-            active_connections[websocket].extend(data_dict["message"])
-        else:
-            active_connections[websocket].append(data_dict["message"])
-        print(active_connections)
+    try:
+        while True:
+            try:
+                data = await websocket.receive_text()
+                data_dict = json.loads(data)
+                if isinstance(data_dict["message"], list):
+                    active_connections[websocket].extend(data_dict["message"])
+                else:
+                    active_connections[websocket].append(data_dict["message"])
+                print(active_connections)
+            except WebSocketDisconnect:
+                break
+    finally:
+        if websocket in active_connections:
+            del active_connections[websocket]
 
 
 def sync(f):
@@ -189,7 +196,10 @@ async def callback(ch, method, properties, body):
     status = data["status"]
     for websocket, uuid_list in active_connections.items():
         if uuid in uuid_list:
-            await websocket.send_text("current status: " + status)
+            try:
+                await websocket.send_text("current status: " + status)
+            except WebSocketDisconnect:
+                del active_connections[websocket]
 
 
 def consumer():
