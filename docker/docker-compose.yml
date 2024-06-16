@@ -23,13 +23,6 @@ services:
     networks:
       - app-network
 
-  faiss:
-    image: daangn/faiss-server
-    ports:
-      - 5000:5000
-    networks:
-      - app-network
-
   ollama:
     image: ollama/ollama
     expose:
