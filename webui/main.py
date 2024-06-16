@@ -1,7 +1,7 @@
 from __future__ import annotations
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from core.databases.db_crawl_tasks import db_add_crawl_task
+from core.databases.db_crawl_tasks import db_add_crawl_task, db_get_crawl_tasks_by_page
 from core.databases.db_completion_tasks import (
     db_add_completion_task,
     db_get_completion_tasks_by_page,
@@ -32,6 +32,10 @@ def add_crawl_task(req_body: RequestBody):
         raise HTTPException(status_code=500, detail="Something went wrong")
     return {"uuid": new_uuid}
 
+@app.get("/crawl")
+def get_crawl_tasks(page: int = 0):
+    crawl_tasks = db_get_crawl_tasks_by_page(page)
+    return {"tasks": crawl_tasks}
 
 @app.post("/completion")
 def add_completion_task(req_body: RequestBody):
