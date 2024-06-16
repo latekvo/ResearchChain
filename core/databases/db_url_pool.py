@@ -84,6 +84,7 @@ def db_get_not_downloaded() -> list:
         )
 
         results = list(session.scalars(query).all())
+        session.expunge_all()
 
         return results
 
@@ -110,6 +111,7 @@ def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
         query.except_(exclusion_query)
 
         results = list(session.scalars(query).all())
+        session.expunge_all()
 
         return results
 

@@ -84,6 +84,8 @@ def db_get_crawl_tasks_by_page(
         start, stop = page_to_range(page, per_page)
         query = select(CrawlTask).slice(start, stop)
         results = list(session.scalars(query))
+        session.expunge_all()
+
         return results
 
 
@@ -93,6 +95,8 @@ def db_get_crawl_task_by_uuid(uuid: int) -> CrawlTask:
 
         query = select(CrawlTask).where(CrawlTask.uuid == uuid)
         result = session.scalars(query).one()
+        session.expunge_all()
+
         return result
 
 
@@ -134,6 +138,8 @@ def db_get_incomplete_crawl_task():
 
         if crawl_task is not None:
             db_set_crawl_executing(crawl_task.uuid)
+
+        session.expunge_all()
 
         return crawl_task
 
