@@ -10,9 +10,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
+from core.databases import defaults
 from core.databases.db_base import Base, engine
 from core.tools import utils
-from core.tools.utils import gen_unix_time
+from core.tools.utils import gen_unix_time, page_to_range
 
 
 class EmbeddingProgression(Base):
@@ -72,6 +73,26 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
         session.commit()
 
     return new_uuid
+
+def db_get_crawl_tasks_by_page(
+    page: int, per_page: int = defaults.ITEMS_PER_PAGE
+) -> list[CrawlTask]:
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        start, stop = page_to_range(page, per_page)
+        query = select(CrawlTask).slice(start, stop)
+        results = list(session.scalars(query))
+        return results
+
+
+def db_get_crawl_task_by_uuid(uuid: int) -> CrawlTask:
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
+        result = session.scalars(query).one()
+        return result
 
 
 def db_set_crawl_executing(uuid: str):
