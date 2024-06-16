@@ -59,6 +59,8 @@ def db_get_completion_tasks_by_page(
         start, stop = page_to_range(page, per_page)
         query = select(CompletionTask).slice(start, stop)
         results = list(session.scalars(query))
+        session.expunge_all()
+
         return results
 
 
@@ -68,6 +70,7 @@ def db_get_completion_task_by_uuid(uuid: int) -> CompletionTask:
 
         query = select(CompletionTask).where(CompletionTask.uuid == uuid)
         result = session.scalars(query).one()
+        session.expunge_all()
         return result
 
 
@@ -99,6 +102,8 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
         for task in results:
             db_set_completion_task_executing(task.uuid)
 
+        session.expunge_all()
+
         return results
 
 
@@ -111,6 +116,25 @@ def db_release_executing_tasks(uuid_list: list[str]):
         )
 
         session.commit()
+
+
+def db_required_crawl_tasks_for_uuid(uuid: str):
+    # TODO!!!
+    # currently summarizer pings the db with this command
+    # instead we want it to ping the db for already crawl-ready summary tasks,
+    # while not holding onto any non-ready tasks
+    # More details: PR #47
+
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        query = select(CrawlTask).where(CrawlTask.required_by_uuid == uuid)
+
+        results = list(session.scalars(query).all())
+
+        session.expunge_all()
+
+        return results
 
 
 def db_update_completion_task_after_summarizing(summary: str, uuid: str):

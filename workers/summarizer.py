@@ -9,6 +9,7 @@ from core.databases.db_completion_tasks import (
     db_get_incomplete_completion_tasks,
     db_update_completion_task_after_summarizing,
     db_release_executing_tasks,
+    db_required_crawl_tasks_for_uuid,
 )
 from langchain_core.runnables import RunnableLambda
 from core.classes.query import WebQuery
@@ -53,7 +54,7 @@ def summarize():
     # find the first task ready for execution, dismiss the others
     for task in task_queue:
         # check all dependencies for completeness
-        dep_list = task.required_crawl_tasks
+        dep_list = db_required_crawl_tasks_for_uuid(task.uuid)
 
         if db_are_crawl_tasks_fully_embedded(dep_list, current_vec_db_model):
             current_task = task
@@ -74,11 +75,11 @@ def summarize():
         return
 
     def interpret_prompt_mode():
-        if current_task.mode == "News":
+        if current_task.mode == "news":
             return web_news_lookup_prompt()
-        elif current_task.mode == "Docs":
+        elif current_task.mode == "docs":
             return web_docs_lookup_prompt()
-        elif current_task.mode == "Wiki":
+        elif current_task.mode == "wiki":
             return web_wiki_lookup_prompt()
 
     def get_user_prompt(_: dict):

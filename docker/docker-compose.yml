@@ -23,13 +23,6 @@ services:
     networks:
       - app-network
 
-  faiss:
-    image: daangn/faiss-server
-    ports:
-      - 5000:5000
-    networks:
-      - app-network
-
   ollama:
     image: ollama/ollama
     expose:
@@ -70,7 +63,7 @@ services:
       - app-network
       - ollama-network
     volumes:
-      - shared-vector-store:/app/store/data
+      - shared-vector-store:/app/store/vector
 
   summarizer:
     image: summarizer
@@ -84,7 +77,7 @@ services:
       - app-network
       - ollama-network
     volumes:
-      - shared-vector-store:/app/store/data
+      - shared-vector-store:/app/store/vector
 
   webui:
     image: webui
