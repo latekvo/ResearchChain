@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from sqlalchemy import (
     String,
@@ -7,12 +7,14 @@ from sqlalchemy import (
     update,
     select,
     ForeignKey,
+    insert,
 )
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
+from core.databases import defaults
 from core.databases.db_base import Base, engine
 from core.tools import utils
-from core.tools.utils import gen_unix_time
+from core.tools.utils import gen_unix_time, page_to_range
 
 
 class EmbeddingProgression(Base):
@@ -43,8 +45,9 @@ class CrawlTask(Base):
 
     embedding_progression: Mapped[list["EmbeddingProgression"]] = relationship()
     base_amount_scheduled: Mapped[int] = mapped_column(Integer())
-
-    required_by_uuid: Mapped[str] = mapped_column(ForeignKey("completion_tasks.uuid"))
+    required_by_uuid: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("completion_tasks.uuid"), nullable=True
+    )
 
 
 def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki"):
@@ -63,7 +66,8 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
             completed=False,
             completion_date=0,
             base_amount_scheduled=100,
-            embedding_progression={},
+            required_by_uuid=None,
+            embedding_progression=[],
         )
 
         session.add(crawl_task)
@@ -72,68 +76,82 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
     return new_uuid
 
 
+def db_get_crawl_tasks_by_page(
+    page: int, per_page: int = defaults.ITEMS_PER_PAGE
+) -> list[CrawlTask]:
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        start, stop = page_to_range(page, per_page)
+        query = select(CrawlTask).slice(start, stop)
+        results = list(session.scalars(query))
+        session.expunge_all()
+
+        return results
+
+
+def db_get_crawl_task_by_uuid(uuid: int) -> CrawlTask:
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
+        result = session.scalars(query).one()
+        session.expunge_all()
+
+        return result
+
+
 def db_set_crawl_executing(uuid: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.execute(
+            update(CrawlTask)
+            .where(CrawlTask.uuid == uuid)
+            .values(executing=True, execution_date=gen_unix_time())
+        )
 
-    session.execute(
-        update(CrawlTask)
-        .where(CrawlTask.uuid.is_(uuid))
-        .values(executing=True, execution_date=gen_unix_time())
-    )
-
-    session.commit()
+        session.commit()
 
 
 def db_set_crawl_completed(uuid: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        session.execute(
+            update(CrawlTask)
+            .where(CrawlTask.uuid == uuid)
+            .values(completed=True, completion_date=gen_unix_time())
+        )
 
-    session.execute(
-        update(CrawlTask)
-        .where(CrawlTask.uuid.is_(uuid))
-        .values(completed=True, completion_date=gen_unix_time())
-    )
-
-    session.commit()
-
-
-# fixme: this function should return a list of all tasks for management purposes (see below)
-def db_get_crawl_task():
-    session = Session(engine)
-
-    query = select(CrawlTask).where(CrawlTask.completed.is_(False))
-    crawl_task = session.scalars(query).one_or_none()
-
-    if crawl_task is not None:
-        db_set_crawl_executing(crawl_task.uuid)
-
-    return crawl_task
+        session.commit()
 
 
 # fixme cont. and this function should only return n of inComp and nonExec tasks, for workers
 def db_get_incomplete_crawl_task():
-    session = Session(engine)
+    with Session(engine) as session:
+        session.expire_on_commit = False
 
-    query = (
-        select(CrawlTask)
-        .where(CrawlTask.completed.is_(False))
-        .where(CrawlTask.executing.is_(False))
-    )
+        query = (
+            select(CrawlTask)
+            .where(CrawlTask.completed.is_(False))
+            .where(CrawlTask.executing.is_(False))
+            .limit(1)
+        )
 
-    crawl_task = session.scalars(query).one_or_none()
+        crawl_task = session.scalars(query).one_or_none()
 
-    if crawl_task is not None:
-        db_set_crawl_executing(crawl_task.uuid)
+        if crawl_task is not None:
+            db_set_crawl_executing(crawl_task.uuid)
 
-    return crawl_task
+        session.expunge_all()
+
+        return crawl_task
 
 
 def db_is_task_completed(uuid: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
+        crawl_task = session.scalars(query).one()
+        crawl_state = crawl_task.completed
 
-    query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
-    crawl_task = session.scalars(query).one_or_none()
-
-    return crawl_task.completed
+        return crawl_state
 
 
 def db_are_tasks_completed(uuid_list: list[str]):
@@ -152,15 +170,14 @@ def db_are_tasks_completed(uuid_list: list[str]):
 
 
 def db_is_crawl_task_fully_embedded(uuid: str, model_name: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
+        crawl_task = session.scalars(query).one()
 
-    query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
-    crawl_task = session.scalars(query).one()
+        baseline_count = crawl_task.base_amount_scheduled
+        current_count = crawl_task.embedding_progression[model_name]
 
-    baseline_count = crawl_task.base_amount_scheduled
-    current_count = crawl_task.embedding_progression[model_name]
-
-    return current_count >= baseline_count
+        return current_count >= baseline_count
 
 
 def db_are_crawl_tasks_fully_embedded(uuid_list: str, model_name: str):
@@ -173,25 +190,38 @@ def db_are_crawl_tasks_fully_embedded(uuid_list: str, model_name: str):
 
 
 def db_increment_task_embedding_progression(uuid: str, model_name: str):
-    session = Session(engine)
+    with Session(engine) as session:
+        query = (
+            select(EmbeddingProgression)
+            .where(EmbeddingProgression.crawl_uuid == uuid)
+            .where(EmbeddingProgression.embedder_name == model_name)
+        )
 
-    query = select(CrawlTask).where(CrawlTask.uuid.is_(uuid))
-    crawl_task = session.scalars(query).one()
+        embedding_progression = session.scalars(query).one_or_none()
 
-    current_progression = crawl_task.embedding_progression
-    current_count = current_progression[model_name]
+        # no prior progression records found, add them
+        if embedding_progression is None:
+            session.execute(
+                insert(EmbeddingProgression).values(
+                    uuid=utils.gen_uuid(),
+                    crawl_uuid=uuid,
+                    embedder_name=model_name,
+                    embedding_amount=1,
+                    timestamp=utils.gen_unix_time(),
+                )
+            )
 
-    if current_count is not None:
-        current_count += 1
-    else:
-        current_count = 1
+            session.commit()
+            return
 
-    current_progression[model_name] = current_count
+        current_count = embedding_progression.embedding_amount
+        new_count = current_count + 1
 
-    session.execute(
-        update(CrawlTask)
-        .where(CrawlTask.uuid.is_(crawl_task.uuid))
-        .values(embedding_progression=current_progression)
-    )
+        session.execute(
+            update(EmbeddingProgression)
+            .where(EmbeddingProgression.crawl_uuid == uuid)
+            .where(EmbeddingProgression.embedder_name == model_name)
+            .values(embedding_amount=new_count)
+        )
 
-    session.commit()
+        session.commit()

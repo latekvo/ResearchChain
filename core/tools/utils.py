@@ -1,11 +1,11 @@
 import datetime
+import math
 import os
+import random
 import re
 import sys
 import time
 import uuid
-
-from tinydb import TinyDB
 
 from configurator import get_runtime_config
 from core.databases import defaults
@@ -67,19 +67,8 @@ def gen_uuid() -> str:
     return uuid.uuid4().hex
 
 
-def gen_unix_time() -> float:
-    return datetime.datetime.utcnow().timestamp()
-
-
-def use_tinydb(db_name):
-    data_path = defaults.DATA_PATH
-    if not os.path.exists(data_path):
-        os.makedirs(data_path)
-
-    db_path = data_path + "/{}.json".format(db_name)
-    db = TinyDB(db_path)
-
-    return db
+def gen_unix_time() -> int:
+    return math.floor(datetime.datetime.utcnow().timestamp())
 
 
 def page_to_range(page: int, per_page: int) -> (int, int):
@@ -120,6 +109,15 @@ def send_update_to_api(task_uuid: str, status: str, routing_key: str):
     message = json.dumps({"task_uuid": task_uuid, "status": status})
     channel.basic_publish(exchange="", routing_key=routing_key, body=message)
     print("status sent")
+
+
+# deviation [0.0 -> 1.0]
+def sleep_noisy(duration: int, deviation=0.10):
+    rng = random.Random()
+    from_duration = duration - duration * deviation
+    to_duration = duration + duration * deviation
+    random_coefficient = rng.uniform(from_duration, to_duration)
+    time.sleep(duration * random_coefficient)
 
 
 class hide_prints:

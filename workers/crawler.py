@@ -8,7 +8,7 @@ from core.databases import db_url_pool, db_crawl_tasks
 from core.tools import utils
 from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
-from core.tools.utils import hide_prints
+from core.tools.utils import hide_prints, sleep_noisy
 
 import pika
 import json
@@ -38,7 +38,7 @@ def rq_refill(seed_task, use_google: bool = True):
     seed_query = None
 
     if seed_task is not None:
-        seed_query = WebQuery(query_type=seed_task.type, prompt_core=seed_task.prompt)
+        seed_query = WebQuery(query_type=seed_task.mode, prompt_core=seed_task.prompt)
 
     # 0. check for space
     url_space_left = url_queue_limit - len(url_rapid_queue)
@@ -127,8 +127,8 @@ def url_download_text(url: str):
 
 
 def url_download(url_object):
-    url_uuid = url_object["uuid"]
-    url_addr = url_object["url"]
+    url_uuid = url_object.uuid
+    url_addr = url_object.url
     document = url_download_text(url_addr)
     if document is None:
         db_url_pool.db_set_url_rubbish(url_uuid)
@@ -141,8 +141,8 @@ def url_download(url_object):
 
 
 def process_url(url_object):
-    url_uuid = url_object["uuid"]
-    url_task_uuid = url_object["task_uuid"]
+    url_uuid = url_object.uuid
+    url_task_uuid = url_object.task_uuid
 
     # 0. download article
     document_text = url_download(url_object)
@@ -164,7 +164,7 @@ def processing_iteration():
 
     task_space_left = requested_tasks_limit - len(requested_crawl_tasks)
     if task_space_left > 0:
-        new_tasks = db_crawl_tasks.db_get_crawl_task()
+        new_tasks = db_crawl_tasks.db_get_incomplete_crawl_task()
         requested_crawl_tasks.append(new_tasks)
 
     seed_task = None
@@ -189,7 +189,8 @@ def start_crawler():
     while True:
         queue_length = len(url_rapid_queue)
         if queue_length > previous_tasks_queued:
-            print(f"{Fore.CYAN}{Style.BRIGHT}RECEIVED NEW TASKS")
+            print(f"{Fore.CYAN}{Style.BRIGHT}--- CRAWLER ---")
+            print(f"RECEIVED NEW TASKS")
             print(f"currently executing:", url_rapid_queue[0])
 
         if queue_length != previous_tasks_queued:
@@ -197,3 +198,5 @@ def start_crawler():
             previous_tasks_queued = queue_length
 
         processing_iteration()
+
+        sleep_noisy(4)

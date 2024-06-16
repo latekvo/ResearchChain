@@ -3,16 +3,17 @@ import { PiQueueDuotone } from "react-icons/pi";
 import { MdDone } from "react-icons/md";
 import { GrInProgress } from "react-icons/gr";
 import { calculateElapsedTime } from "../hooks/calculateElapsedTime";
-import type { Task } from "../types/TaskType";
+import type { CrawlTask } from "../types/TaskType";
 
 type TaskCardProps = {
-  item: Task;
+  item: CrawlTask;
+  onClick?: (item: any) => void;
 };
 
-const CrawlHistoryCard: React.FC<TaskCardProps> = ({ item }) => {
+const HistoryCard: React.FC<TaskCardProps> = ({ item }) => {
   let status: string = "status";
 
-  function getIconComponent(item: Task) {
+  function getIconComponent(item: CrawlTask) {
     if (item.executing) {
       status = "Executing";
       return <GrInProgress color="#006fee" className="text-3xl my-auto mr-6" />;
@@ -40,7 +41,7 @@ const CrawlHistoryCard: React.FC<TaskCardProps> = ({ item }) => {
     <Card
       isBlurred={false}
       key={item.uuid}
-      className="p-2 m-2 cursor-pointer w-full h-5/6 mx-auto shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-25"
+      className="p-2 m-2 w-full h-5/6 mx-auto shadow-xl rounded-xl border border-opacity-15 border-gray-400 bg-black bg-opacity-25"
     >
       <CardHeader className="p-1">
         <div className="flex justify-between items-center w-full">
@@ -58,10 +59,10 @@ const CrawlHistoryCard: React.FC<TaskCardProps> = ({ item }) => {
       </CardHeader>
       <Divider />
       <CardBody className="h-14 p-2">
-        <p className="text-sm">{item.prompt}</p>
+        <p className="text-sm text-default-600">{item.prompt}</p>
       </CardBody>
     </Card>
   );
 };
 
-export default CrawlHistoryCard;
+export default HistoryCard;
