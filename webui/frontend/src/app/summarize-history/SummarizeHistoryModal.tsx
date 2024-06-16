@@ -55,7 +55,7 @@ const ExampleModal: React.FC<ExampleModalProps> = ({
         backdrop: "top-0 left-0",
       }}
     >
-      <ModalContent>
+      <ModalContent className="overflow-auto">
         <ModalHeader className="border-b-1 border-indigo-800 ">
           <div className="grid grid-cols-3 gap-40 items-center w-full py-2">
             <div className="flex justify-center">
@@ -100,7 +100,7 @@ const ExampleModal: React.FC<ExampleModalProps> = ({
                 <p className="pt-3 text-xl text-primary">Prompt</p>
                 <p className="text-lg">{summaryTask?.prompt}</p>
               </div>
-              <div className="">
+              <div>
                 <p className="pt-3 text-xl text-primary">Completion result</p>
                 <p className="text-lg">{summaryTask?.completion_result}</p>
               </div>
