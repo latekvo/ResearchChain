@@ -74,6 +74,7 @@ def db_add_crawl_task(prompt: str, mode: Literal["news", "wiki", "docs"] = "wiki
 
     return new_uuid
 
+
 def db_get_crawl_tasks_by_page(
     page: int, per_page: int = defaults.ITEMS_PER_PAGE
 ) -> list[CrawlTask]:
