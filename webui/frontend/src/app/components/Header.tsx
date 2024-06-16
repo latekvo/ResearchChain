@@ -29,7 +29,7 @@ const Header = () => {
             href="/"
             className={pathName === "/" ? "text-blue-500 font-normal" : ""}
           >
-            Add task
+            New task
           </Link>
         </NavbarItem>
         <NavbarItem isActive={pathName === "/crawl-history" ? true : false}>
@@ -39,7 +39,7 @@ const Header = () => {
               pathName === "/crawl-history" ? "text-blue-500 font-normal" : ""
             }
           >
-            Crawl history
+            Crawls
           </Link>
         </NavbarItem>
         <NavbarItem isActive={pathName === "/summarize-history" ? true : false}>
@@ -51,7 +51,7 @@ const Header = () => {
                 : ""
             }
           >
-            Summarize history
+            Summaries
           </Link>
         </NavbarItem>
       </NavbarContent>
