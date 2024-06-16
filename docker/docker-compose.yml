@@ -23,6 +23,31 @@ services:
     networks:
       - app-network
 
+  faiss:
+    image: daangn/faiss-server
+    ports:
+      - 5000:5000
+    networks:
+      - app-network
+
+  ollama:
+    image: ollama/ollama
+    expose:
+      - 11434
+    ports:
+      - 11434:11434
+    pull_policy: always
+    tty: true
+    restart: always
+    entrypoint: [ "/usr/bin/bash", "./ollama/entrypoint.sh" ]
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama:/root/.ollama
+      - ./ollama/entrypoint.sh:/ollama/entrypoint.sh
+    networks:
+      - ollama-network
+
   crawler:
     image: crawler
     depends_on:
@@ -68,31 +93,6 @@ services:
       - 8000:8000
     networks:
       - app-network
-
-  faiss:
-    image: daangn/faiss-server
-    depends_on:
-      - postgres
-    networks:
-      - app-network
-
-  ollama:
-    image: ollama/ollama
-    expose:
-      - 11434
-    ports:
-      - 11434:11434
-    pull_policy: always
-    tty: true
-    restart: always
-    entrypoint: ["/usr/bin/bash", "./ollama/entrypoint.sh"]
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-    volumes:
-      - ollama:/root/.ollama
-      - ./ollama/entrypoint.sh:/ollama/entrypoint.sh
-    networks:
-      - ollama-network
 
 volumes:
   ollama:
