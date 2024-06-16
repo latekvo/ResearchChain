@@ -160,7 +160,7 @@ def processing_iteration():
 
     task_space_left = requested_tasks_limit - len(requested_crawl_tasks)
     if task_space_left > 0:
-        new_tasks = db_crawl_tasks.db_get_crawl_task()
+        new_tasks = db_crawl_tasks.db_get_incomplete_crawl_task()
         requested_crawl_tasks.append(new_tasks)
 
     seed_task = None
