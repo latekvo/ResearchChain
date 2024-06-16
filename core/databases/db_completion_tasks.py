@@ -39,7 +39,7 @@ def db_add_completion_task(prompt, mode) -> str:
             executing=False,
             execution_date=0,
             completed=False,
-            completion_result="", # providing default value
+            completion_result="",  # providing default value
             completion_date=0,
             required_crawl_tasks=[],
         )
@@ -77,7 +77,9 @@ def db_set_completion_task_executing(uuid: str):
 
     session.execute(
         update(CompletionTask)
-        .where(CompletionTask.uuid == uuid)  # new comparasion operator could be replaced with (__eq__) method s
+        .where(
+            CompletionTask.uuid == uuid
+        )  # new  operator could be replaced with (__eq__) method s
         .values(executing=True, execution_date=gen_unix_time())
     )
 
