@@ -1,4 +1,5 @@
-from sqlalchemy import String, Integer, Boolean, select, update
+from typing import Optional
+from sqlalchemy import String, TEXT, Integer, Boolean, select, update
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
 from core.databases import defaults
@@ -12,11 +13,10 @@ class CompletionTask(Base):
     __tablename__ = "completion_tasks"
 
     uuid: Mapped[str] = mapped_column(primary_key=True)
-    prompt: Mapped[str] = mapped_column(String())  # make sure postgres uses "TEXT" here
+    prompt: Mapped[str] = mapped_column(TEXT())  # make sure postgres uses "TEXT" here
     mode: Mapped[str] = mapped_column(String(12))
     timestamp: Mapped[int] = mapped_column(Integer())  # time added
-    completion_result: Mapped[str] = mapped_column(String())  # "TEXT" type here as well
-
+    completion_result: Mapped[str] = mapped_column(TEXT())  # "TEXT" type here as well
     executing: Mapped[bool] = mapped_column(Boolean())
     execution_date: Mapped[int] = mapped_column(Integer())  # time started completion
 
@@ -39,6 +39,7 @@ def db_add_completion_task(prompt, mode) -> str:
             executing=False,
             execution_date=0,
             completed=False,
+            completion_result="",  # providing default value
             completion_date=0,
             required_crawl_tasks=[],
         )
@@ -76,7 +77,9 @@ def db_set_completion_task_executing(uuid: str):
 
     session.execute(
         update(CompletionTask)
-        .where(CompletionTask.uuid.is_(uuid))
+        .where(
+            CompletionTask.uuid == uuid
+        )  # new  operator could be replaced with (__eq__) method s
         .values(executing=True, execution_date=gen_unix_time())
     )
 
