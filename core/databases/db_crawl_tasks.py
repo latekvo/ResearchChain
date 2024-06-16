@@ -12,7 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
 from core.databases.db_base import Base, engine
 from core.tools import utils
-from core.tools.utils import gen_unix_time,
+from core.tools.utils import gen_unix_time
 
 
 class EmbeddingProgression(Base):
@@ -99,6 +99,7 @@ def db_set_crawl_completed(uuid: str):
 # fixme: this function should return a list of all tasks for management purposes (see below)
 def db_get_crawl_task():
     with Session(engine) as session:
+        session.expire_on_commit = False
         query = select(CrawlTask).where(CrawlTask.completed.is_(False)).limit(1)
         crawl_task = session.scalars(query).one_or_none()
 
@@ -111,6 +112,8 @@ def db_get_crawl_task():
 # fixme cont. and this function should only return n of inComp and nonExec tasks, for workers
 def db_get_incomplete_crawl_task():
     with Session(engine) as session:
+        session.expire_on_commit = False
+
         query = (
             select(CrawlTask)
             .where(CrawlTask.completed.is_(False))

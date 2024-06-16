@@ -54,6 +54,8 @@ def db_get_completion_tasks_by_page(
     page: int, per_page: int = defaults.ITEMS_PER_PAGE
 ) -> list[CompletionTask]:
     with Session(engine) as session:
+        session.expire_on_commit = False
+
         start, stop = page_to_range(page, per_page)
         query = select(CompletionTask).slice(start, stop)
         results = list(session.scalars(query))
@@ -62,6 +64,8 @@ def db_get_completion_tasks_by_page(
 
 def db_get_completion_task_by_uuid(uuid: int) -> CompletionTask:
     with Session(engine) as session:
+        session.expire_on_commit = False
+
         query = select(CompletionTask).where(CompletionTask.uuid == uuid)
         result = session.scalars(query).one()
         return result
@@ -80,6 +84,8 @@ def db_set_completion_task_executing(uuid: str):
 
 def db_get_incomplete_completion_tasks(amount: int = 1):
     with Session(engine) as session:
+        session.expire_on_commit = False
+
         query = (
             select(CompletionTask)
             .where(CompletionTask.completed.is_(False))

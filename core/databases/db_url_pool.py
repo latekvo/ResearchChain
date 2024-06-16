@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import (
     String,
     Boolean,
@@ -5,6 +7,7 @@ from sqlalchemy import (
     select,
     update,
     ForeignKey,
+    TEXT,
 )
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
@@ -28,13 +31,15 @@ class UrlObject(Base):
 
     # base data
     uuid: Mapped[str] = mapped_column(primary_key=True)
-    url: Mapped[str] = mapped_column(String())
-    text: Mapped[str] = mapped_column(String(), nullable=True)
+    url: Mapped[str] = mapped_column(TEXT())
+    text: Mapped[str] = mapped_column(TEXT(), nullable=True)
 
     # tracking data
-    parent_uuid: Mapped[str] = mapped_column(String())
-    task_uuid: Mapped[str] = mapped_column(String())
-    prompt: Mapped[str] = mapped_column(String())
+    parent_uuid: Mapped[Optional["UrlObject"]] = mapped_column(
+        ForeignKey("url_pool.uuid"), nullable=True
+    )
+    task_uuid: Mapped[str] = mapped_column(String(), nullable=True)
+    prompt: Mapped[str] = mapped_column(TEXT())
 
     timestamp: Mapped[int] = mapped_column(Integer())  # time added UNIX SECONDS
 
@@ -70,6 +75,8 @@ def db_add_url(url: str, prompt: str, parent_uuid: str = None, task_uuid: str = 
 
 def db_get_not_downloaded() -> list:
     with Session(engine) as session:
+        session.expire_on_commit = False
+
         query = (
             select(UrlObject)
             .where(UrlObject.is_downloaded.is_(False))
@@ -83,6 +90,8 @@ def db_get_not_downloaded() -> list:
 
 def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
     with Session(engine) as session:
+        session.expire_on_commit = False
+
         exclusion_query = (
             select(UrlObject)
             .where(UrlEmbedding.document_uuid == UrlObject.uuid)
