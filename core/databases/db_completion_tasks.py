@@ -118,6 +118,25 @@ def db_release_executing_tasks(uuid_list: list[str]):
         session.commit()
 
 
+def db_required_crawl_tasks_for_uuid(uuid: str):
+    # TODO!!!
+    # currently summarizer pings the db with this command
+    # instead we want it to ping the db for already crawl-ready summary tasks,
+    # while not holding onto any non-ready tasks
+    # More details: PR #47
+
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        query = select(CrawlTask).where(CrawlTask.required_by_uuid == uuid)
+
+        results = list(session.scalars(query).all())
+
+        session.expunge_all()
+
+        return results
+
+
 def db_update_completion_task_after_summarizing(summary: str, uuid: str):
     with Session(engine) as session:
         session.execute(
