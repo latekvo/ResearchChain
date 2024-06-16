@@ -7,6 +7,7 @@ from sqlalchemy import (
     update,
     select,
     ForeignKey,
+    insert,
 )
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
@@ -84,6 +85,8 @@ def db_get_crawl_tasks_by_page(
         start, stop = page_to_range(page, per_page)
         query = select(CrawlTask).slice(start, stop)
         results = list(session.scalars(query))
+        session.expunge_all()
+
         return results
 
 
@@ -93,6 +96,8 @@ def db_get_crawl_task_by_uuid(uuid: int) -> CrawlTask:
 
         query = select(CrawlTask).where(CrawlTask.uuid == uuid)
         result = session.scalars(query).one()
+        session.expunge_all()
+
         return result
 
 
@@ -134,6 +139,8 @@ def db_get_incomplete_crawl_task():
 
         if crawl_task is not None:
             db_set_crawl_executing(crawl_task.uuid)
+
+        session.expunge_all()
 
         return crawl_task
 
@@ -183,23 +190,37 @@ def db_are_crawl_tasks_fully_embedded(uuid_list: str, model_name: str):
 
 def db_increment_task_embedding_progression(uuid: str, model_name: str):
     with Session(engine) as session:
-        query = select(CrawlTask).where(CrawlTask.uuid == uuid)
-        crawl_task = session.scalars(query).one()
+        query = (
+            select(EmbeddingProgression)
+            .where(EmbeddingProgression.crawl_uuid == uuid)
+            .where(EmbeddingProgression.embedder_name == model_name)
+        )
 
-        current_progression = crawl_task.embedding_progression
-        current_count = current_progression[model_name]
+        embedding_progression = session.scalars(query).one_or_none()
 
-        if current_count is not None:
-            current_count += 1
-        else:
-            current_count = 1
+        # no prior progression records found, add them
+        if embedding_progression is None:
+            session.execute(
+                insert(EmbeddingProgression).values(
+                    uuid=utils.gen_uuid(),
+                    crawl_uuid=uuid,
+                    embedder_name=model_name,
+                    embedding_amount=1,
+                    timestamp=utils.gen_unix_time(),
+                )
+            )
 
-        current_progression[model_name] = current_count
+            session.commit()
+            return
+
+        current_count = embedding_progression.embedding_amount
+        new_count = current_count + 1
 
         session.execute(
-            update(CrawlTask)
-            .where(CrawlTask.uuid == crawl_task.uuid)
-            .values(embedding_progression=current_progression)
+            update(EmbeddingProgression)
+            .where(EmbeddingProgression.crawl_uuid == uuid)
+            .where(EmbeddingProgression.embedder_name == model_name)
+            .values(embedding_amount=new_count)
         )
 
         session.commit()
