@@ -164,7 +164,10 @@ async def on_connection(websocket: WebSocket):
     while True:
         data = await websocket.receive_text()
         data_dict = json.loads(data)
-        active_connections[websocket].append(data_dict["message"])
+        if isinstance(data_dict["message"], list):
+            active_connections[websocket].extend(data_dict["message"])
+        else:
+            active_connections[websocket].append(data_dict["message"])
         print(active_connections)
 
 
