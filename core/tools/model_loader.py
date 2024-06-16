@@ -22,7 +22,7 @@ def load_ollama_llm() -> Ollama:
     if cached_llm:
         return cached_llm
     else:
-        llm = Ollama(model=llm_config.model_name)
+        llm = Ollama(model=llm_config.model_name, base_url="http://ollama:11434")
         runtime_configuration.llm_object = llm
         return llm
 
@@ -32,7 +32,9 @@ def load_ollama_embedder() -> OllamaEmbeddings:
     if cached_embedder:
         return cached_embedder
     else:
-        embedder = OllamaEmbeddings(model=embedder_config.model_name)
+        embedder = OllamaEmbeddings(
+            model=embedder_config.model_name, base_url="http://ollama:11434"
+        )
         runtime_configuration.embedder_object = embedder
         return embedder
 

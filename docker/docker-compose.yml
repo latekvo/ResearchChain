@@ -37,21 +37,25 @@ services:
     image: embedder
     depends_on:
       - postgres
+      - ollama
     build:
       context: ../.
       dockerfile: ./docker/embedder/Dockerfile
     networks:
       - app-network
+      - ollama-network
 
   summarizer:
     image: summarizer
     depends_on:
       - postgres
+      - ollama
     build:
       context: ../.
       dockerfile: ./docker/summarizer/Dockerfile
     networks:
       - app-network
+      - ollama-network
 
   webui:
     image: webui
@@ -65,10 +69,38 @@ services:
     networks:
       - app-network
 
+  faiss:
+    image: daangn/faiss-server
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  ollama:
+    image: ollama/ollama
+    expose:
+      - 11434
+    ports:
+      - 11434:11434
+    pull_policy: always
+    tty: true
+    restart: always
+    entrypoint: ["/usr/bin/bash", "./ollama/entrypoint.sh"]
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama:/root/.ollama
+      - ./ollama/entrypoint.sh:/ollama/entrypoint.sh
+    networks:
+      - ollama-network
+
 volumes:
+  ollama:
   pgdata:
     driver: local
 
 networks:
+  ollama-network:
+    driver: bridge
   app-network:
     driver: bridge
