@@ -69,6 +69,8 @@ services:
     networks:
       - app-network
       - ollama-network
+    volumes:
+      - shared-vector-store:/app/store/data
 
   summarizer:
     image: summarizer
@@ -81,6 +83,8 @@ services:
     networks:
       - app-network
       - ollama-network
+    volumes:
+      - shared-vector-store:/app/store/data
 
   webui:
     image: webui
@@ -97,6 +101,8 @@ services:
 volumes:
   ollama:
   pgdata:
+    driver: local
+  shared-vector-store:
     driver: local
 
 networks:
