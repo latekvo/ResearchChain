@@ -90,7 +90,6 @@ def rq_refill(seed_task, use_google: bool = True):
         if idx == 0 and not quit_unexpectedly:
             requested_crawl_tasks.remove(seed_task)
             db_crawl_tasks.db_set_crawl_completed(seed_task.uuid)
-            utils.send_update_to_api(seed_task.uuid, "crawl completed", "update_status")
             print("removed exhausted query:", seed_query.web_query)
 
     # 3. fill from db + google
