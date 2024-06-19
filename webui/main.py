@@ -108,7 +108,8 @@ async def callback(ch, method, properties, body):
 
 
 def consumer():
-    connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
+    connection_params = pika.ConnectionParameters(host='rabbitmq', port=5672)
+    connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
 
     channel.exchange_declare(exchange="status", exchange_type="direct")

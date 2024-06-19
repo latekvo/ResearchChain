@@ -19,7 +19,7 @@ def create_faiss_db_if_not_exists(
 
 
 def get_vec_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
-    folder_path = "store/vector"
+    folder_path = "app/store/vector"
 
     create_faiss_db_if_not_exists(db_name, folder_path, embeddings)
 
@@ -34,10 +34,6 @@ def get_vec_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
     except Exception:
         # legacy version
         db_connection = FAISS.load_local(
-            folder_path=folder_path,
-            embeddings=embeddings,
-            index_name=db_name,
-            allow_dangerous_deserialization=True,
+            folder_path=folder_path, embeddings=embeddings, index_name=db_name, allow_dangerous_deserialization=True
         )
-
     return db_connection
