@@ -39,10 +39,12 @@ def add_crawl_task(req_body: RequestBody):
         raise HTTPException(status_code=500, detail="Something went wrong")
     return {"uuid": new_uuid}
 
+
 @app.get("/crawl")
 def get_crawl_tasks(page: int = 0):
     crawl_tasks = db_get_crawl_tasks_by_page(page)
     return {"tasks": crawl_tasks}
+
 
 @app.post("/completion")
 def add_completion_task(req_body: RequestBody):
@@ -108,7 +110,7 @@ async def callback(ch, method, properties, body):
 
 
 def consumer():
-    connection_params = pika.ConnectionParameters(host='rabbitmq', port=5672)
+    connection_params = pika.ConnectionParameters(host="rabbitmq", port=5672)
     connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
 

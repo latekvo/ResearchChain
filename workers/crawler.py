@@ -159,6 +159,7 @@ def process_url(url_object):
 
 
 def processing_iteration():
+    test = db_url_pool.db_get_not_downloaded()
     global requested_crawl_tasks
 
     task_space_left = requested_tasks_limit - len(requested_crawl_tasks)

@@ -62,7 +62,9 @@ def summarize():
             task_queue.remove(task)
             task_uuid_list = list(map(extract_uuid, task_queue))
             db_release_executing_tasks(task_uuid_list)
-            utils.send_update_to_api(current_task.uuid, "embedding completed", "update_status")
+            utils.send_update_to_api(
+                current_task.uuid, "embedding completed", "update_status"
+            )
 
     if current_task is None:
         return
