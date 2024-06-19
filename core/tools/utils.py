@@ -103,7 +103,8 @@ def sleep_forever():
 
 
 def send_update_to_api(task_uuid: str, status: str, routing_key: str):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
+    connection_params = pika.ConnectionParameters(host='rabbitmq', port=5672)
+    connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
     channel.exchange_declare(exchange="status", exchange_type="direct")
     message = json.dumps({"task_uuid": task_uuid, "status": status})
