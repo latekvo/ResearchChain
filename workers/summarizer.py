@@ -106,8 +106,8 @@ def summarize():
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
 
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
-    print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task["uuid"])
-    utils.send_update_to_api(current_task["uuid"], "summary completed", "update_status")
+    print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
+    utils.send_update_to_api(current_task.uuid, "summary completed", "update_status")
 
 
 previous_queued_tasks = 0
