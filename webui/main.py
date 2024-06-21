@@ -100,10 +100,13 @@ def sync(f):
 async def callback(ch, method, properties, body):
     data = json.loads(body)
     uuid = data["task_uuid"]
+    status = data["status"]
+    payload = data["payload"]
+    message = json.dumps({"uuid": uuid, "status": status, "payload": payload})
     for websocket, uuid_list in active_connections.items():
         if uuid in uuid_list:
             try:
-                await websocket.send_text(data)
+                await websocket.send_text(message)
             except WebSocketDisconnect:
                 del active_connections[websocket]
 
