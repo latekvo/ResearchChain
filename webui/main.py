@@ -73,10 +73,10 @@ async def on_connection(websocket: WebSocket):
             try:
                 data = await websocket.receive_text()
                 data_dict = json.loads(data)
-                if isinstance(data_dict["message"], list):
-                    active_connections[websocket].extend(data_dict["message"])
+                if isinstance(data_dict["uuid"], list):
+                    active_connections[websocket].extend(data_dict["uuid"])
                 else:
-                    active_connections[websocket].append(data_dict["message"])
+                    active_connections[websocket].append(data_dict["uuid"])
                 print(active_connections)
             except WebSocketDisconnect:
                 break
@@ -85,6 +85,7 @@ async def on_connection(websocket: WebSocket):
             del active_connections[websocket]
 
 
+# This decorator allow to call async callback function in side synchronous context
 def sync(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
@@ -98,13 +99,11 @@ def sync(f):
 @sync
 async def callback(ch, method, properties, body):
     data = json.loads(body)
-    print("getting data from: ", data)
     uuid = data["task_uuid"]
-    status = data["status"]
     for websocket, uuid_list in active_connections.items():
         if uuid in uuid_list:
             try:
-                await websocket.send_text("current status: " + status)
+                await websocket.send_text(data)
             except WebSocketDisconnect:
                 del active_connections[websocket]
 
