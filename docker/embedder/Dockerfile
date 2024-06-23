@@ -14,4 +14,4 @@ RUN conda env create -f environment.yml
 
 SHELL ["conda", "run", "-n", "ResearchChain", "/bin/bash", "-c"]
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ResearchChain", "python3", "main.py", "-w", "embedder"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ResearchChain", "python3", "main.py", "-w", "embedder", "-E", "hugging_face_medium"]

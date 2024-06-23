@@ -23,24 +23,6 @@ services:
     networks:
       - app-network
 
-  ollama:
-    image: ollama/ollama
-    expose:
-      - 11434
-    ports:
-      - 11434:11434
-    pull_policy: always
-    tty: true
-    restart: always
-    entrypoint: [ "/usr/bin/bash", "./ollama/entrypoint.sh" ]
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-    volumes:
-      - ollama:/root/.ollama
-      - ./ollama/entrypoint.sh:/ollama/entrypoint.sh
-    networks:
-      - ollama-network
-
   crawler:
     image: crawler
     depends_on:
@@ -55,7 +37,6 @@ services:
     image: embedder
     depends_on:
       - postgres
-      - ollama
     build:
       context: ../.
       dockerfile: ./docker/embedder/Dockerfile
@@ -69,7 +50,6 @@ services:
     image: summarizer
     depends_on:
       - postgres
-      - ollama
     build:
       context: ../.
       dockerfile: ./docker/summarizer/Dockerfile

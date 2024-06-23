@@ -1,4 +1,3 @@
-from typing import Optional
 from sqlalchemy import String, TEXT, Integer, Boolean, select, update
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
