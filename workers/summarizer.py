@@ -20,10 +20,12 @@ from core.chainables.web import (
 )
 from core.tools.model_loader import load_llm
 from langchain_core.output_parsers import StrOutputParser
-from core.tools import utils
 
 from core.tools.utils import sleep_noisy
 from colorama import Fore, Style
+
+import pika
+import json
 
 output_parser = StrOutputParser()
 
@@ -33,6 +35,16 @@ llm = None
 # as soon as one task is started, all elements of the queue are released
 task_queue = []
 task_queue_limit = 10
+
+connection_params = pika.ConnectionParameters(host="rabbitmq", port=5672)
+connection = pika.BlockingConnection(connection_params)
+channel = connection.channel()
+
+
+def send_status_to_api_via_rabbitmq(task_uuid: str, status: str, routing_key: str, payload: str):
+    channel.exchange_declare(exchange="status", exchange_type="direct")
+    message = json.dumps({"task_uuid": task_uuid, "status": status, "payload": payload})
+    channel.basic_publish(exchange="", routing_key=routing_key, body=message)
 
 
 def extract_uuid(task):
@@ -62,7 +74,7 @@ def summarize():
             task_queue.remove(task)
             task_uuid_list = list(map(extract_uuid, task_queue))
             db_release_executing_tasks(task_uuid_list)
-            utils.send_update_to_api(
+            send_status_to_api_via_rabbitmq(
                 current_task.uuid, "embedding completed", "update_status", ""
             )
 
@@ -109,7 +121,7 @@ def summarize():
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
 
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
-    utils.send_update_to_api(current_task.uuid, "summary completed", "update_status", summary)
+    send_status_to_api_via_rabbitmq(current_task.uuid, "summary completed", "update_status", summary)
 
 
 previous_queued_tasks = 0
