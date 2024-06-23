@@ -10,9 +10,6 @@ from core.classes.query import WebQuery
 from core.tools.scraper import query_for_urls
 from core.tools.utils import hide_prints, sleep_noisy
 
-import pika
-import json
-
 # 100 links max, then put new ones in db
 # this does not increase access speed,
 # it only encourages a better mix of broadness and deepness of links

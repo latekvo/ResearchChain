@@ -36,22 +36,18 @@ llm = None
 task_queue = []
 task_queue_limit = 10
 
-connection_params = pika.ConnectionParameters(host="rabbitmq", port=5672)
-connection = pika.BlockingConnection(connection_params)
-channel = connection.channel()
 
-
-def send_status_to_api_via_rabbitmq(task_uuid: str, status: str, routing_key: str, payload: str):
+def send_status_to_api_via_rabbitmq(task_uuid: str, status: str, routing_key: str, payload: str, channel):
     channel.exchange_declare(exchange="status", exchange_type="direct")
     message = json.dumps({"task_uuid": task_uuid, "status": status, "payload": payload})
-    channel.basic_publish(exchange="", routing_key=routing_key, body=message)
+    channel.basic_publish(exchange="status", routing_key=routing_key, body=message)
 
 
 def extract_uuid(task):
     return task.uuid
 
 
-def summarize():
+def summarize(channel):
     global task_queue, llm
 
     if llm is None:
@@ -75,7 +71,7 @@ def summarize():
             task_uuid_list = list(map(extract_uuid, task_queue))
             db_release_executing_tasks(task_uuid_list)
             send_status_to_api_via_rabbitmq(
-                current_task.uuid, "embedding completed", "update_status", ""
+                current_task.uuid, "embedding completed", "update_status", "", channel
             )
 
     if current_task is None:
@@ -121,7 +117,7 @@ def summarize():
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
 
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
-    send_status_to_api_via_rabbitmq(current_task.uuid, "summary completed", "update_status", summary)
+    send_status_to_api_via_rabbitmq(current_task.uuid, "summary completed", "update_status", summary, channel)
 
 
 previous_queued_tasks = 0
@@ -136,7 +132,9 @@ previous_queued_tasks = 0
 
 def start_summarizer():
     global previous_queued_tasks
-
+    connection_params = pika.ConnectionParameters(host="rabbitmq", port=5672, heartbeat=600)
+    connection = pika.BlockingConnection(connection_params)
+    channel = connection.channel()
     while True:
         queue_length = len(task_queue)
         if queue_length > previous_queued_tasks:
@@ -146,7 +144,7 @@ def start_summarizer():
 
         if queue_length != previous_queued_tasks:
             print(f"{Fore.CYAN}tasks left:", queue_length, f"{Style.RESET_ALL}")
-            previous_tasks_queued = queue_length
+            previous_queued_tasks = queue_length
 
-        summarize()
+        summarize(channel)
         sleep_noisy(5)

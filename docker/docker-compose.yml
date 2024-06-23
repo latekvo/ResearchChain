@@ -82,8 +82,12 @@ services:
   summarizer:
     image: summarizer
     depends_on:
-      - postgres
-      - ollama
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      ollama:
+        condition: service_started
     build:
       context: ../.
       dockerfile: ./docker/summarizer/Dockerfile
