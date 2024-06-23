@@ -91,6 +91,19 @@ services:
     networks:
       - app-network
 
+  frontend:
+    image: frontend
+    depends_on:
+      - postgres
+      - webui
+    build:
+      context: ../.
+      dockerfile: ./docker/frontend/Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+
 volumes:
   ollama:
   pgdata:
@@ -103,3 +116,4 @@ networks:
     driver: bridge
   app-network:
     driver: bridge
+

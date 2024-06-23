@@ -1,1 +1,3 @@
-webui/frontend
+webui/frontend/node_modules
+webui/frontend/.next
+webui/frontend/package-lock.json
