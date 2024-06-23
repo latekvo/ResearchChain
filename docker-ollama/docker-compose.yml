@@ -1,0 +1,105 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 8081:80
+    networks:
+      - app-network
+
+  ollama:
+    image: ollama/ollama
+    expose:
+      - 11434
+    ports:
+      - 11434:11434
+    pull_policy: always
+    tty: true
+    restart: always
+    entrypoint: [ "/usr/bin/bash", "./ollama/entrypoint.sh" ]
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama:/root/.ollama
+      - ./ollama/entrypoint.sh:/ollama/entrypoint.sh
+    networks:
+      - ollama-network
+
+  crawler:
+    image: crawler
+    depends_on:
+      - postgres
+    build:
+     context: ../.
+     dockerfile: ./docker/crawler/Dockerfile
+    networks:
+      - app-network
+
+  embedder:
+    image: embedder
+    depends_on:
+      - postgres
+      - ollama
+    build:
+      context: ../.
+      dockerfile: ./docker/embedder/Dockerfile
+    networks:
+      - app-network
+      - ollama-network
+    volumes:
+      - shared-vector-store:/app/store/vector
+
+  summarizer:
+    image: summarizer
+    depends_on:
+      - postgres
+      - ollama
+    build:
+      context: ../.
+      dockerfile: ./docker/summarizer/Dockerfile
+    networks:
+      - app-network
+      - ollama-network
+    volumes:
+      - shared-vector-store:/app/store/vector
+
+  webui:
+    image: webui
+    depends_on:
+      - postgres
+    build:
+      context: ../.
+      dockerfile: ./docker/webui/Dockerfile
+    ports:
+      - 8000:8000
+    networks:
+      - app-network
+
+volumes:
+  ollama:
+  pgdata:
+    driver: local
+  shared-vector-store:
+    driver: local
+
+networks:
+  ollama-network:
+    driver: bridge
+  app-network:
+    driver: bridge
