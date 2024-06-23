@@ -72,7 +72,6 @@ services:
       - app-network
 
 volumes:
-  ollama:
   pgdata:
     driver: local
   shared-vector-store:
