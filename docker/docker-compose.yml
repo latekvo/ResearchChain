@@ -68,12 +68,8 @@ services:
   embedder:
     image: embedder
     depends_on:
-      postgres:
-        condition: service_started
-      rabbitmq:
-          condition: service_healthy
-      ollama:
-        condition: service_started
+      - postgres
+      - ollama
     build:
       context: ../.
       dockerfile: ./docker/embedder/Dockerfile

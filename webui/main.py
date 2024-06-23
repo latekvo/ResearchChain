@@ -67,7 +67,6 @@ active_connections = {}
 async def on_connection(websocket: WebSocket):
     await websocket.accept()
     active_connections[websocket] = []
-    print(active_connections)
     try:
         while True:
             try:
@@ -77,7 +76,6 @@ async def on_connection(websocket: WebSocket):
                     active_connections[websocket].extend(data_dict["uuid"])
                 else:
                     active_connections[websocket].append(data_dict["uuid"])
-                print(active_connections)
             except WebSocketDisconnect:
                 break
     finally:
