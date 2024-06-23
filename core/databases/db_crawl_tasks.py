@@ -130,8 +130,8 @@ def db_get_incomplete_crawl_task():
 
         query = (
             select(CrawlTask)
-            .where(CrawlTask.completed.is_(False))
-            .where(CrawlTask.executing.is_(False))
+            .where(CrawlTask.completed == False)
+            .where(CrawlTask.executing == False)
             .limit(1)
         )
 
