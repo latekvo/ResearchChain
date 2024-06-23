@@ -7,7 +7,6 @@ COPY . /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     g++ \
-    clang \
     && rm -rf /var/lib/apt/lists/*
 
 RUN conda env create -f environment.yml
