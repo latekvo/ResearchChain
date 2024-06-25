@@ -19,7 +19,7 @@ def create_faiss_db_if_not_exists(
 
 
 def get_vec_db_by_name(db_name: str, embeddings: Embeddings) -> FAISS:
-    folder_path = "app/store/vector"
+    folder_path = "store/vector"
 
     create_faiss_db_if_not_exists(db_name, folder_path, embeddings)
 
