@@ -13,8 +13,10 @@ import { usePathname } from "next/navigation";
 const Header = () => {
   const pathName = usePathname();
 
+  const isSticky = pathName === "/" ? "sticky" : "static";
+
   return (
-    <Navbar>
+    <Navbar position={isSticky}>
       <NavbarBrand>
         <h1 className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-purple-700 bg-clip-text">
           Research Chain
