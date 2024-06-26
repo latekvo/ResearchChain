@@ -79,8 +79,8 @@ def db_get_not_downloaded() -> list:
 
         query = (
             select(UrlObject)
-            .where(UrlObject.is_downloaded.is_(False))
-            .where(UrlObject.is_rubbish.is_(False))
+            .where(UrlObject.is_downloaded == False)
+            .where(UrlObject.is_rubbish == False)
         )
 
         results = list(session.scalars(query).all())
@@ -102,8 +102,8 @@ def db_get_not_embedded(model: str, amount: int = 100) -> list[UrlObject]:
 
         query = (
             select(UrlObject)
-            .where(UrlObject.is_downloaded.is_(True))
-            .where(UrlObject.is_rubbish.is_(False))
+            .where(UrlObject.is_downloaded == True)
+            .where(UrlObject.is_rubbish == False)
         )
 
         # todo: this particular function requires rigorous testing,
