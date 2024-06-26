@@ -1,5 +1,5 @@
 from colorama import Fore
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings, LlamaCppEmbeddings
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
@@ -65,7 +65,7 @@ def load_hf_embedder():
         embedder_model_path = hf_hub_download(
             embedder_config.model_file, filename=embedder_config.model_name
         )
-        embedder = Llama(
+        embedder = LlamaCppEmbeddings(
             model_path=embedder_model_path,
             n_gpu_layers=-1,
             n_batch=embedder_config.model_token_limit,
