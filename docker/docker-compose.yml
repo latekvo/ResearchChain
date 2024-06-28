@@ -1,4 +1,18 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 20s
+      retries: 5
+
   postgres:
     image: postgres
     restart: always
@@ -68,8 +82,12 @@ services:
   summarizer:
     image: summarizer
     depends_on:
-      - postgres
-      - ollama
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      ollama:
+        condition: service_started
     build:
       context: ../.
       dockerfile: ./docker/summarizer/Dockerfile
@@ -82,12 +100,28 @@ services:
   webui:
     image: webui
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     build:
       context: ../.
       dockerfile: ./docker/webui/Dockerfile
     ports:
       - 8000:8000
+    networks:
+      - app-network
+
+  frontend:
+    image: frontend
+    depends_on:
+      - postgres
+      - webui
+    build:
+      context: ../.
+      dockerfile: ./docker/frontend/Dockerfile
+    ports:
+      - 3000:3000
     networks:
       - app-network
 
@@ -103,3 +137,4 @@ networks:
     driver: bridge
   app-network:
     driver: bridge
+

@@ -91,9 +91,8 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
 
         query = (
             select(CompletionTask)
-            # point of notice! is_ may need to be replaced with ==
-            .where(CompletionTask.completed.is_(False))
-            .where(CompletionTask.executing.is_(False))
+            .where(CompletionTask.completed == False)
+            .where(CompletionTask.executing == False)
             .limit(amount)
         )
 
