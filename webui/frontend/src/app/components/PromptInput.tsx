@@ -1,5 +1,6 @@
 "use client";
-import React, { Key, useState } from "react";
+import React, { Key, useState, useContext } from "react";
+import { SummarizerContext } from "@/app/context/SummarizerContext";
 import { Button, Tab, Tabs, Textarea } from "@nextui-org/react";
 import {
   UseMutationOptions,
@@ -14,8 +15,7 @@ type FormValues = {
 };
 
 type MutationResult = {
-  success: boolean;
-  message: string;
+  uuid: string;
 };
 
 function PromptInput() {
@@ -24,6 +24,7 @@ function PromptInput() {
     prompt: "",
     mode: "",
   });
+  const context = useContext(SummarizerContext);
 
   const FormData = z.object({
     prompt: z.string().min(1),
@@ -60,7 +61,7 @@ function PromptInput() {
       {
         onSuccess: (result) => {},
         onError: (error) => {},
-      } as UseMutationOptions<MutationResult, unknown, FormValues>
+      } as UseMutationOptions<MutationResult, unknown, FormValues>,
     );
 
   const addSummarize: UseMutationResult<MutationResult, unknown, FormValues> =
@@ -85,7 +86,7 @@ function PromptInput() {
       {
         onSuccess: (result) => {},
         onError: (error) => {},
-      } as UseMutationOptions<MutationResult, unknown, FormValues>
+      } as UseMutationOptions<MutationResult, unknown, FormValues>,
     );
 
   const onModeChange = (key: Key) => {
@@ -103,12 +104,14 @@ function PromptInput() {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (crawlActive) {
       addCrawl.mutate(formValues);
     } else {
-      addSummarize.mutate(formValues);
+      await addSummarize.mutate(formValues);
+      console.log(addSummarize?.data);
+      context?.sendUuid(addSummarize?.data?.uuid);
     }
   };
 
