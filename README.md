@@ -28,6 +28,11 @@ Frontend is launched separately to back end, run the following command to start 
 - click `save`, the database should be immediately available
 - there, you'll see connection statistics as well as the entire schema
 
+### GPU offloading
+
+Automatic GPU offloading is built into Research Chain, 
+but requires `nvidia-container-toolkit` to be installed in order to share hardware GPU resources with the containers.
+
 #### Other notes
 
 - The default models can be seen in the `core/models/configurations` folder.<br>

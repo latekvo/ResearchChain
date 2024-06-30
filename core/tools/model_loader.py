@@ -1,8 +1,8 @@
 from colorama import Fore
 from langchain_community.embeddings import OllamaEmbeddings, LlamaCppEmbeddings
+from langchain_community.llms import LlamaCpp
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
-from llama_cpp import Llama
 
 from configurator import get_runtime_config
 from core.tools import errorlib
@@ -39,7 +39,7 @@ def load_ollama_embedder() -> OllamaEmbeddings:
         return embedder
 
 
-def load_hf_llm() -> Llama:
+def load_hf_llm() -> LlamaCpp:
     cached_llm = runtime_configuration.llm_object
     if cached_llm:
         return cached_llm
@@ -47,7 +47,7 @@ def load_hf_llm() -> Llama:
         base_model_path = hf_hub_download(
             llm_config.model_file, filename=llm_config.model_name
         )
-        llm = Llama(
+        llm = LlamaCpp(
             model_path=base_model_path,
             n_gpu_layers=-1,
             n_batch=llm_config.model_token_limit,
