@@ -35,6 +35,9 @@ Frontend is launched separately to back end, run the following command to start 
 - `environment.yml` is the linux env, but for macOS (silicon) and windows there are other available
 - Apple intel is not supported anymore, but you can still get it working by manually installing
   any missing package that comes up during the program execution.
+- `pull access denied for X` error: The connection may occasionally get throttled, resulting in this error.
+  To solve this issue, let all the current downloads finish downloading, and restart the program. 
+  Repeat until every file is downloaded.
 
 ### This is a monorepo for both a tool, and apps for it:
 
