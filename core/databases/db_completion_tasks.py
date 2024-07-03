@@ -106,6 +106,22 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
         return results
 
 
+def db_get_complete_completion_tasks(amount: int = 1):
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        query = (
+            select(CompletionTask)
+            .where(CompletionTask.completed == True)
+            .limit(amount)
+        )
+
+        results = list(session.scalars(query).all())
+        session.expunge_all()
+
+        return results
+
+
 def db_release_executing_tasks(uuid_list: list[str]):
     with Session(engine) as session:
         session.execute(
