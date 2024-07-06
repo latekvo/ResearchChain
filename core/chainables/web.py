@@ -78,3 +78,30 @@ def web_news_lookup_prompt():
         ]
     )
 
+
+# TODO: simple question -> answer, not yet required by any scheduler.
+def basic_query_prompt():
+    pass
+
+
+# some schedulers may require data-extraction capabilities outside data-gathering
+def structured_extraction_prompt():
+    return ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a data extraction and analysis specialist. "
+                "Your job is to respond in a structured way to the question you were given. "
+                "You are to follow the orders given precisely and intelligently. "
+                "Satisfy the requested task to the best of your abilities. "
+            ),
+            (
+                "user",
+                "Data: "
+                "```"
+                "{data}"
+                "```"
+                'User request: "{user_request}"'
+            ),
+        ]
+    )
