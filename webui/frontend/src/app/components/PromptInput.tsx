@@ -61,7 +61,7 @@ function PromptInput() {
       {
         onSuccess: (result) => {},
         onError: (error) => {},
-      } as UseMutationOptions<MutationResult, unknown, FormValues>,
+      } as UseMutationOptions<MutationResult, unknown, FormValues>
     );
 
   const addSummarize: UseMutationResult<MutationResult, unknown, FormValues> =
@@ -84,9 +84,11 @@ function PromptInput() {
         return result;
       },
       {
-        onSuccess: (result) => {},
+        onSuccess: (result) => {
+          context?.sendUuid(result.uuid);
+        },
         onError: (error) => {},
-      } as UseMutationOptions<MutationResult, unknown, FormValues>,
+      } as UseMutationOptions<MutationResult, unknown, FormValues>
     );
 
   const onModeChange = (key: Key) => {
@@ -109,9 +111,7 @@ function PromptInput() {
     if (crawlActive) {
       addCrawl.mutate(formValues);
     } else {
-      await addSummarize.mutate(formValues);
-      console.log(addSummarize?.data);
-      context?.sendUuid(addSummarize?.data?.uuid);
+      addSummarize.mutate(formValues);
     }
   };
 
