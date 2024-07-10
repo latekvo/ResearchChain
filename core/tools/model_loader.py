@@ -112,7 +112,7 @@ def load_functional_llm():
                    f"Please switch to {Fore.CYAN}Ollama{Fore.RESET} or stop using functional models.",
         )
     else:
-        return load_ollama_llm()
+        return load_ollama_functional_llm()
 
 
 def load_embedder():

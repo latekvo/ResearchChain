@@ -93,7 +93,8 @@ def structured_extraction_prompt():
                 "You are a data extraction and analysis specialist. "
                 "Your job is to respond in a structured way to the question you were given. "
                 "You are to follow the orders given precisely and intelligently. "
-                "Satisfy the requested task to the best of your abilities. "
+                "You are provided with data chunk, use it, to fulfill user's request. "
+                "Satisfy the requested task to the best of your abilities."
             ),
             (
                 "user",
