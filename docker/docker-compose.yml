@@ -8,7 +8,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       timeout: 20s
       retries: 5
@@ -39,14 +39,12 @@ services:
 
   ollama:
     image: ollama/ollama
-    expose:
-      - 11434
     ports:
       - 11434:11434
     pull_policy: always
     tty: true
     restart: always
-    entrypoint: [ "/usr/bin/bash", "./ollama/entrypoint.sh" ]
+    entrypoint: ["/usr/bin/bash", "./ollama/entrypoint.sh"]
     environment:
       - OLLAMA_HOST=0.0.0.0
     volumes:
@@ -60,8 +58,8 @@ services:
     depends_on:
       - postgres
     build:
-     context: ../.
-     dockerfile: ./docker/crawler/Dockerfile
+      context: ../.
+      dockerfile: ./docker/crawler/Dockerfile
     networks:
       - app-network
 
@@ -137,4 +135,3 @@ networks:
     driver: bridge
   app-network:
     driver: bridge
-
