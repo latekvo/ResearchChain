@@ -1,10 +1,10 @@
 "use client";
 
-import { createContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useState, ReactNode } from "react";
 
-interface SummarizerContext {
+interface SummarizerContextProps {
   isSummarizing: boolean;
-  completion: { uuid: string; status: string; payload: string }[];
+  completion?: { uuid: string; status: string; payload: string };
   sendUuid: (uuid: string) => void;
 }
 
@@ -12,15 +12,19 @@ interface SummarizerContextProviderProps {
   children?: ReactNode;
 }
 
-export const SummarizerContext = createContext<SummarizerContext | null>(null);
+export const SummarizerContext = createContext<SummarizerContextProps | null>(
+  null
+);
 
 const SummarizerContextProvider = ({
   children,
 }: SummarizerContextProviderProps) => {
   const [isSummarizing, setIsSummarizing] = useState<boolean>(false);
-  const [completion, setCompletion] = useState<
-    { uuid: string; status: string; payload: string }[]
-  >([]);
+  const [completion, setCompletion] = useState<{
+    uuid: string;
+    status: string;
+    payload: string;
+  }>();
 
   const socket = new WebSocket("ws://localhost:8000/ws");
 
@@ -35,7 +39,7 @@ const SummarizerContextProvider = ({
     try {
       const completion = JSON.parse(event.data);
       if (completion.uuid && completion.status === "summary completed") {
-        setCompletion((prevCompletion) => [...prevCompletion, completion]);
+        setCompletion(completion);
       } else {
         console.error("Received message has an invalid structure:", completion);
       }
@@ -43,6 +47,7 @@ const SummarizerContextProvider = ({
       console.error("Error parsing message:", error);
     }
   };
+  console.log(isSummarizing, completion);
 
   const value = {
     isSummarizing,

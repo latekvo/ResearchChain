@@ -1,4 +1,4 @@
 export interface RenderCompletionProps {
     executing: boolean;
-    completion_result: string;
+    completion_result: string | undefined;
 }

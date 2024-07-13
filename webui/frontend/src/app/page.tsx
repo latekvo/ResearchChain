@@ -1,15 +1,24 @@
+"use client"
+import { useContext } from "react";
 import PromptInput from "./components/PromptInput";
 import RenderCompletion from "./components/RenderCompletion";
+import { SummarizerContext } from "./context/SummarizerContext";
 
 export default function Page() {
+  const context = useContext(SummarizerContext);
+  const isSummarizing = context?.isSummarizing ?? false;
+  const completion = context?.completion ?? null;
   return (
     <>
       <main className="h-screen flex justify-center items-center flex-col">
-        <PromptInput />
-        <RenderCompletion
-          executing={false}
-          completion_result=""
-        />
+        {isSummarizing || completion ? (
+          <RenderCompletion
+            executing={isSummarizing}
+            completion_result={completion?.payload}
+          />
+        ) : (
+          <PromptInput />
+        )}
       </main>
     </>
   );
