@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.34.0 (HEAD)
+  labels:
+    io.kompose.service: crawler
+  name: crawler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: crawler
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.34.0 (HEAD)
+      labels:
+        io.kompose.service: crawler
+    spec:
+      containers:
+        - image: crawler
+          name: crawler
+      restartPolicy: Always
