@@ -1,11 +1,13 @@
 # The first automatic scheduler.
 # When launched, looks at the available data, picks interesting topics and requests deeper searches about them.
+from __future__ import annotations
+
 from langchain_core.output_parsers import StrOutputParser
 
-from core.databases.db_completion_tasks import CompletionTask
+from core.chainables.web import structured_extraction_prompt
+from core.databases.db_completion_tasks import CompletionTask, db_get_complete_completion_tasks, db_add_completion_task
 from core.tools.model_loader import load_functional_llm
 from core.tools.utils import sleep_noisy
-
 
 # get finished tasks
 # extract interesting talking points
@@ -20,27 +22,38 @@ from core.tools.utils import sleep_noisy
 # then: grab a random topic from one of the summaries, and focus on it,
 #       continuously condensing summaries and requesting them on deeper topics
 
-llm = load_functional_llm()
+# TODO: move all LLM load to summarizer, local for now
 
+llm = load_functional_llm()
 output_parser = StrOutputParser()
+
+extraction_chain = structured_extraction_prompt() | llm | output_parser
 
 
 def are_workers_free():
-    # check if there are tasks scheduled waiting for execution
+    # todo: check if there are non-busy workers available
     return True
 
 
-def get_random_completion() -> CompletionTask:
-    pass
+def get_random_completion() -> CompletionTask | None:
+    completions_list = db_get_complete_completion_tasks()
+    if len(completions_list) > 0:
+        return completions_list[0]
+    else:
+        return None
 
 
 def extract_interesting_topics(text: str) -> list[str]:
     # todo: perform semantic grouping of subjects + their context
+    # fixme: instead of TODO, extracting a single topic as a POC for now
+    extraction_request = "aa"
+
+    extraction_chain({'data': text, 'user_request': extraction_request})
     pass
 
 
 def schedule_new_completion(query: str) -> str:
-    pass
+    return db_add_completion_task(query, 'info')
 
 
 def start_deepsearch():
@@ -57,3 +70,5 @@ def start_deepsearch():
             schedule_new_completion(topic)
 
         sleep_noisy(6)
+        print("DBG: shutting down deepsearcher - only 1 loop scheduled")
+        return
