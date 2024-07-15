@@ -44,19 +44,22 @@ def get_random_completion() -> CompletionTask | None:
 
 
 def extract_interesting_topics(text: str) -> list[str]:
+    # todo: separate function for extracting topics and getting one,
+    #       run the extraction one only when lacking topics
     # todo: perform semantic grouping of subjects + their context
     # fixme: instead of TODO, extracting a single topic as a POC for now
-    extraction_request = "aa"
+    extraction_request = "Find exactly one topic from this text, it must be interesting. Reply in 3 words at most."
 
-    extraction_chain({'data': text, 'user_request': extraction_request})
-    pass
+    result = extraction_chain.invoke({'data': text, 'user_request': extraction_request})
+
+    return [result]
 
 
 def schedule_new_completion(query: str) -> str:
     return db_add_completion_task(query, 'info')
 
 
-def start_deepsearch():
+def start_deep_searcher():
     while True:
         # fixme: replace False with free worker checking
         if not are_workers_free():
@@ -70,5 +73,5 @@ def start_deepsearch():
             schedule_new_completion(topic)
 
         sleep_noisy(6)
-        print("DBG: shutting down deepsearcher - only 1 loop scheduled")
+        print("DBG: shutting down deep_searcher - only 1 loop scheduled")
         return
