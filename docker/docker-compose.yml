@@ -134,7 +134,7 @@ services:
         condition: service_started
     build:
       context: ../.
-      dockerfile: ./docker/frontend/Dockerfile
+      dockerfile: ./docker/deep_searcher/Dockerfile
     networks:
       - app-network
 

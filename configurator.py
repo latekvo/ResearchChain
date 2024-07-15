@@ -27,6 +27,7 @@ parser.add_argument(
         "crawler",
         "embedder",
         "summarizer",
+        "deep_searcher",
     ],
     default="none",
     help="Select one of the ready worker configs to be used",
