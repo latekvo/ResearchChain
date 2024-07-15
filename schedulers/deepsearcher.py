@@ -11,7 +11,7 @@ from core.databases.db_completion_tasks import (
     db_add_completion_task,
 )
 from core.tools.model_loader import load_llm
-from core.tools.utils import sleep_noisy
+from core.tools.utils import sleep_noisy, remove_characters
 
 # get finished tasks
 # extract interesting talking points
@@ -60,7 +60,9 @@ def extract_interesting_topics(text: str) -> list[str]:
 
 
 def schedule_new_completion(query: str) -> str:
-    return db_add_completion_task(query, "info")
+    # fixme: regex remove anything not a-zA-Z
+    pure_query = remove_characters(query, ['"', "'", ':', '?', '!'])
+    return db_add_completion_task(pure_query, "info")
 
 
 def start_deep_searcher():

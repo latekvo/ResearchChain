@@ -98,21 +98,24 @@ def summarize(channel):
             return web_docs_lookup_prompt()
         elif current_task.mode == "wiki":
             return web_wiki_lookup_prompt()
+        else:
+            # todo: add info query - plain basic nothing
+            return web_wiki_lookup_prompt()
 
     web_interpret_prompt_mode = interpret_prompt_mode()
 
     print("Summarizing task with uuid: ", current_task.uuid)
 
     chain = (
-        web_interpret_prompt_mode
-        | llm
-        | output_parser
+            web_interpret_prompt_mode
+            | llm
+            | output_parser
     )
 
     chain_input = {
-            "search_data": context,
-            "user_request": current_task.prompt,
-        }
+        "search_data": context,
+        "user_request": current_task.prompt,
+    }
 
     summary = chain.invoke(chain_input)
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
@@ -122,6 +125,7 @@ def summarize(channel):
 
 
 previous_queued_tasks = 0
+
 
 # 1. get a list of available tasks, in the backend they'll be automatically set as executing
 # 2. parse through all of them, until one that has all it's dependencies resolved appears
