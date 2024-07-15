@@ -11,16 +11,16 @@ from core.databases.db_completion_tasks import (
     db_release_executing_tasks,
     db_required_crawl_tasks_for_uuid,
 )
-from langchain_core.runnables import RunnableLambda
 from core.classes.query import WebQuery
 from core.chainables.web import (
     web_docs_lookup_prompt,
     web_news_lookup_prompt,
     web_wiki_lookup_prompt,
 )
-from core.tools.model_loader import load_llm
+from core.tools.model_loader import load_llm, runtime_configuration
 from langchain_core.output_parsers import StrOutputParser
 
+from core.tools.scraper import docs_to_context
 from core.tools.utils import sleep_noisy
 from colorama import Fore, Style
 
@@ -29,7 +29,8 @@ import json
 
 output_parser = StrOutputParser()
 
-llm = None
+llm_config = runtime_configuration.llm_config
+llm = load_llm()
 
 # even though a single task takes a long time to complete,
 # as soon as one task is started, all elements of the queue are released
@@ -82,11 +83,13 @@ def summarize(channel):
     )
 
     # fixme: there is no context building here, it's just the first result!
-    context = db_search_for_similar_queries(task_query)
+    context_list = db_search_for_similar_queries(task_query)
 
-    if context is None or len(context) == 0:
+    if context_list is None or len(context_list) == 0:
         print('received context is none')
         return
+
+    context = docs_to_context(context_list, llm_config.model_token_limit / 2)
 
     def interpret_prompt_mode():
         if current_task.mode == "news":
@@ -107,7 +110,7 @@ def summarize(channel):
     )
 
     chain_input = {
-            "search_data": context[0].page_content,
+            "search_data": context,
             "user_request": current_task.prompt,
         }
 
