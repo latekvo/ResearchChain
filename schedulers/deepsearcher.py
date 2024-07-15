@@ -10,7 +10,7 @@ from core.databases.db_completion_tasks import (
     db_get_complete_completion_tasks,
     db_add_completion_task,
 )
-from core.tools.model_loader import load_functional_llm
+from core.tools.model_loader import load_llm
 from core.tools.utils import sleep_noisy
 
 # get finished tasks
@@ -28,7 +28,7 @@ from core.tools.utils import sleep_noisy
 
 # TODO: move all LLM load to summarizer, local for now
 
-llm = load_functional_llm()
+llm = load_llm()
 output_parser = StrOutputParser()
 
 extraction_chain = structured_extraction_prompt() | llm | output_parser
@@ -67,13 +67,20 @@ def start_deep_searcher():
     while True:
         # fixme: replace False with free worker checking
         if not are_workers_free():
+            sleep_noisy(6)
             continue
 
         completion = get_random_completion()
+
+        if not completion:
+            sleep_noisy(6)
+            continue
+
         completion_text = completion.completion_result
         topics = extract_interesting_topics(completion_text)
 
         for topic in topics:
+            print('dispatching new summaries:', topic)
             schedule_new_completion(topic)
 
         sleep_noisy(6)

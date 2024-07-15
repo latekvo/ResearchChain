@@ -14,6 +14,12 @@ from workers.summarizer import start_summarizer
 colorama_init()
 db_base.db_init()
 
+# todo: change deep_searcher into a scheduler instead of worker, -s flag
+#       this is because workers use cpu, gpu and memory resources in a distributed way,
+#       while a scheduler only does lightweight management without any significant load,
+#       and most importantly contrary to worker, doesn't require a config file to run
+#       theoretically this makes the crawler a scheduler as well, but for now it is a core part
+
 if args.worker_type == "webui":
     # fixme: this is a workaround, webui should be started from it's folder
     uvicorn.run("webui.main:app", host="0.0.0.0", port=8000)
