@@ -5,7 +5,11 @@ from __future__ import annotations
 from langchain_core.output_parsers import StrOutputParser
 
 from core.chainables.web import structured_extraction_prompt
-from core.databases.db_completion_tasks import CompletionTask, db_get_complete_completion_tasks, db_add_completion_task
+from core.databases.db_completion_tasks import (
+    CompletionTask,
+    db_get_complete_completion_tasks,
+    db_add_completion_task,
+)
 from core.tools.model_loader import load_functional_llm
 from core.tools.utils import sleep_noisy
 
@@ -50,13 +54,13 @@ def extract_interesting_topics(text: str) -> list[str]:
     # fixme: instead of TODO, extracting a single topic as a POC for now
     extraction_request = "Find exactly one topic from this text, it must be interesting. Reply in 3 words at most."
 
-    result = extraction_chain.invoke({'data': text, 'user_request': extraction_request})
+    result = extraction_chain.invoke({"data": text, "user_request": extraction_request})
 
     return [result]
 
 
 def schedule_new_completion(query: str) -> str:
-    return db_add_completion_task(query, 'info')
+    return db_add_completion_task(query, "info")
 
 
 def start_deep_searcher():

@@ -87,7 +87,7 @@ def load_llm():
         errorlib.pretty_error(
             title="Tried loading LLM without a valid configuration",
             advice=f"Your worker configuration file is likely missing "
-                   f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
+            f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
         )
 
     if llm_config.supplier == "hugging_face":
@@ -102,14 +102,14 @@ def load_functional_llm():
         errorlib.pretty_error(
             title="Tried loading LLM without a valid configuration",
             advice=f"Your worker configuration file is likely missing "
-                   f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
+            f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
         )
 
     if llm_config.supplier == "hugging_face":
         errorlib.pretty_error(
             title="Tried running functional model with a HF configuration.",
             advice=f"Functional models are not yet supported with llama.cpp loaders. "
-                   f"Please switch to {Fore.CYAN}Ollama{Fore.RESET} or stop using functional models.",
+            f"Please switch to {Fore.CYAN}Ollama{Fore.RESET} or stop using functional models.",
         )
     else:
         return load_ollama_functional_llm()
@@ -120,7 +120,7 @@ def load_embedder():
         errorlib.pretty_error(
             title="Tried loading EMBEDDER without a valid configuration",
             advice=f"Your worker configuration file is likely missing "
-                   f"a valid {Fore.CYAN}embedder_config_name{Fore.RESET} variable",
+            f"a valid {Fore.CYAN}embedder_config_name{Fore.RESET} variable",
         )
 
     if embedder_config.supplier == "hugging_face":

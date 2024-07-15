@@ -94,15 +94,8 @@ def structured_extraction_prompt():
                 "Your job is to respond in a structured way to the question you were given. "
                 "You are to follow the orders given precisely and intelligently. "
                 "You are provided with data chunk, use it, to fulfill user's request. "
-                "Satisfy the requested task to the best of your abilities."
+                "Satisfy the requested task to the best of your abilities.",
             ),
-            (
-                "user",
-                "Data: "
-                "```"
-                "{data}"
-                "```"
-                'User request: "{user_request}"'
-            ),
+            ("user", "Data: ```{data}``` User request: '{user_request}'"),
         ]
     )

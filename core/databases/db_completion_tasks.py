@@ -111,9 +111,7 @@ def db_get_complete_completion_tasks(amount: int = 1):
         session.expire_on_commit = False
 
         query = (
-            select(CompletionTask)
-            .where(CompletionTask.completed == True)
-            .limit(amount)
+            select(CompletionTask).where(CompletionTask.completed == True).limit(amount)
         )
 
         results = list(session.scalars(query).all())
