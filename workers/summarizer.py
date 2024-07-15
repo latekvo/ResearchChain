@@ -82,7 +82,6 @@ def summarize(channel):
         prompt_core=current_task.prompt, query_type=current_task.mode.lower()
     )
 
-    # fixme: there is no context building here, it's just the first result!
     context_list = db_search_for_similar_queries(task_query)
 
     if context_list is None or len(context_list) == 0:
