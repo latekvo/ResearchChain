@@ -81,9 +81,11 @@ def summarize(channel):
         prompt_core=current_task.prompt, query_type=current_task.mode.lower()
     )
 
+    # fixme: there is no context building here, it's just the first result!
     context = db_search_for_similar_queries(task_query)
 
-    if context is None:
+    if context is None or len(context) == 0:
+        print('received context is none')
         return
 
     def interpret_prompt_mode():
@@ -94,26 +96,22 @@ def summarize(channel):
         elif current_task.mode == "wiki":
             return web_wiki_lookup_prompt()
 
-    def get_user_prompt(_: dict):
-        return current_task.prompt
-
-    def get_context(_: dict):
-        return context[0].page_content
-
     web_interpret_prompt_mode = interpret_prompt_mode()
 
     print("Summarizing task with uuid: ", current_task.uuid)
+
     chain = (
-        {
-            "search_data": RunnableLambda(get_context),
-            # this has to be a RunnableLambda, it cannot be a string
-            "user_request": RunnableLambda(get_user_prompt),
-        }
-        | web_interpret_prompt_mode
+        web_interpret_prompt_mode
         | llm
         | output_parser
     )
-    summary = chain.invoke(current_task)
+
+    chain_input = {
+            "search_data": context[0].page_content,
+            "user_request": current_task.prompt,
+        }
+
+    summary = chain.invoke(chain_input)
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
 
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
