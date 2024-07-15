@@ -125,6 +125,20 @@ services:
     networks:
       - app-network
 
+  deep_searcher:
+    profiles:
+      - deep_searcher
+    image: deep_searcher
+    depends_on:
+      postgres:
+        condition: service_started
+    build:
+      context: ../.
+      dockerfile: ./docker/frontend/Dockerfile
+    networks:
+      - app-network
+
+
 volumes:
   ollama:
   pgdata:

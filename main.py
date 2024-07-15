@@ -6,6 +6,7 @@ from colorama import init as colorama_init, Fore
 from configurator import get_runtime_config, args
 from core.databases import db_base
 from core.tools import errorlib
+from schedulers.deepsearcher import start_deep_searcher
 from workers.crawler import start_crawler
 from workers.embedder import start_embedder
 from workers.summarizer import start_summarizer
@@ -31,6 +32,9 @@ try:
         start_embedder()
     if runtime_config.worker_type == "summarizer":
         start_summarizer()
+    if runtime_config.worker_type == "deep_searcher":
+        start_deep_searcher()
+
 except requests.exceptions.ConnectionError:
     errorlib.pretty_error(
         title=f"OLLAMA called but not running",
