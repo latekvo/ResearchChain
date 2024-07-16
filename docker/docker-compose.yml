@@ -39,8 +39,6 @@ services:
 
   ollama:
     image: ollama/ollama
-    expose:
-      - 11434
     ports:
       - 11434:11434
     pull_policy: always
