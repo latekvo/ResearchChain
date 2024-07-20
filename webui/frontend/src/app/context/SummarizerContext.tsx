@@ -4,8 +4,9 @@ import { createContext, useState, ReactNode } from "react";
 
 interface SummarizerContextProps {
   isSummarizing: boolean;
-  completion?: { uuid: string; status: string; payload: string };
+  completion?: { uuid: string; status: string; payload: string } | null;
   sendUuid: (uuid: string) => void;
+  handleCloseCompletionModal: () => void;
 }
 
 interface SummarizerContextProviderProps {
@@ -24,13 +25,13 @@ const SummarizerContextProvider = ({
     uuid: string;
     status: string;
     payload: string;
-  }>();
+  } | null>();
 
   const socket = new WebSocket("ws://localhost:8000/ws");
 
   const sendUuid = (uuid: string) => {
     if (socket && socket.readyState === WebSocket.OPEN && uuid) {
-      setIsSummarizing(false);
+      setIsSummarizing(true);
       socket.send(JSON.stringify({ uuid: uuid }));
     }
   };
@@ -40,8 +41,7 @@ const SummarizerContextProvider = ({
       const completion = JSON.parse(event.data);
       if (completion.uuid && completion.status === "summary completed") {
         setCompletion(completion);
-      } else {
-        console.error("Received message has an invalid structure:", completion);
+        setIsSummarizing(false);
       }
     } catch (error) {
       console.error("Error parsing message:", error);
@@ -49,10 +49,15 @@ const SummarizerContextProvider = ({
   };
   console.log(isSummarizing, completion);
 
+  const handleCloseCompletionModal = () => {
+    setCompletion(null);
+  };
+
   const value = {
     isSummarizing,
     completion,
     sendUuid,
+    handleCloseCompletionModal,
   };
 
   return (
