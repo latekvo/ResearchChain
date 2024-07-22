@@ -136,6 +136,11 @@ def start_summarizer():
     connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
     while True:
+        if connection.is_open is False:
+            connection_params = pika.ConnectionParameters(host="rabbitmq", port=5672, heartbeat=600)
+            connection = pika.BlockingConnection(connection_params)
+            channel = connection.channel()
+
         queue_length = len(task_queue)
         if queue_length > previous_queued_tasks:
             print(f"{Fore.CYAN}{Style.BRIGHT}--- SUMMARIZER ---")
