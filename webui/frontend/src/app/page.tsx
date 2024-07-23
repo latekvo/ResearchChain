@@ -11,7 +11,7 @@ export default function Page() {
   const handleCloseCompletionModal = context!.handleCloseCompletionModal;
   return (
     <>
-      <main className="h-screen flex justify-center items-center flex-col">
+      <main className="min-h-screen flex justify-center items-center flex-col">
         {isSummarizing || completion ? (
           <RenderCompletion
             executing={isSummarizing}
