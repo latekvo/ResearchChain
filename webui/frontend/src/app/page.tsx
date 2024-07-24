@@ -9,18 +9,29 @@ export default function Page() {
   const isSummarizing = context?.isSummarizing ?? false;
   const completion = context?.completion ?? null;
   const handleCloseCompletionModal = context!.handleCloseCompletionModal;
+  let heightClass = "h-60";
+  if (isSummarizing) {
+    heightClass = "h-32";
+  } else if (completion) {
+    heightClass = "h-96";
+  }
   return (
     <>
       <main className="min-h-screen flex justify-center items-center flex-col">
-        {isSummarizing || completion ? (
-          <RenderCompletion
-            executing={isSummarizing}
-            handleClose={handleCloseCompletionModal}
-            completion_result={completion?.payload}
-          />
-        ) : (
-          <PromptInput />
-        )}
+        <div
+          className={`w-3/5 px-6 py-8 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between ${heightClass} transition-all duration-500 ease-in-out overflow-y-auto`}
+          data-testid="blackbox"
+        >
+          {isSummarizing || completion ? (
+            <RenderCompletion
+              executing={isSummarizing}
+              handleClose={handleCloseCompletionModal}
+              completion_result={completion?.payload}
+            />
+          ) : (
+            <PromptInput />
+          )}
+        </div>
       </main>
     </>
   );

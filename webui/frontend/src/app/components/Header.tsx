@@ -16,7 +16,7 @@ const Header = () => {
   const isSticky = pathName === "/" ? "sticky" : "static";
 
   return (
-    <Navbar position={isSticky}>
+    <Navbar position={isSticky} className="absolute top-0 left-0">
       <NavbarBrand>
         <h1 className="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-purple-700 bg-clip-text">
           Research Chain

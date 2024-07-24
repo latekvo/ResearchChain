@@ -116,54 +116,52 @@ function PromptInput() {
   };
 
   return (
-    <form className="w-3/5 flex-col" onSubmit={handleSubmit}>
-      <div className="w-full p-6 py-8 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between">
-        <Textarea
-          type="text"
-          name="prompt"
-          value={formValues.prompt}
-          variant="underlined"
-          placeholder="Ask a question :)"
-          color="default"
-          size="lg"
-          minRows={1}
-          onChange={onPromptChange}
-          className="text-gray-300 px-3 text-large whitespace-normal"
-        />
+    <form className="flex-col" onSubmit={handleSubmit}>
+      <Textarea
+        type="text"
+        name="prompt"
+        value={formValues.prompt}
+        variant="underlined"
+        placeholder="Ask a question :)"
+        color="default"
+        size="lg"
+        minRows={1}
+        onChange={onPromptChange}
+        className="text-gray-300 px-3 text-large whitespace-normal"
+      />
+      <Tabs
+        size="md"
+        aria-label="Options"
+        color="primary"
+        variant="light"
+        onSelectionChange={onCrawlChange}
+        className="mt-4 mb-2 shadow-xl  rounded-xl  bg-black bg-opacity-15 z-10 flex flex-col justify-between"
+      >
+        <Tab key="crawl" title="Crawl" />
+        <Tab key="summarize" title="Summarize" />
+      </Tabs>
+      <div className="w-full mt-4 flex justify-between">
         <Tabs
-          size="md"
+          size="lg"
           aria-label="Options"
-          color="primary"
-          variant="light"
-          onSelectionChange={onCrawlChange}
-          className="mt-4 mb-2 shadow-xl  rounded-xl  bg-black bg-opacity-15 z-10 flex flex-col justify-between"
+          variant="underlined"
+          color="default"
+          onSelectionChange={onModeChange}
         >
-          <Tab key="crawl" title="Crawl" />
-          <Tab key="summarize" title="Summarize" />
+          <Tab key="news" title="News" />
+          <Tab key="docs" title="Documentation" />
+          <Tab key="wiki" title="Wikipedia" />
         </Tabs>
-        <div className="w-full mt-4 flex justify-between">
-          <Tabs
+        <div className="w-2/3 mr-3 flex flex-row-reverse">
+          <Button
             size="lg"
-            aria-label="Options"
-            variant="underlined"
+            type="submit"
             color="default"
-            onSelectionChange={onModeChange}
+            variant="bordered"
+            className="w-2/3 mr-3 flex flex-row-reverse"
           >
-            <Tab key="news" title="News" />
-            <Tab key="docs" title="Documentation" />
-            <Tab key="wiki" title="Wikipedia" />
-          </Tabs>
-          <div className="w-2/3 mr-3 flex flex-row-reverse">
-            <Button
-              size="lg"
-              type="submit"
-              color="default"
-              variant="bordered"
-              className="w-2/3 mr-3 flex flex-row-reverse"
-            >
-              Search
-            </Button>
-          </div>
+            Search
+          </Button>
         </div>
       </div>
     </form>
