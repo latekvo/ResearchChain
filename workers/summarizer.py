@@ -15,7 +15,7 @@ from core.classes.query import WebQuery
 from core.chainables.web import (
     web_docs_lookup_prompt,
     web_news_lookup_prompt,
-    web_wiki_lookup_prompt,
+    web_wiki_lookup_prompt, basic_query_prompt,
 )
 from core.tools.model_loader import load_llm, runtime_configuration
 from langchain_core.output_parsers import StrOutputParser
@@ -30,7 +30,7 @@ import json
 output_parser = StrOutputParser()
 
 llm_config = runtime_configuration.llm_config
-llm = load_llm()
+llm = None
 
 # even though a single task takes a long time to complete,
 # as soon as one task is started, all elements of the queue are released
@@ -98,7 +98,6 @@ def summarize(channel):
         elif current_task.mode == "wiki":
             return web_wiki_lookup_prompt()
         else:
-            # todo: add info query - plain basic nothing
             return web_wiki_lookup_prompt()
 
     web_interpret_prompt_mode = interpret_prompt_mode()
@@ -115,6 +114,17 @@ def summarize(channel):
         "search_data": context,
         "user_request": current_task.prompt,
     }
+
+    if current_task.mode == 'basic':
+        chain = (
+                basic_query_prompt()
+                | llm
+                | output_parser
+        )
+
+        chain_input = {
+            "user_request": current_task.prompt,
+        }
 
     summary = chain.invoke(chain_input)
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
