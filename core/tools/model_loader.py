@@ -100,7 +100,7 @@ def load_functional_llm():
     # EXPERIMENTAL
     if llm_config is None:
         errorlib.pretty_error(
-            title="Tried loading LLM without a valid configuration",
+            title="Tried loading functional LLM without a valid configuration",
             advice=f"Your worker configuration file is likely missing "
             f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
         )

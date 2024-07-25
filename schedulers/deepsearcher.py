@@ -28,11 +28,8 @@ from core.tools.utils import sleep_noisy, remove_characters
 
 # TODO: move all LLM load to summarizer, local for now
 
-llm = load_llm()
+llm = None
 output_parser = StrOutputParser()
-
-extraction_chain = structured_extraction_prompt() | llm | output_parser
-
 
 def are_workers_free():
     # todo: check if there are non-busy workers available
@@ -53,6 +50,11 @@ def extract_interesting_topics(text: str) -> list[str]:
     # todo: perform semantic grouping of subjects + their context
     # fixme: instead of TODO, extracting a single topic as a POC for now
     extraction_request = "Find exactly one topic from this text, it must be interesting. Reply in 3 words at most."
+
+    global llm
+    if llm is None:
+        llm = load_llm()
+    extraction_chain = structured_extraction_prompt() | llm | output_parser
 
     result = extraction_chain.invoke({"data": text, "user_request": extraction_request})
 
