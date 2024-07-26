@@ -23,14 +23,24 @@ parser.add_argument(
     type=str,
     dest="worker_type",
     choices=[
-        "webui",
         "crawler",
         "embedder",
         "summarizer",
-        "deep_searcher",
     ],
     default="none",
     help="Select one of the ready worker configs to be used",
+)
+parser.add_argument(
+    "-s",
+    "--run-scheduler",
+    type=str,
+    dest="scheduler_type",
+    choices=[
+        "webui",
+        "deep_searcher",
+    ],
+    default="none",
+    help="Select one of the available schedulers",
 )
 parser.add_argument(
     "-c",
@@ -79,7 +89,7 @@ runtime_config = None
 def get_runtime_config():
     global runtime_config
 
-    fallback_config_path = "configs/crawler.json"
+    fallback_config_path = "configs/none.json"
 
     if args.worker_type == "webui":
         # fixme: this is a workaround, webui should be started from it's folder
