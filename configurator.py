@@ -89,11 +89,11 @@ runtime_config = None
 def get_runtime_config():
     global runtime_config
 
-    fallback_config_path = "configs/none.json"
+    empty_config_path = "configs/none.json"
 
-    if args.worker_type == "webui":
+    if args.worker_type == "none":
         # fixme: this is a workaround, webui should be started from it's folder
-        return load_runtime_config_from_file(fallback_config_path)
+        return load_runtime_config_from_file(empty_config_path)
 
     # fetch cache
     if runtime_config:
