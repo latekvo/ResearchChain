@@ -149,6 +149,7 @@ function PromptInput() {
             <Tab key="news" title="News" />
             <Tab key="docs" title="Documentation" />
             <Tab key="wiki" title="Wikipedia" />
+            <Tab key="basic" title="Basic" />
           </Tabs>
           <div className="w-2/3 mr-3 flex flex-row-reverse">
             <Button
