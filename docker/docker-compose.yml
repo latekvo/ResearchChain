@@ -26,6 +26,8 @@ services:
       - app-network
 
   pgadmin:
+    profiles:
+      - pgadmin
     image: dpage/pgadmin4
     depends_on:
       - postgres
@@ -39,8 +41,6 @@ services:
 
   ollama:
     image: ollama/ollama
-    expose:
-      - 11434
     ports:
       - 11434:11434
     pull_policy: always
@@ -113,6 +113,8 @@ services:
       - app-network
 
   frontend:
+    profiles:
+      - frontend
     image: frontend
     depends_on:
       - postgres
@@ -124,6 +126,24 @@ services:
       - 3000:3000
     networks:
       - app-network
+
+  deep_searcher:
+    profiles:
+      - deep_searcher
+    image: deep_searcher
+    depends_on:
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    build:
+      context: ../.
+      dockerfile: ./docker/deep_searcher/Dockerfile
+    networks:
+      - app-network
+      - ollama-network
 
 volumes:
   ollama:

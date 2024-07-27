@@ -225,3 +225,21 @@ def db_increment_task_embedding_progression(uuid: str, model_name: str):
         )
 
         session.commit()
+
+
+def db_refresh_crawl_tasks(timeout_seconds: int = 600):
+    # find completion tasks with timed-out execution and restart them to the awaiting state
+    # timing out after 600 seconds = 10 minutes by default
+    timeout_date = utils.gen_unix_time() + timeout_seconds
+    with Session(engine) as session:
+        session.execute(
+            update(CrawlTask)
+            .where(CrawlTask.executing == True)
+            .where(CrawlTask.completed == False)
+            .where(CrawlTask.execution_date > timeout_date)
+            .values(
+                executing=False,
+            )
+        )
+
+        session.commit()

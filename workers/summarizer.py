@@ -11,16 +11,16 @@ from core.databases.db_completion_tasks import (
     db_release_executing_tasks,
     db_required_crawl_tasks_for_uuid,
 )
-from langchain_core.runnables import RunnableLambda
 from core.classes.query import WebQuery
 from core.chainables.web import (
     web_docs_lookup_prompt,
     web_news_lookup_prompt,
-    web_wiki_lookup_prompt,
+    web_wiki_lookup_prompt, basic_query_prompt,
 )
-from core.tools.model_loader import load_llm
+from core.tools.model_loader import load_llm, runtime_configuration
 from langchain_core.output_parsers import StrOutputParser
 
+from core.tools.scraper import docs_to_context
 from core.tools.utils import sleep_noisy
 from colorama import Fore, Style
 
@@ -29,6 +29,7 @@ import json
 
 output_parser = StrOutputParser()
 
+llm_config = runtime_configuration.llm_config
 llm = None
 
 # even though a single task takes a long time to complete,
@@ -81,10 +82,13 @@ def summarize(channel):
         prompt_core=current_task.prompt, query_type=current_task.mode.lower()
     )
 
-    context = db_search_for_similar_queries(task_query)
+    context_list = db_search_for_similar_queries(task_query)
 
-    if context is None:
+    if context_list is None or len(context_list) == 0:
+        print('received context is none')
         return
+
+    context = docs_to_context(context_list, llm_config.model_token_limit / 2)
 
     def interpret_prompt_mode():
         if current_task.mode == "news":
@@ -93,27 +97,36 @@ def summarize(channel):
             return web_docs_lookup_prompt()
         elif current_task.mode == "wiki":
             return web_wiki_lookup_prompt()
-
-    def get_user_prompt(_: dict):
-        return current_task.prompt
-
-    def get_context(_: dict):
-        return context[0].page_content
+        else:
+            return web_wiki_lookup_prompt()
 
     web_interpret_prompt_mode = interpret_prompt_mode()
 
     print("Summarizing task with uuid: ", current_task.uuid)
+
     chain = (
-        {
-            "search_data": RunnableLambda(get_context),
-            # this has to be a RunnableLambda, it cannot be a string
-            "user_request": RunnableLambda(get_user_prompt),
-        }
-        | web_interpret_prompt_mode
-        | llm
-        | output_parser
+            web_interpret_prompt_mode
+            | llm
+            | output_parser
     )
-    summary = chain.invoke(current_task)
+
+    chain_input = {
+        "search_data": context,
+        "user_request": current_task.prompt,
+    }
+
+    if current_task.mode == 'basic':
+        chain = (
+                basic_query_prompt()
+                | llm
+                | output_parser
+        )
+
+        chain_input = {
+            "user_request": current_task.prompt,
+        }
+
+    summary = chain.invoke(chain_input)
     db_update_completion_task_after_summarizing(summary, current_task.uuid)
 
     print(f"{Fore.CYAN}Completed task with uuid: {Fore.RESET}", current_task.uuid)
@@ -121,6 +134,7 @@ def summarize(channel):
 
 
 previous_queued_tasks = 0
+
 
 # 1. get a list of available tasks, in the backend they'll be automatically set as executing
 # 2. parse through all of them, until one that has all it's dependencies resolved appears

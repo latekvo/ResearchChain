@@ -1,4 +1,3 @@
-from typing import Optional
 from sqlalchemy import String, TEXT, Integer, Boolean, select, update
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 
@@ -106,6 +105,20 @@ def db_get_incomplete_completion_tasks(amount: int = 1):
         return results
 
 
+def db_get_complete_completion_tasks(amount: int = 1):
+    with Session(engine) as session:
+        session.expire_on_commit = False
+
+        query = (
+            select(CompletionTask).where(CompletionTask.completed == True).limit(amount)
+        )
+
+        results = list(session.scalars(query).all())
+        session.expunge_all()
+
+        return results
+
+
 def db_release_executing_tasks(uuid_list: list[str]):
     with Session(engine) as session:
         session.execute(
@@ -145,6 +158,24 @@ def db_update_completion_task_after_summarizing(summary: str, uuid: str):
                 completed=True,
                 completion_result=summary,
                 completion_date=gen_unix_time(),
+            )
+        )
+
+        session.commit()
+
+
+def db_refresh_completion_tasks(timeout_seconds: int = 600):
+    # find completion tasks with timed-out execution and restart them to the awaiting state
+    # timing out after 600 seconds = 10 minutes by default
+    timeout_date = utils.gen_unix_time() + timeout_seconds
+    with Session(engine) as session:
+        session.execute(
+            update(CompletionTask)
+            .where(CompletionTask.executing == True)
+            .where(CompletionTask.completed == False)
+            .where(CompletionTask.execution_date > timeout_date)
+            .values(
+                executing=False,
             )
         )
 

@@ -35,6 +35,27 @@ Frontend is launched separately to back end, run the following command to start 
 - `environment.yml` is the linux env, but for macOS (silicon) and windows there are other available
 - Apple intel is not supported anymore, but you can still get it working by manually installing
   any missing package that comes up during the program execution.
+- `pull access denied for X` error: The connection may occasionally get throttled, resulting in this error.
+  To solve this issue, let all the current downloads finish downloading, and restart the program. 
+  Repeat until every file is downloaded.
+
+#### Running locally
+
+If you intend on running this project locally, whether for development, debugging or performance purposes, 
+you'll still need to have these three docker containers launched somewhere in the background: `ollama`, `postgres` and `rabbitmq`.
+
+Here's a full command on how to initialize the conda environment run them all at once: 
+
+- `conda env create -f environment.yml`
+- `sudo docker-compose -f docker/docker-compose.yml up ollama postgres rabbitmq`
+
+Rest of the workers and services can now be launched directly via `main.py`:
+
+- `conda activate ResearchChain`
+- `python main.py -w crawler`
+
+For list of all available workers and services see:
+- `python main.py -h`
 
 ### This is a monorepo for both a tool, and apps for it:
 

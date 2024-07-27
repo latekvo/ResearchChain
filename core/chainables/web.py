@@ -77,3 +77,35 @@ def web_news_lookup_prompt():
             ),
         ]
     )
+
+
+def basic_query_prompt():
+    return ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a personal assistant. "
+                "Your job is to respond to the requests given to you by the user. "
+                "You are to follow the requests given precisely and intelligently. "
+                "Answer or complete the request to the best of your abilities. ",
+            ),
+            ("user", "{user_request}"),
+        ]
+    )
+
+
+# some schedulers may require data-extraction capabilities outside data-gathering
+def structured_extraction_prompt():
+    return ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a data extraction and analysis specialist. "
+                "Your job is to respond in a structured way to the question you were given. "
+                "You are to follow the orders given precisely and intelligently. "
+                "You are provided with data chunk, use it, to fulfill user's request. "
+                "Satisfy the requested task to the best of your abilities. ",
+            ),
+            ("user", "Data: ```{data}``` User request: '{user_request}'"),
+        ]
+    )

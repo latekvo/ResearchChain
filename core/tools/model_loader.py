@@ -3,6 +3,7 @@ from langchain_community.embeddings import OllamaEmbeddings, LlamaCppEmbeddings
 from langchain_community.llms.ollama import Ollama
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
+from langchain_experimental.llms.ollama_functions import OllamaFunctions
 
 from configurator import get_runtime_config
 from core.tools import errorlib
@@ -10,6 +11,7 @@ from core.tools import errorlib
 runtime_configuration = get_runtime_config()
 llm_config = runtime_configuration.llm_config
 embedder_config = runtime_configuration.embedder_config
+
 
 # problem with the current caching: we have to share those singletons across instances
 
@@ -25,6 +27,11 @@ def load_ollama_llm() -> Ollama:
         llm = Ollama(model=llm_config.model_name, base_url="http://ollama:11434")
         runtime_configuration.llm_object = llm
         return llm
+
+
+def load_ollama_functional_llm() -> OllamaFunctions:
+    # todo: As far as i see OllamaFunctions could be used by default, but old code has to be adapted
+    return OllamaFunctions(model=llm_config.model_name, base_url="http://ollama:11434")
 
 
 def load_ollama_embedder() -> OllamaEmbeddings:
@@ -87,6 +94,25 @@ def load_llm():
         return load_hf_llm()
     else:
         return load_ollama_llm()
+
+
+def load_functional_llm():
+    # EXPERIMENTAL
+    if llm_config is None:
+        errorlib.pretty_error(
+            title="Tried loading functional LLM without a valid configuration",
+            advice=f"Your worker configuration file is likely missing "
+            f"a valid {Fore.CYAN}llm_config_name{Fore.RESET} variable",
+        )
+
+    if llm_config.supplier == "hugging_face":
+        errorlib.pretty_error(
+            title="Tried running functional model with a HF configuration.",
+            advice=f"Functional models are not yet supported with llama.cpp loaders. "
+            f"Please switch to {Fore.CYAN}Ollama{Fore.RESET} or stop using functional models.",
+        )
+    else:
+        return load_ollama_functional_llm()
 
 
 def load_embedder():
