@@ -111,6 +111,8 @@ services:
       - app-network
 
   frontend:
+    profiles:
+      - frontend
     image: frontend
     depends_on:
       - postgres
