@@ -83,6 +83,7 @@ async def on_connection(websocket: WebSocket):
             del active_connections[websocket]
 
 
+
 # This decorator allow to call async callback function in side synchronous context
 def sync(f):
     @functools.wraps(f)

@@ -56,7 +56,7 @@ const ExampleModal: React.FC<ExampleModalProps> = ({
       }}
     >
       <ModalContent className="overflow-auto">
-        <ModalHeader className="border-b-1 border-indigo-800 ">
+        <ModalHeader className="border-b-1 pt-5 border-indigo-800 ">
           <div className="grid grid-cols-3 gap-40 items-center w-full py-2">
             <div className="flex justify-center">
               {getIconComponent(summaryTask)}
@@ -77,24 +77,25 @@ const ExampleModal: React.FC<ExampleModalProps> = ({
             className="flex-1 overflow-y-auto px-6"
             ref={scrollableTargetRef}
           >
-            <div className="grid grid-cols-3 py-4 gap-40 w-full">
-              <div className="text-md text-center">
-                <span className="text-xl">uuid</span>
-                <span className="block">{summaryTask?.uuid}</span>
+            <div className="grid grid-cols-4 py-4 gap-10 w-full">
+              <div className="col-span-2 text-md text-center">
+                <span className="text-md text-primary">UUID</span>
+                <span className="block break-words">{summaryTask?.uuid}</span>
               </div>
               <div className="text-md text-center">
-                Execution date
+                <p className="text-primary">Execution date</p>
                 <span className="block">
                   {calculateElapsedTime(summaryTask?.execution_date)}
                 </span>
               </div>
-              <div className="text-md text-center">
-                Completion date
+              <div className="text-md text-center ">
+              <p className="text-primary">Completion date </p>
                 <span className="block">
                   {calculateElapsedTime(summaryTask?.completion_date)}
                 </span>
               </div>
             </div>
+
             <div className="pb-8">
               <div className="">
                 <p className="pt-3 text-xl text-primary">Prompt</p>
