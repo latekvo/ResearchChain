@@ -13,13 +13,13 @@ export default function Page() {
   if (isSummarizing) {
     heightClass = "h-32";
   } else if (completion) {
-    heightClass = "h-96";
+    heightClass = "h-2/3";
   }
   return (
     <>
-      <main className="min-h-screen flex justify-center items-center flex-col">
+      <main className="h-screen flex justify-center items-center flex-col">
         <div
-          className={`w-3/5 px-6 py-8 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between ${heightClass} transition-all duration-500 ease-in-out overflow-y-auto`}
+          className={`w-3/5 px-6 relative py-8 shadow-xl rounded-xl border border-opacity-10 border-gray-400 bg-black bg-opacity-15 z-10 flex flex-col justify-between ${heightClass} transition-all duration-500 ease-in-out overflow-y-auto`}
           data-testid="blackbox"
         >
           {isSummarizing || completion ? (
