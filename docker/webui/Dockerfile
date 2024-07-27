@@ -16,4 +16,4 @@ EXPOSE 8000
 
 SHELL ["conda", "run", "-n", "ResearchChain", "/bin/bash", "-c"]
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ResearchChain", "python3", "main.py", "-w", "webui"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "ResearchChain", "python3", "main.py", "-s", "webui"]
