@@ -162,3 +162,21 @@ def db_update_completion_task_after_summarizing(summary: str, uuid: str):
         )
 
         session.commit()
+
+
+def db_refresh_completion_tasks(timeout_seconds: int = 600):
+    # find completion tasks with timed-out execution and restart them to the awaiting state
+    # timing out after 600 seconds = 10 minutes by default
+    timeout_date = utils.gen_unix_time() + timeout_seconds
+    with Session(engine) as session:
+        session.execute(
+            update(CompletionTask)
+            .where(CompletionTask.executing == True)
+            .where(CompletionTask.completed == False)
+            .where(CompletionTask.execution_date > timeout_date)
+            .values(
+                executing=False,
+            )
+        )
+
+        session.commit()
