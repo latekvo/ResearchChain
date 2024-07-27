@@ -26,6 +26,8 @@ services:
       - app-network
 
   pgadmin:
+    profiles:
+      - pgadmin
     image: dpage/pgadmin4
     depends_on:
       - postgres
